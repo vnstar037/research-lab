@@ -3,7 +3,7 @@ module SEEQSTEigenstates
 using LinearAlgebra
 
 export GenerateSGroups, GenerateComputationalBasis, ValidPStates, ValidQStates,
-       ComplementStateFromP, PermuteQubits, GenerateEigenstates, GenerateEigenstatesO
+       ComplementStateFromP, PermuteQubits, GenerateEigenstatesE, GenerateEigenstatesO
 
 # --------------------------------------------------------------------
 # Generate all stabilizer groups for N qubits (strings "IZ" or "XY")
