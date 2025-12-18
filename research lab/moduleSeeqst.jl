@@ -1,9 +1,12 @@
 module SEEQSTEigenstates
 
 using LinearAlgebra
+using StatsBase
 
 export GenerateSGroups, GenerateComputationalBasis, ValidPStates, ValidQStates,
-       ComplementStateFromP, PermuteQubits, GenerateEigenstatesE, GenerateEigenstatesO
+       ComplementStateFromP, PermuteQubits, GenerateEigenstatesE, GenerateEigenstatesO,
+       pauli_string_eigenvalues,MatrixElementsForGroup,DensityMatrixFromGroup, ProjectorsFromEigenstates,
+       generate_combinations,ExpectationValuesFromCounts,pauli
 
 # --------------------------------------------------------------------
 # Generate all stabilizer groups for N qubits (strings "IZ" or "XY")
@@ -180,4 +183,63 @@ function GenerateEigenstatesO(S::Vector{String})
     return eigenstates
 end
 
+ProjectorsFromEigenstates(eigs) = [ψ * ψ' for ψ in eigs]
+
+function pauli_string_eigenvalues(s::String)
+    ev = [1.0]
+    for p in s
+        ev = vec([a*b for a in ev, b in pauli_eigenvalues(p)])
+    end
+    return ev
+end
+
+function pauli_eigenvalues(p::Char)
+    if p == 'I'
+        return [1, 1]
+    elseif p == 'X' || p == 'Y' || p == 'Z'
+        return [1, -1]
+    else
+        error("Unknown Pauli operator: $p")
+    end
+end
+
+
+generate_combinations(S) =
+    [join(t) for t in Iterators.product(map(collect, S)...)]
+
+# --------------------------------------------------------------------
+# Erwartungswerte
+# --------------------------------------------------------------------
+function ExpectationValuesFromCounts(paulis, cE, cO)
+    Dict(p => dot(pauli_string_eigenvalues(p),
+                  occursin('Y', p) ? cO : cE)
+         for p in paulis)
+end
+
+# --------------------------------------------------------------------
+# Matrixelemente & Rekonstruktion
+# --------------------------------------------------------------------
+function MatrixElementsForGroup(S)
+    N = length(S); dim = 2^N
+    bits = [reverse(digits(i, base=2, pad=N)) for i in 0:dim-1]
+    [(i,j) for i in 1:dim, j in 1:dim
+     if all(S[k]=="IZ" ? bits[i][k]==bits[j][k] :
+            bits[i][k]!=bits[j][k] for k in 1:N)]
+end
+
+function DensityMatrixFromGroup(evs, positions, n)
+    ρ = zeros(ComplexF64, 2^n, 2^n)
+    for (i,j) in positions
+        bi = reverse(digits(i-1, base=2, pad=n))
+        bj = reverse(digits(j-1, base=2, pad=n))
+        for (p,v) in evs
+            fac = prod(k->p[k]=='Y' ? (bi[k]==0 ? im : -im) :
+                           p[k]=='Z' ? (bi[k]==0 ? 1 : -1) : 1, 1:n)
+            ρ[i,j] += fac * v
+        end
+    end
+    return ρ / 2^n
+end
+
 end # module
+

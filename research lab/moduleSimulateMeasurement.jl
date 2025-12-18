@@ -3,7 +3,7 @@ module SimulateMeasurement
 using LinearAlgebra
 using StatsBase
 
-export SimulateMeasurement
+export simulateMeasurement
 
 """
     simulate_measurement(rho, projectors, n)
