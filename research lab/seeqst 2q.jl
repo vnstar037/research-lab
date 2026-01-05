@@ -23,15 +23,15 @@ end
 
 n=2
 d=2^n
-N=1000
+N=10000
 rho_true=random_density_matrix(d)
 
-rho_true = [
-    0.3  0.1+0.05im  0.05-0.02im  0.1+0.0im;
-    0.1-0.05im  0.25  0.05+0.03im  0.05-0.01im;
-    0.05+0.02im 0.05-0.03im 0.2  0.08+0.04im;
-    0.1+0.0im 0.05+0.01im 0.08-0.04im 0.25
-]
+#rho_true = [
+#    0.3  0.1+0.05im  0.05-0.02im  0.1+0.0im;
+#    0.1-0.05im  0.25  0.05+0.03im  0.05-0.01im;
+#    0.05+0.02im 0.05-0.03im 0.2  0.08+0.04im;
+#    0.1+0.0im 0.05+0.01im 0.08-0.04im 0.25
+#]
 
 
 
@@ -84,6 +84,7 @@ OS4=[kron(sigma_x,sigma_y),kron(sigma_y,sigma_x)]
 
 proj_00=[kron(proj_z1,proj_z1),kron(proj_z1,proj_z2),kron(proj_z2,proj_z1),kron(proj_z2,proj_z2)]
 
+
 proj_0x=[kron(proj_z1,proj_x1),kron(proj_z1,proj_x2),kron(proj_z2,proj_x1),kron(proj_z2,proj_x2)]
 proj_0y=[kron(proj_z1,proj_y1),kron(proj_z1,proj_y2),kron(proj_z2,proj_y1),kron(proj_z2,proj_y2)]
 
@@ -92,6 +93,8 @@ proj_y0=[kron(proj_y1,proj_z1),kron(proj_y1,proj_z2),kron(proj_y2,proj_z1),kron(
 
 proj_xx=[kron(proj_x1,proj_x1),kron(proj_x1,proj_x2),kron(proj_x2,proj_x1),kron(proj_x2,proj_x2)]
 proj_xy=[kron(proj_x1,proj_y1),kron(proj_x1,proj_y2),kron(proj_x2,proj_y1),kron(proj_x2,proj_y2)]
+
+println(proj_0x)
 
 counts_00=simulate_measurement(rho_true,proj_00,N)
 
@@ -182,5 +185,6 @@ rho_num = [
 F = fidelity(rho_num,rho_true)
 
 println("Matrixelement-Differenzen:")
-println(Δρ)
+#println(Δρ)
 println("fidelity :", F)
+
