@@ -147,34 +147,48 @@ end
 # Generate eigenstates of the O-group (±i)
 # --------------------------------------------------------------------
 function GenerateEigenstatesO(S::Vector{String})
+    # 🔴 FALL: nur IZ → keine O-Eigenzustände
+    if all(x -> x == "IZ", S)
+        return Vector{Vector{ComplexF64}}()  # leere Menge
+    end
+
     N = length(S)
     IZpos = findall(x -> x == "IZ", S)
     XYpos = findall(x -> x == "XY", S)
     M = length(XYpos)
     K = length(IZpos)
+
     basis_p_valid = ValidPStates(S)
     basis_q = ValidQStates(S)
     basis_p_full = GenerateComputationalBasis(M)
+
     eigenstates = Vector{Vector{ComplexF64}}()
     π = vcat(XYpos, IZpos)
 
     for p in basis_p_valid
         p_ = ComplementStateFromP(basis_p_full, p)
-        e_plus = (ComplexF64.(p) .+ im .* ComplexF64.(p_)) ./ sqrt(2)
+        e_plus  = (ComplexF64.(p) .+ im .* ComplexF64.(p_)) ./ sqrt(2)
         e_minus = (ComplexF64.(p) .- im .* ComplexF64.(p_)) ./ sqrt(2)
+
         for q in basis_q
             qc = ComplexF64.(q)
+
             if K == 0
                 push!(eigenstates, e_plus)
                 push!(eigenstates, e_minus)
                 continue
             end
+
             if M == 0
+                # Dieser Fall tritt jetzt praktisch nicht mehr auf,
+                # aber wir lassen ihn sicherheitshalber drin
                 push!(eigenstates, qc)
                 continue
             end
-            ψplus = kron(e_plus, qc)
+
+            ψplus  = kron(e_plus, qc)
             ψminus = kron(e_minus, qc)
+
             push!(eigenstates, PermuteQubits(ψplus, π))
             push!(eigenstates, PermuteQubits(ψminus, π))
         end
@@ -183,7 +197,10 @@ function GenerateEigenstatesO(S::Vector{String})
     return eigenstates
 end
 
-ProjectorsFromEigenstates(eigs) = [ψ * ψ' for ψ in eigs]
+function ProjectorsFromEigenstates(eigs)
+    isempty(eigs) && return Matrix{ComplexF64}[]
+    return [ψ * ψ' for ψ in eigs]
+end
 
 function pauli_string_eigenvalues(s::String)
     ev = [1.0]
@@ -204,8 +221,10 @@ function pauli_eigenvalues(p::Char)
 end
 
 
-generate_combinations(S) =
-    [join(t) for t in Iterators.product(map(collect, S)...)]
+function generate_combinations(S::Vector{String})
+    charlists = map(collect, S)
+    vec([join(t) for t in Iterators.product(charlists...)])
+end
 
 # --------------------------------------------------------------------
 # Erwartungswerte
@@ -242,4 +261,35 @@ function DensityMatrixFromGroup(evs, positions, n)
 end
 
 end # module
+
+module SimulateMeasurementSeeqst
+
+using LinearAlgebra
+using StatsBase
+
+export simulateMeasurementSeeqst
+
+"""
+    simulateMeasurement(rho, projectors, n)
+
+Simuliert eine Messung mit Projektionen `projectors` an einem Zustand `rho`
+und liefert die relativen Häufigkeiten der Ergebnisse (counts / n).
+
+Falls `projectors` leer ist, wird eine leere Menge zurückgegeben.
+"""
+function simulateMeasurementSeeqst(rho, projectors, n)
+    isempty(projectors) && return Float64[]
+
+    # Wahrscheinlichkeiten: p_i = Tr(rho * P_i)
+    probs = [real(tr(rho * P)) for P in projectors]
+
+    outcomes = sample(1:length(projectors), Weights(probs), n)
+
+    counts = [sum(outcomes .== i) for i in 1:length(projectors)]
+
+    return counts ./ n
+end
+
+end # module
+
 
