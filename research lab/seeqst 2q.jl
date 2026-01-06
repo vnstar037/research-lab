@@ -1,3 +1,5 @@
+
+
 using LinearAlgebra
 using StatsBase
 using Distributions
@@ -94,7 +96,7 @@ proj_y0=[kron(proj_y1,proj_z1),kron(proj_y1,proj_z2),kron(proj_y2,proj_z1),kron(
 proj_xx=[kron(proj_x1,proj_x1),kron(proj_x1,proj_x2),kron(proj_x2,proj_x1),kron(proj_x2,proj_x2)]
 proj_xy=[kron(proj_x1,proj_y1),kron(proj_x1,proj_y2),kron(proj_x2,proj_y1),kron(proj_x2,proj_y2)]
 
-println(proj_0x)
+println(proj_x0)
 
 counts_00=simulate_measurement(rho_true,proj_00,N)
 

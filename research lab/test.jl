@@ -1,113 +1,136 @@
-using LinearAlgebra
-using StatsBase
-using Distributions
-using Convex
-using SCS
 
-function random_density_matrix(d)
-    M = randn(ComplexF64, d, d) + 1im * randn(ComplexF64, d, d)
-    rho = M * M'
-    rho /= tr(rho)  # normieren auf Spur = 1
-    return rho
+function generate_combinations(liste::Vector{String})
+    # Wir kehren die Liste um (reverse), damit die Zeichen des 
+    # ersten Strings im Produkt am schnellsten rotieren.
+    kombinationen = Iterators.product(reverse(liste)...)
+    
+    # Beim Zusammenfügen (join) kehren wir die Tupel wieder um, 
+    # damit die ursprüngliche Zeichenfolge (1. String, 2. String) erhalten bleibt.
+    return vec([join(reverse(k)) for k in kombinationen])
 end
 
-function simulate_measurement(rho,projectors,n)
-    probs= [real(tr(rho * P)) for P in projectors]
-    outcomes= sample(1:4,Weights(probs), n)
-    counts= [sum(outcomes .== i) for i in 1:4]
-    return counts[1]/n,counts[2]/n,counts[3]/n,counts[4]/n
-    #return counts/n
-end
 
-n=2
-dim=2^n
-n_shots=1000
-
-rho_true= random_density_matrix(dim)
-
-# Projektoren definieren
-
-# Z-Basis
-p_0 = [1, 0]
-p_1 = [0, 1]
-proj_0 = p_0 * p_0'
-proj_1 = p_1 * p_1'
-proj_z = [proj_0, proj_1]
-
-# X-Basis
-p_2 = (1 / sqrt(2)) * [1; 1]
-p_3 = (1 / sqrt(2)) * [1; -1]
-proj_2 = p_2 * p_2'
-proj_3 = p_3 * p_3'
-proj_x = [proj_2, proj_3]
-
-# Y-Basis
-p_4 = (1 / sqrt(2)) * [1; 1im]
-p_5 = (1 / sqrt(2)) * [1; -1im]
-proj_4 = p_4 * p_4'
-proj_5 = p_5 * p_5'
-proj_y = [proj_4, proj_5]
-
-
-projektoren_basis = [proj_z, proj_x, proj_y, proj_z]
-
-tensor_projectors = Matrix{ComplexF64}[]
-counts=Float64[]
-
-for i in 1:dim
-    for j in 1:dim
-        p1=kron(projektoren_basis[i][1], projektoren_basis[j][1])
-        p2=kron(projektoren_basis[i][1], projektoren_basis[j][2])
-        p3=kron(projektoren_basis[i][2], projektoren_basis[j][1])
-        p4=kron(projektoren_basis[i][2], projektoren_basis[j][2])
-        push!(tensor_projectors, p1)
-        push!(tensor_projectors, p2)
-        push!(tensor_projectors, p3)
-        push!(tensor_projectors, p4)
-        projectors=[p1,p2,p3,p4]
-        n1,n2,n3,n4=simulate_measurement(rho_true, projectors, n_shots)
-        push!(counts, n1)
-        push!(counts, n2)
-        push!(counts, n3)
-        push!(counts, n4)
+function pauli_eigenvalues(p::Char)
+    if p == 'I'
+        return [1.0, 1.0]
+    elseif p in ('X','Y','Z')
+        return [1.0, -1.0]
+    else
+        error("Unknown Pauli operator: $p")
     end
 end
 
-rho = ComplexVariable(dim, dim)
+# --------------------------------------------------------------------
+# Eigenwerte eines Pauli-Strings (Kronecker-artiges Produkt)
+# Die Reihenfolge der Bits ist so gewählt, dass die erste Position im String
+# der langsam rotierende Faktor ist
+# --------------------------------------------------------------------
+function pauli_string_eigenvalues(s::String)
+    ev = [1.0]
 
-constraints = [
-    rho == rho',       # Hermitesch
-    rho ⪰ 0,           # positiv semidefinit
-    tr(rho) == 1       # Spur = 1
-]
+    # reverse(s) → erster Buchstabe rotiert langsam
+    for p in reverse(s)
+        local_eigs = pauli_eigenvalues(p)
+        ev = vec([a*b for a in ev, b in local_eigs])
+    end
 
-logL = sum(
-    -counts[i] * log(real(tr(rho * tensor_projectors[i])) + 1e-10)
-    for i in 1:length(tensor_projectors)
-)
-
-problem = minimize(logL, constraints)
-solve!(problem, SCS.Optimizer)  # kein verbose Argument mehr
-
-rho_mle = evaluate(rho)
-
-
-println("\nWahre Dichtematrix:")
-println(rho_true)
-
-println("\nRekonstruktion (MLE):")
-println(rho_mle)
-
-function sqrt_hermitian(A::Matrix{ComplexF64})
-    vals, vecs = eigen(A)
-    sqrt_vals = sqrt.(vals)
-    return vecs * Diagonal(sqrt_vals) * vecs'
+    return ev
 end
 
-function fidelity(rho1, rho2)
-    sqrt_rho = sqrt_hermitian(rho1)
-    return real(tr(sqrt_hermitian(sqrt_rho * rho2 * sqrt_rho)))^2
+a = generate_combinations(["XY", "XY"])
+
+#println(a)      # ["IX", "IY", "ZX", "ZY"]
+#println(a[2])   # "IY"
+
+
+for i in a
+    b=pauli_string_eigenvalues(i)
+    #println(b,i)
 end
 
-println("\nFidelity:")
-println(fidelity(rho_true, rho_mle))
+function GenerateEigenstatesE(S::Vector{String})
+    ket0 = [1.0, 0.0]
+    ket1 = [0.0, 1.0]
+    ketp = (ket0 .+ ket1) ./ sqrt(2)
+    ketm = (ket0 .- ket1) ./ sqrt(2)
+
+    # lokale Basen
+    local_bases = Vector{Vector{Vector{Float64}}}()
+    for s in S
+        if s == "IZ"
+            push!(local_bases, [ket0, ket1])
+        elseif s == "XY"
+            push!(local_bases, [ketp, ketm])
+        else
+            error("Unknown stabilizer type $s")
+        end
+    end
+
+    eigenstates = Vector{Vector{Float64}}()
+
+    # ⬇️ WICHTIG: product über reversed(local_bases)
+    for combo_rev in Base.Iterators.product(reverse(local_bases)...)
+        combo = reverse(combo_rev)  # zurück zur physikalischen Reihenfolge
+
+        ψ = combo[1]
+        for k in combo[2:end]
+            ψ = kron(ψ, k)
+        end
+
+        push!(eigenstates, ψ)
+    end
+
+    return eigenstates
+end
+
+function GenerateEigenstatesO(S::Vector{String})
+    # 🔴 nur IZ → keine O-Eigenzustände
+    if all(x -> x == "IZ", S)
+        return Vector{Vector{ComplexF64}}()
+    end
+
+    # Basiszustände
+    ket0 = ComplexF64[1, 0]
+    ket1 = ComplexF64[0, 1]
+    ket_ip = (ket0 .+ im .* ket1) ./ sqrt(2)   # |+i⟩
+    ket_im = (ket0 .- im .* ket1) ./ sqrt(2)   # |-i⟩
+
+    # lokale Basen pro Qubit
+    local_bases = Vector{Vector{Vector{ComplexF64}}}()
+    for s in S
+        if s == "IZ"
+            push!(local_bases, [ket0, ket1])
+        elseif s == "XY"
+            push!(local_bases, [ket_ip, ket_im])
+        else
+            error("Unknown stabilizer type $s")
+        end
+    end
+
+    eigenstates = Vector{Vector{ComplexF64}}()
+
+    # rechte Qubits laufen am schnellsten
+    for combo_rev in Base.Iterators.product(reverse(local_bases)...)
+        combo = reverse(combo_rev)
+
+        ψ = combo[1]
+        for k in combo[2:end]
+            ψ = kron(ψ, k)
+        end
+
+        push!(eigenstates, ψ)
+    end
+
+    return eigenstates
+end
+
+function ProjectorsFromEigenstates(eigs)
+    isempty(eigs) && return Matrix{ComplexF64}[]
+    return [ψ * ψ' for ψ in eigs]
+end
+
+d=GenerateEigenstatesO(["XY","XY"])
+d2=ProjectorsFromEigenstates(d)
+
+#println(d)
+#println(d2)

@@ -108,36 +108,35 @@ end
 # Generate eigenstates of the stabilizer group (E-group, ±1)
 # --------------------------------------------------------------------
 function GenerateEigenstatesE(S::Vector{String})
-    N = length(S)
-    IZpos = findall(x -> x == "IZ", S)
-    XYpos = findall(x -> x == "XY", S)
-    M = length(XYpos)
-    K = length(IZpos)
-    basis_p_valid = ValidPStates(S)
-    basis_q = ValidQStates(S)
-    basis_p_full = GenerateComputationalBasis(M)
-    eigenstates = Vector{Vector{Float64}}()
-    π = vcat(XYpos, IZpos)
+    ket0 = [1.0, 0.0]
+    ket1 = [0.0, 1.0]
+    ketp = (ket0 .+ ket1) ./ sqrt(2)
+    ketm = (ket0 .- ket1) ./ sqrt(2)
 
-    for p in basis_p_valid
-        p_ = ComplementStateFromP(basis_p_full, p)
-        e_plus = (p .+ p_) ./ sqrt(2)
-        e_minus = (p .- p_) ./ sqrt(2)
-        for q in basis_q
-            if K == 0
-                push!(eigenstates, e_plus)
-                push!(eigenstates, e_minus)
-                continue
-            end
-            if M == 0
-                push!(eigenstates, q)
-                continue
-            end
-            ψplus = kron(e_plus, q)
-            ψminus = kron(e_minus, q)
-            push!(eigenstates, PermuteQubits(ψplus, π))
-            push!(eigenstates, PermuteQubits(ψminus, π))
+    # lokale Basen
+    local_bases = Vector{Vector{Vector{Float64}}}()
+    for s in S
+        if s == "IZ"
+            push!(local_bases, [ket0, ket1])
+        elseif s == "XY"
+            push!(local_bases, [ketp, ketm])
+        else
+            error("Unknown stabilizer type $s")
         end
+    end
+
+    eigenstates = Vector{Vector{Float64}}()
+
+    # ⬇️ WICHTIG: product über reversed(local_bases)
+    for combo_rev in Base.Iterators.product(reverse(local_bases)...)
+        combo = reverse(combo_rev)  # zurück zur physikalischen Reihenfolge
+
+        ψ = combo[1]
+        for k in combo[2:end]
+            ψ = kron(ψ, k)
+        end
+
+        push!(eigenstates, ψ)
     end
 
     return eigenstates
@@ -147,84 +146,91 @@ end
 # Generate eigenstates of the O-group (±i)
 # --------------------------------------------------------------------
 function GenerateEigenstatesO(S::Vector{String})
-    # 🔴 FALL: nur IZ → keine O-Eigenzustände
+    # 🔴 nur IZ → keine O-Eigenzustände
     if all(x -> x == "IZ", S)
-        return Vector{Vector{ComplexF64}}()  # leere Menge
+        return Vector{Vector{ComplexF64}}()
     end
 
-    N = length(S)
-    IZpos = findall(x -> x == "IZ", S)
-    XYpos = findall(x -> x == "XY", S)
-    M = length(XYpos)
-    K = length(IZpos)
+    # Basiszustände
+    ket0 = ComplexF64[1, 0]
+    ket1 = ComplexF64[0, 1]
+    ket_ip = (ket0 .+ im .* ket1) ./ sqrt(2)   # |+i⟩
+    ket_im = (ket0 .- im .* ket1) ./ sqrt(2)   # |-i⟩
 
-    basis_p_valid = ValidPStates(S)
-    basis_q = ValidQStates(S)
-    basis_p_full = GenerateComputationalBasis(M)
+    # lokale Basen pro Qubit
+    local_bases = Vector{Vector{Vector{ComplexF64}}}()
+    for s in S
+        if s == "IZ"
+            push!(local_bases, [ket0, ket1])
+        elseif s == "XY"
+            push!(local_bases, [ket_ip, ket_im])
+        else
+            error("Unknown stabilizer type $s")
+        end
+    end
 
     eigenstates = Vector{Vector{ComplexF64}}()
-    π = vcat(XYpos, IZpos)
 
-    for p in basis_p_valid
-        p_ = ComplementStateFromP(basis_p_full, p)
-        e_plus  = (ComplexF64.(p) .+ im .* ComplexF64.(p_)) ./ sqrt(2)
-        e_minus = (ComplexF64.(p) .- im .* ComplexF64.(p_)) ./ sqrt(2)
+    # rechte Qubits laufen am schnellsten
+    for combo_rev in Base.Iterators.product(reverse(local_bases)...)
+        combo = reverse(combo_rev)
 
-        for q in basis_q
-            qc = ComplexF64.(q)
-
-            if K == 0
-                push!(eigenstates, e_plus)
-                push!(eigenstates, e_minus)
-                continue
-            end
-
-            if M == 0
-                # Dieser Fall tritt jetzt praktisch nicht mehr auf,
-                # aber wir lassen ihn sicherheitshalber drin
-                push!(eigenstates, qc)
-                continue
-            end
-
-            ψplus  = kron(e_plus, qc)
-            ψminus = kron(e_minus, qc)
-
-            push!(eigenstates, PermuteQubits(ψplus, π))
-            push!(eigenstates, PermuteQubits(ψminus, π))
+        ψ = combo[1]
+        for k in combo[2:end]
+            ψ = kron(ψ, k)
         end
+
+        push!(eigenstates, ψ)
     end
 
     return eigenstates
 end
+
 
 function ProjectorsFromEigenstates(eigs)
     isempty(eigs) && return Matrix{ComplexF64}[]
     return [ψ * ψ' for ψ in eigs]
 end
 
-function pauli_string_eigenvalues(s::String)
-    ev = [1.0]
-    for p in s
-        ev = vec([a*b for a in ev, b in pauli_eigenvalues(p)])
-    end
-    return ev
-end
-
 function pauli_eigenvalues(p::Char)
     if p == 'I'
-        return [1, 1]
-    elseif p == 'X' || p == 'Y' || p == 'Z'
-        return [1, -1]
+        return [1.0, 1.0]
+    elseif p in ('X','Y','Z')
+        return [1.0, -1.0]
     else
         error("Unknown Pauli operator: $p")
     end
 end
 
+# --------------------------------------------------------------------
+# Eigenwerte eines Pauli-Strings (Kronecker-artiges Produkt)
+# Die Reihenfolge der Bits ist so gewählt, dass die erste Position im String
+# der langsam rotierende Faktor ist
+# --------------------------------------------------------------------
+function pauli_string_eigenvalues(s::String)
+    ev = [1.0]
 
-function generate_combinations(S::Vector{String})
-    charlists = map(collect, S)
-    vec([join(t) for t in Iterators.product(charlists...)])
+    # reverse(s) → erster Buchstabe rotiert langsam
+    for p in reverse(s)
+        local_eigs = pauli_eigenvalues(p)
+        ev = vec([a*b for a in ev, b in local_eigs])
+    end
+
+    return ev
 end
+
+function generate_combinations(liste::Vector{String})
+    # Wir kehren die Liste um (reverse), damit die Zeichen des 
+    # ersten Strings im Produkt am schnellsten rotieren.
+    kombinationen = Iterators.product(reverse(liste)...)
+    
+    # Beim Zusammenfügen (join) kehren wir die Tupel wieder um, 
+    # damit die ursprüngliche Zeichenfolge (1. String, 2. String) erhalten bleibt.
+    return vec([join(reverse(k)) for k in kombinationen])
+end
+
+
+
 
 # --------------------------------------------------------------------
 # Erwartungswerte
@@ -248,17 +254,41 @@ end
 
 function DensityMatrixFromGroup(evs, positions, n)
     ρ = zeros(ComplexF64, 2^n, 2^n)
+
     for (i,j) in positions
+        # Bits von i und j (0 oder 1) in der Qubit-Basis
         bi = reverse(digits(i-1, base=2, pad=n))
         bj = reverse(digits(j-1, base=2, pad=n))
-        for (p,v) in evs
-            fac = prod(k->p[k]=='Y' ? (bi[k]==0 ? im : -im) :
-                           p[k]=='Z' ? (bi[k]==0 ? 1 : -1) : 1, 1:n)
+
+        for (pauli_string, v) in evs
+            # Faktor für jedes Pauli-String-Element
+            fac = 1.0 + 0im
+            for k in 1:n
+                if pauli_string[k] == 'I'
+                    fac *= 1
+                elseif pauli_string[k] == 'Z'
+                    fac *= bi[k] == 0 ? 1 : -1
+                elseif pauli_string[k] == 'X'
+                    # X flippt die Basis |0> <-> |1>, also nur nicht-diagonal
+                    fac *= bi[k] == bj[k] ? 0 : 1
+                elseif pauli_string[k] == 'Y'
+                    # Y flippt wie X, aber multipliziert mit ±i
+                    if bi[k] == bj[k]
+                        fac *= 0
+                    elseif bi[k] == 0 && bj[k] == 1
+                        fac *= -im   # <0|Y|1> = -i
+                    elseif bi[k] == 1 && bj[k] == 0
+                        fac *= im    # <1|Y|0> = i
+                    end
+                end
+            end
             ρ[i,j] += fac * v
         end
     end
+
     return ρ / 2^n
 end
+
 
 end # module
 
