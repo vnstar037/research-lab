@@ -7,11 +7,13 @@ using SCS
 using QuantumInformation
 using Plots
 
-include("module simulate measurement.jl")
+include("moduleSimulateMeasurement.jl")
 include("moduleSeeqst.jl")
-using .SEEQSTEigenstates
-using .SimulateMeasurementSeeqst
+
 using .SimulateMeasurement
+using .SEEQSTEigenstates
+
+
 
 sigma_0= [1 0; 0 1]
 sigma_x= [ 0 1; 1 0]
@@ -34,12 +36,12 @@ rho_true=random_density_matrix(d)
 
 
 
-rho_true = [
-    0.3  0.1+0.05im  0.05-0.02im  0.1+0.0im;
-    0.1-0.05im  0.25  0.05+0.03im  0.05-0.01im;
-    0.05+0.02im 0.05-0.03im 0.2  0.08+0.04im;
-    0.1+0.0im 0.05+0.01im 0.08-0.04im 0.25
-]
+#rho_true = [
+#    0.3  0.1+0.05im  0.05-0.02im  0.1+0.0im;
+#    0.1-0.05im  0.25  0.05+0.03im  0.05-0.01im;
+#    0.05+0.02im 0.05-0.03im 0.2  0.08+0.04im;
+#    0.1+0.0im 0.05+0.01im 0.08-0.04im 0.25
+#]
 
 #rho_true = [
 #    0.28              0.10+0.07im   0.06-0.05im   0.08+0.09im;
@@ -50,61 +52,35 @@ rho_true = [
 
 
 
-#S=GenerateSGroups(n)
-#println(S)
-#si=S[4]
-#SE=GenerateEigenstatesE(si)
-#SO=GenerateEigenstatesO(si)
-#println(SO)
-#pSE=ProjectorsFromEigenstates(SE)
-#pSO=ProjectorsFromEigenstates(SO)
+S=GenerateSGroups(n)
+println(S)
+si=S[4]
+SE=GenerateEigenstatesE(si)
+SO=GenerateEigenstatesO(si)
+println(SO)
+pSE=ProjectorsFromEigenstates(SE)
+pSO=ProjectorsFromEigenstates(SO)
 #cSE=simulateMeasurementSeeqst(rho_true,pSE,N)
 #cSO=simulateMeasurementSeeqst(rho_true,pSO,N)
-#cSE=simulate_measurement(rho_true,pSE,N)
-#cSO=simulate_measurement(rho_true,pSO,N)
-#SiComb=generate_combinations(si)
-#println(SiComb)
-#println(cSO)
-#println(pSE)
-#ev3=ExpectationValuesFromCounts(SiComb,cSE,cSO)
-#println(ev3)
-#position=MatrixElementsForGroup(si)
-#p_si=DensityMatrixFromGroup(ev3,position,n)
-#println(p_si)
-#println(rho_true)
+cSE=simulateMeasurement(rho_true,pSE,N)
+cSO=simulateMeasurement(rho_true,pSO,N)
+SiComb=GenerateCombinations(si)
+println(SiComb)
+println(pSE)
+ev3=ExpectationValuesFromCounts(SiComb,cSE,cSO)
+println(ev3)
+position=MatrixElementsForGroup(si)
+p_si=DensityMatrixFromGroup(ev3,position,n)
+println(p_si)
+println(rho_true)
 
-function reconstruct_density_matrix(rho_true, n, N)
-    d = 2^n
-    rho_num = zeros(ComplexF64, d, d)
 
-    S = GenerateSGroups(n)
-
-    for si in S
-        SE = GenerateEigenstatesE(si)
-        SO = GenerateEigenstatesO(si)
-
-        pSE = ProjectorsFromEigenstates(SE)
-        pSO = ProjectorsFromEigenstates(SO)
-
-        cSE = simulateMeasurementSeeqst(rho_true, pSE, N)
-        cSO = simulateMeasurementSeeqst(rho_true, pSO, N)
-
-        SiComb = generate_combinations(si)
-        ev = ExpectationValuesFromCounts(SiComb, cSE, cSO)
-
-        position = MatrixElementsForGroup(si)
-        rho_num += DensityMatrixFromGroup(ev, position, n)
-    end
-
-    return rho_num
-end
-
-rho_num = reconstruct_density_matrix(rho_true, n, N)
+#rho_num = RecreatingDensityMatrixWithSeeqst(rho_true, N)
 
 #println("OG matrix",rho_true,"Ende")
 #println(rho_num-rho_true)
 
 #println(rho_num)
 
-F = fidelity(rho_num,rho_true)
-println("fidelity :", F)
+#F = fidelity(rho_num,rho_true)
+#println("fidelity :", F)
