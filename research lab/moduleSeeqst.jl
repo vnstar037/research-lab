@@ -5,8 +5,8 @@ using StatsBase
 using IterTools
 
 export GenerateSGroups,
-       GenerateEigenstatesE,
-       GenerateEigenstatesO,
+       generateEigenstatesE,
+       generateEigenstatesO,
        ProjectorsFromEigenstates,
        PauliStringEigenvalues,
        MatrixElementsForGroup,
@@ -30,61 +30,197 @@ function GenerateSGroups(N::Int)
     return groups
 end
 
+
+function GenerateComputationalBasis(N::Int)
+    basis = Vector{Vector{Float64}}()
+    dim = 2^N
+    for i in 0:(dim-1)
+        bits = reverse(digits(i, base=2, pad=N))
+        ket = [1.0]
+        for b in bits
+            ket = kron(ket, b == 0 ? [1.0; 0.0] : [0.0; 1.0])
+        end
+        push!(basis, ket)
+    end
+    return basis
+end
+
 # --------------------------------------------------------------------
 # Eigenstates (E group)
 # --------------------------------------------------------------------
-function GenerateEigenstatesE(S::Vector{String})
-    ket0 = [1.0, 0.0]
-    ket1 = [0.0, 1.0]
-    ketp = (ket0 .+ ket1) ./ sqrt(2)
-    ketm = (ket0 .- ket1) ./ sqrt(2)
-
-    local_bases = Vector{Vector{Vector{Float64}}}()
-    for s in S
-        s == "IZ" && push!(local_bases, [ket0, ket1])
-        s == "XY" && push!(local_bases, [ketp, ketm])
+# ============================================================
+# Computational basis |bits>
+# ============================================================
+function basisVector(bits::Vector{Int})
+    v = [1.0]
+    for b in bits
+        v = kron(v, b == 0 ? [1.0, 0.0] : [0.0, 1.0])
     end
-
-    eigenstates = Vector{Vector{Float64}}()
-    for combo_rev in Iterators.product(reverse(local_bases)...)
-        combo = reverse(combo_rev)
-        ψ = combo[1]
-        for k in combo[2:end]
-            ψ = kron(ψ, k)
-        end
-        push!(eigenstates, ψ)
-    end
-    return eigenstates
+    return v
 end
 
-# --------------------------------------------------------------------
-# Eigenstates (O group)
-# --------------------------------------------------------------------
-function GenerateEigenstatesO(S::Vector{String})
-    all(x -> x == "IZ", S) && return Vector{Vector{ComplexF64}}()
+# ============================================================
+bitFlip(bits::Vector{Int}) = [1 - b for b in bits]
 
-    ket0 = ComplexF64[1, 0]
-    ket1 = ComplexF64[0, 1]
-    ketIp = (ket0 .+ im .* ket1) ./ sqrt(2)
-    ketIm = (ket0 .- im .* ket1) ./ sqrt(2)
-
-    local_bases = Vector{Vector{Vector{ComplexF64}}}()
-    for s in S
-        s == "IZ" && push!(local_bases, [ket0, ket1])
-        s == "XY" && push!(local_bases, [ketIp, ketIm])
+# ============================================================
+function bitStrings(n::Int)
+    if n == 0
+        return [Int[]]
     end
-
-    eigenstates = Vector{Vector{ComplexF64}}()
-    for combo_rev in Iterators.product(reverse(local_bases)...)
-        combo = reverse(combo_rev)
-        ψ = combo[1]
-        for k in combo[2:end]
-            ψ = kron(ψ, k)
-        end
-        push!(eigenstates, ψ)
+    prev = bitStrings(n - 1)
+    res = Vector{Vector{Int}}()
+    for p in prev
+        push!(res, vcat(p, 0))
+        push!(res, vcat(p, 1))
     end
-    return eigenstates
+    return res
 end
+
+# ============================================================
+# Permutation: canonical [offdiag | diag] → physical
+# ============================================================
+function permuteToPhysical(state::AbstractVector, offdiagPos::Vector{Int}, diagPos::Vector{Int})
+    perm = vcat(offdiagPos, diagPos)
+    N = length(perm)
+    reshaped = reshape(state, ntuple(_ -> 2, N)...)
+    invp = invperm(perm)
+    return vec(permutedims(reshaped, invp))
+end
+
+# ============================================================
+# Parse Pauli strings
+# ============================================================
+function parsePaulis(paulis::Vector{String})
+    offdiagPos = Int[]
+    diagPos    = Int[]
+
+    for (i, p) in enumerate(paulis)
+        if p == "XY"
+            push!(offdiagPos, i)
+        elseif p == "IZ"
+            push!(diagPos, i)
+        else
+            error("Unbekannter Pauli-String: $p")
+        end
+    end
+
+    return offdiagPos, diagPos
+end
+
+# ============================================================
+# MAIN FUNCTION (user-facing)
+# ============================================================
+function generateEigenstatesE(paulis::Vector{String})
+    offdiagPos, diagPos = parsePaulis(paulis)
+
+    M = length(offdiagPos)
+    K = length(diagPos)
+
+    states = Vector{Vector{ComplexF64}}()
+
+    # --------------------------------------------------------
+    # Case 1: M = 0 → pure computational basis
+    # --------------------------------------------------------
+    if M == 0
+        for q in bitStrings(K)
+            ψ = ComplexF64.(basisVector(q))
+            push!(states, permuteToPhysical(ψ, Int[], diagPos))
+        end
+        return states
+    end
+
+    # --------------------------------------------------------
+    # Case 2: M > 0, K = 0
+    # --------------------------------------------------------
+    if K == 0
+        p_bits = [p for p in bitStrings(M) if p[1] == 0]
+
+        for p in p_bits
+            pbar = bitFlip(p)
+
+            vp    = ComplexF64.(basisVector(p))
+            vpbar = ComplexF64.(basisVector(pbar))
+
+            plus  = (vp + vpbar) / sqrt(2)
+            minus = (vp - vpbar) / sqrt(2)
+
+            push!(states, permuteToPhysical(plus,  offdiagPos, Int[]))
+            push!(states, permuteToPhysical(minus, offdiagPos, Int[]))
+        end
+        return states
+    end
+
+    # --------------------------------------------------------
+    # Case 3: M > 0, K > 0
+    # --------------------------------------------------------
+    p_bits = [p for p in bitStrings(M) if p[1] == 0]
+    q_bits = bitStrings(K)
+
+    for p in p_bits
+        pbar = bitFlip(p)
+
+        vp    = ComplexF64.(basisVector(p))
+        vpbar = ComplexF64.(basisVector(pbar))
+
+        plus  = (vp + vpbar) / sqrt(2)
+        minus = (vp - vpbar) / sqrt(2)
+
+        for q in q_bits
+            vq = ComplexF64.(basisVector(q))
+
+            ψ_plus  = kron(plus,  vq)
+            ψ_minus = kron(minus, vq)
+
+            push!(states, permuteToPhysical(ψ_plus,  offdiagPos, diagPos))
+            push!(states, permuteToPhysical(ψ_minus, offdiagPos, diagPos))
+        end
+    end
+
+    return states
+end
+
+# ============================================================
+function generateEigenstatesO(paulis::Vector{String})
+    offdiagPos = [i for (i,p) in enumerate(paulis) if p == "XY"]
+    diagPos    = [i for (i,p) in enumerate(paulis) if p == "IZ"]
+
+    M = length(offdiagPos)
+    K = length(diagPos)
+
+    if M == 0
+        return Vector{Vector{ComplexF64}}()
+    end
+
+    states = Vector{Vector{ComplexF64}}()
+    q_bits = bitStrings(K)
+
+    p_bits = [p for p in bitStrings(M) if p[1] == 0]
+
+    for p in p_bits
+        pbar = bitFlip(p)
+
+        vp    = ComplexF64.(basisVector(p))
+        vpbar = ComplexF64.(basisVector(pbar))
+
+        # O-Basis: ungerade Anzahl σy → beide Varianten
+        plus_O  = (vp + im*vpbar)/sqrt(2)
+        minus_O = (vp - im*vpbar)/sqrt(2)
+
+        for q in q_bits
+            vq = ComplexF64.(basisVector(q))
+            ψ_plus  = kron(plus_O, vq)
+            ψ_minus = kron(minus_O, vq)
+            push!(states, permuteToPhysical(ψ_plus, offdiagPos, diagPos))
+            push!(states, permuteToPhysical(ψ_minus, offdiagPos, diagPos))
+        end
+    end
+
+    return states
+end
+
+
+
+
 
 # --------------------------------------------------------------------
 # Projectors
@@ -179,8 +315,8 @@ function RecreatingDensityMatrixWithSeeqst(rho_true, N)
     rho_num = zeros(ComplexF64, dim, dim)
 
     for si in GenerateSGroups(n)
-        SE = GenerateEigenstatesE(si)
-        SO = GenerateEigenstatesO(si)
+        SE = generateEigenstatesE(si)
+        SO = generateEigenstatesO(si)
 
         cSE = simulateMeasurement(rho_true, ProjectorsFromEigenstates(SE), N)
         cSO = simulateMeasurement(rho_true, ProjectorsFromEigenstates(SO), N)

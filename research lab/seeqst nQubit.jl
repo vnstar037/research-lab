@@ -5,6 +5,15 @@ using Convex
 using SCS
 using Plots
 
+using LinearAlgebra
+using StatsBase
+using Distributions
+using Convex
+using IterTools
+using SCS
+using QuantumInformation
+using Plots
+
 # ⚠️ IterTools NICHT verwenden
 # using IterTools
 
@@ -36,83 +45,54 @@ nMeasurements = 1000
 
 RhoTrue = GenerateRandomDensityMatrix(dim)
 
-# ---------------- S-GROUPS ------------------
+#RhoTrue== [
+#    0.3  0.1+0.05im  0.05-0.02im  0.1+0.0im;
+#    0.1-0.05im  0.25  0.05+0.03im  0.05-0.01im;
+#    0.05+0.02im 0.05-0.03im 0.2  0.08+0.04im;
+#    0.1+0.0im 0.05+0.01im 0.08-0.04im 0.25
+#]
+
+
+
+
+RhoNum = zeros(ComplexF64, dim, dim)
 
 S_groups = GenerateSGroups(n)
 
-# ---------------- COMBINATION FUNCTION ------------------
-# ✅ Robust against IterTools pollution
-# ✅ Always returns Vector{String}
-
-function generate_combinations(ops::Vector{String})
-    char_lists = [collect(op) for op in ops]
-
-    result = String[]
-
-    for t in Base.Iterators.product(char_lists...)
-        push!(result, join(t))
-    end
-
-    return result
-end
-
-# ---------------- MAIN LOOP ------------------
-
 for S in S_groups
-    eigE = GenerateEigenstatesE(S)    # E-group
-    eigO = GenerateEigenstatesO(S)    # O-group
+    eigE = GenerateEigenstatesE(S)   # Float-Zustände
+    eigO = GenerateEigenstatesO(S)   # Complex-Zustände
+
+    projectorsE = ProjectorsFromEigenstates(eigE)
+    projectorsO = ProjectorsFromEigenstates(eigO)
+
+    global countsE = simulateMeasurement(RhoTrue, projectorsE, nMeasurements)
+    global countsO = simulateMeasurement(RhoTrue, projectorsO, nMeasurements)
+
 
     expanded_ops = generate_combinations(S)
 
-    #println("S-group = ", S)
-    #println("Expanded operators = ", expanded_ops)
-    #println("Type = ", typeof(expanded_ops))
-    #println()
+    positionMatrixElements=MatrixElementsForGroup(S)
+
+    global evs=ExpectationValuesFromCounts(expanded_ops,countsE,countsO)
+
+    partialRho=DensityMatrixFromGroup(evs,positionMatrixElements,n)
+
+    RhoNum .+= partialRho
+
+
 end
 
-# ---------------- FINAL TEST ------------------
+Δρ = RhoTrue-RhoNum
 
-ops = ["IZ", "XY","IZ"]
-all_combos = generate_combinations(ops)
+F = fidelity(RhoTrue,RhoNum)
 
-println("TEST")
-println("Input  = ", ops)
-println("Output = ", all_combos)
-println("Type   = ", typeof(all_combos))
+#println("Matrixelement-Differenzen:")
+#println(Δρ)
+println("fidelity :", F)
 
-function pauli_eigenvalues(p::Char)
-    if p == 'I'
-        return [1, 1]
-    elseif p == 'X' || p == 'Y' || p == 'Z'
-        return [1, -1]
-    else
-        error("Unknown Pauli operator: $p")
-    end
-end
-
-function pauli_string_eigenvalues(pauli::String)
-    eigvals = [1]   # neutraler Startwert
-
-    for p in pauli
-        local_eigs = pauli_eigenvalues(p)
-        eigvals = [a*b for a in eigvals, b in local_eigs]
-        eigvals = vec(eigvals)  # garantiert 1D-Array
-    end
-
-    return eigvals
-end
-
-println(pauli_string_eigenvalues("I"))
-# [1, 1]
-
-println(pauli_string_eigenvalues("X"))
-# [1, -1]
-
-println(pauli_string_eigenvalues("IX"))
-# [1, -1, 1, -1]
-
-println(pauli_string_eigenvalues("XZ"))
-# [1, -1, -1, 1]
-
-println(pauli_string_eigenvalues("IZX"))
-# [1, -1, 1, -1, -1, 1, -1, 1]
+S1=S_groups[1]
+eigE1= GenerateEigenstatesE(S1)
+projE1=ProjectorsFromEigenstates(eigE1)
+println(S1,eigE1)
+println(projE1)

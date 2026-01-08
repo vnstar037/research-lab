@@ -54,10 +54,10 @@ rho_true=random_density_matrix(d)
 
 S=GenerateSGroups(n)
 println(S)
-si=S[4]
-SE=GenerateEigenstatesE(si)
-SO=GenerateEigenstatesO(si)
-println(SO)
+si=S[3]
+SE=generateEigenstatesE(si)
+SO=generateEigenstatesO(si)
+
 pSE=ProjectorsFromEigenstates(SE)
 pSO=ProjectorsFromEigenstates(SO)
 #cSE=simulateMeasurementSeeqst(rho_true,pSE,N)
@@ -66,21 +66,22 @@ cSE=simulateMeasurement(rho_true,pSE,N)
 cSO=simulateMeasurement(rho_true,pSO,N)
 SiComb=GenerateCombinations(si)
 println(SiComb)
-println(pSE)
+
+#println(pSO)
 ev3=ExpectationValuesFromCounts(SiComb,cSE,cSO)
-println(ev3)
+#println(ev3)
 position=MatrixElementsForGroup(si)
 p_si=DensityMatrixFromGroup(ev3,position,n)
 println(p_si)
 println(rho_true)
 
 
-#rho_num = RecreatingDensityMatrixWithSeeqst(rho_true, N)
+rho_num = RecreatingDensityMatrixWithSeeqst(rho_true, N)
 
 #println("OG matrix",rho_true,"Ende")
 #println(rho_num-rho_true)
 
 #println(rho_num)
 
-#F = fidelity(rho_num,rho_true)
-#println("fidelity :", F)
+F = fidelity(rho_num,rho_true)
+println("fidelity :", F)

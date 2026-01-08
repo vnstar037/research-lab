@@ -1,14 +1,13 @@
 using LinearAlgebra
-using QuantumInformation  # für fidelity
-
+using QuantumInformation 
 # ---------------------------
-# Struktur für rekonstruierte Dichte-Matrix
+# struct reconstructed density matrix
 # ---------------------------
 struct ReconstructedDensityMatrix
-    rho::Matrix{ComplexF64}       # die rekonstruierte Dichte-Matrix
+    rho::Matrix{ComplexF64}      
     purity::Float64               # Tr(rho^2)
     fidelity::Float64
-    DeltaRho:::Matrix{ComplexF64}            # Fidelity mit dem wahren Zustand
+    DeltaRho::Matrix{ComplexF64}            
 end
 
 # ---------------------------
@@ -17,7 +16,7 @@ end
 function ReconstructedDensityMatrix(rho_reconstructed::Matrix{ComplexF64}, rho_true::Matrix{ComplexF64})
     ρ = rho_reconstructed
     PurityVal = real(tr(ρ * ρ))               # Purity Tr(rho^2)
-    FidelityVal = fidelity(ρ, rho_true)       # Fidelity mit wahrem rho
+    FidelityVal = fidelity(ρ, rho_true)       # Fidelity 
     DeltaVal = rho_true - rho_reconstructed
     return ReconstructedDensityMatrix(ρ, PurityVal, FidelityVal, DeltaVal)
 end

@@ -15,7 +15,7 @@ using .LineareInversion
 using QuantumInformation
 using .SEEQSTEigenstates
 
-n=2
+n=5
 dim=2^n
 nMeasurements=10000
 

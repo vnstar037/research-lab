@@ -1,136 +1,195 @@
+using LinearAlgebra
 
-function generate_combinations(liste::Vector{String})
-    # Wir kehren die Liste um (reverse), damit die Zeichen des 
-    # ersten Strings im Produkt am schnellsten rotieren.
-    kombinationen = Iterators.product(reverse(liste)...)
-    
-    # Beim Zusammenfügen (join) kehren wir die Tupel wieder um, 
-    # damit die ursprüngliche Zeichenfolge (1. String, 2. String) erhalten bleibt.
-    return vec([join(reverse(k)) for k in kombinationen])
-end
-
-
-function pauli_eigenvalues(p::Char)
-    if p == 'I'
-        return [1.0, 1.0]
-    elseif p in ('X','Y','Z')
-        return [1.0, -1.0]
-    else
-        error("Unknown Pauli operator: $p")
+# ============================================================
+# Computational basis |bits>
+# ============================================================
+function basis_vector(bits::Vector{Int})
+    v = [1.0]
+    for b in bits
+        v = kron(v, b == 0 ? [1.0, 0.0] : [0.0, 1.0])
     end
+    return v
 end
 
-# --------------------------------------------------------------------
-# Eigenwerte eines Pauli-Strings (Kronecker-artiges Produkt)
-# Die Reihenfolge der Bits ist so gewählt, dass die erste Position im String
-# der langsam rotierende Faktor ist
-# --------------------------------------------------------------------
-function pauli_string_eigenvalues(s::String)
-    ev = [1.0]
+# ============================================================
+bitflip(bits::Vector{Int}) = [1 - b for b in bits]
 
-    # reverse(s) → erster Buchstabe rotiert langsam
-    for p in reverse(s)
-        local_eigs = pauli_eigenvalues(p)
-        ev = vec([a*b for a in ev, b in local_eigs])
+# ============================================================
+function bitstrings(n::Int)
+    if n == 0
+        return [Int[]]
     end
-
-    return ev
+    prev = bitstrings(n - 1)
+    res = Vector{Vector{Int}}()
+    for p in prev
+        push!(res, vcat(p, 0))
+        push!(res, vcat(p, 1))
+    end
+    return res
 end
 
-a = generate_combinations(["XY", "XY"])
-
-#println(a)      # ["IX", "IY", "ZX", "ZY"]
-#println(a[2])   # "IY"
-
-
-for i in a
-    b=pauli_string_eigenvalues(i)
-    #println(b,i)
+# ============================================================
+# Permutation: canonical [offdiag | diag] → physical
+# ============================================================
+function permute_to_physical(state::AbstractVector, offdiag_pos::Vector{Int}, diag_pos::Vector{Int})
+    perm = vcat(offdiag_pos, diag_pos)
+    N = length(perm)
+    reshaped = reshape(state, ntuple(_ -> 2, N)...)
+    invp = invperm(perm)
+    return vec(permutedims(reshaped, invp))
 end
 
-function GenerateEigenstatesE(S::Vector{String})
-    ket0 = [1.0, 0.0]
-    ket1 = [0.0, 1.0]
-    ketp = (ket0 .+ ket1) ./ sqrt(2)
-    ketm = (ket0 .- ket1) ./ sqrt(2)
+# ============================================================
+# Parse Pauli strings
+# ============================================================
+function parse_paulis(paulis::Vector{String})
+    offdiag_pos = Int[]
+    diag_pos    = Int[]
 
-    # lokale Basen
-    local_bases = Vector{Vector{Vector{Float64}}}()
-    for s in S
-        if s == "IZ"
-            push!(local_bases, [ket0, ket1])
-        elseif s == "XY"
-            push!(local_bases, [ketp, ketm])
+    for (i, p) in enumerate(paulis)
+        if p == "XY"
+            push!(offdiag_pos, i)
+        elseif p == "IZ"
+            push!(diag_pos, i)
         else
-            error("Unknown stabilizer type $s")
+            error("Unbekannter Pauli-String: $p")
         end
     end
 
-    eigenstates = Vector{Vector{Float64}}()
-
-    # ⬇️ WICHTIG: product über reversed(local_bases)
-    for combo_rev in Base.Iterators.product(reverse(local_bases)...)
-        combo = reverse(combo_rev)  # zurück zur physikalischen Reihenfolge
-
-        ψ = combo[1]
-        for k in combo[2:end]
-            ψ = kron(ψ, k)
-        end
-
-        push!(eigenstates, ψ)
-    end
-
-    return eigenstates
+    return offdiag_pos, diag_pos
 end
 
-function GenerateEigenstatesO(S::Vector{String})
-    # 🔴 nur IZ → keine O-Eigenzustände
-    if all(x -> x == "IZ", S)
+# ============================================================
+# MAIN FUNCTION (user-facing)
+# ============================================================
+function eigenbases_from_paulis(paulis::Vector{String})
+    offdiag_pos, diag_pos = parse_paulis(paulis)
+
+    M = length(offdiag_pos)
+    K = length(diag_pos)
+
+    # → Typ: ComplexF64
+    states = Vector{Vector{ComplexF64}}()
+
+    # --------------------------------------------------------
+    # Case 1: M = 0 → pure computational basis
+    # --------------------------------------------------------
+    if M == 0
+        for q in bitstrings(K)
+            ψ = ComplexF64.(basis_vector(q))  # Float → Complex
+            push!(states, permute_to_physical(ψ, Int[], diag_pos))
+        end
+        return states
+    end
+
+    # --------------------------------------------------------
+    # Case 2: M > 0, K = 0
+    # --------------------------------------------------------
+    if K == 0
+        p_bits = [p for p in bitstrings(M) if p[1] == 0]
+
+        for p in p_bits
+            pbar = bitflip(p)
+
+            vp    = ComplexF64.(basis_vector(p))
+            vpbar = ComplexF64.(basis_vector(pbar))
+
+            plus  = (vp + vpbar) / sqrt(2)
+            minus = (vp - vpbar) / sqrt(2)
+
+            push!(states, permute_to_physical(plus,  offdiag_pos, Int[]))
+            push!(states, permute_to_physical(minus, offdiag_pos, Int[]))
+        end
+        return states
+    end
+
+    # --------------------------------------------------------
+    # Case 3: M > 0, K > 0
+    # --------------------------------------------------------
+    p_bits = [p for p in bitstrings(M) if p[1] == 0]
+    q_bits = bitstrings(K)
+
+    for p in p_bits
+        pbar = bitflip(p)
+
+        vp    = ComplexF64.(basis_vector(p))
+        vpbar = ComplexF64.(basis_vector(pbar))
+
+        plus  = (vp + vpbar) / sqrt(2)
+        minus = (vp - vpbar) / sqrt(2)
+
+        for q in q_bits
+            vq = ComplexF64.(basis_vector(q))
+
+            ψ_plus  = kron(plus,  vq)
+            ψ_minus = kron(minus, vq)
+
+            push!(states, permute_to_physical(ψ_plus,  offdiag_pos, diag_pos))
+            push!(states, permute_to_physical(ψ_minus, offdiag_pos, diag_pos))
+        end
+    end
+
+    return states
+end
+
+function eigenbases_O_from_paulis(paulis::Vector{String})
+    # Off-diagonal Positionen bestimmen
+    offdiag_pos = [i for (i,p) in enumerate(paulis) if p == "XY"]
+    diag_pos    = [i for (i,p) in enumerate(paulis) if p == "IZ"]
+
+    M = length(offdiag_pos)
+    K = length(diag_pos)
+
+    # Spezialfall: keine off-diagonal Elemente → leere Menge
+    if M == 0
         return Vector{Vector{ComplexF64}}()
     end
 
-    # Basiszustände
-    ket0 = ComplexF64[1, 0]
-    ket1 = ComplexF64[0, 1]
-    ket_ip = (ket0 .+ im .* ket1) ./ sqrt(2)   # |+i⟩
-    ket_im = (ket0 .- im .* ket1) ./ sqrt(2)   # |-i⟩
+    states = Vector{Vector{ComplexF64}}()
+    q_bits = bitstrings(K)
 
-    # lokale Basen pro Qubit
-    local_bases = Vector{Vector{Vector{ComplexF64}}}()
-    for s in S
-        if s == "IZ"
-            push!(local_bases, [ket0, ket1])
-        elseif s == "XY"
-            push!(local_bases, [ket_ip, ket_im])
-        else
-            error("Unknown stabilizer type $s")
+    # Vertreter für (p, p̄) Paare
+    p_bits = [p for p in bitstrings(M) if p[1] == 0]
+
+    for p in p_bits
+        pbar = bitflip(p)
+
+        vp    = basis_vector(p)
+        vpbar = basis_vector(pbar)
+
+        # O-Basis: ungerade Anzahl σy → beide Varianten
+        plus_O  = (vp + im*vpbar)/sqrt(2)
+        minus_O = (vp - im*vpbar)/sqrt(2)
+
+        for q in q_bits
+            vq = basis_vector(q)
+            ψ_plus  = kron(plus_O, vq)
+            ψ_minus = kron(minus_O, vq)
+            push!(states, permute_to_physical(ψ_plus, offdiag_pos, diag_pos))
+            push!(states, permute_to_physical(ψ_minus, offdiag_pos, diag_pos))
         end
     end
 
-    eigenstates = Vector{Vector{ComplexF64}}()
-
-    # rechte Qubits laufen am schnellsten
-    for combo_rev in Base.Iterators.product(reverse(local_bases)...)
-        combo = reverse(combo_rev)
-
-        ψ = combo[1]
-        for k in combo[2:end]
-            ψ = kron(ψ, k)
-        end
-
-        push!(eigenstates, ψ)
-    end
-
-    return eigenstates
+    return states
 end
+
+
 
 function ProjectorsFromEigenstates(eigs)
     isempty(eigs) && return Matrix{ComplexF64}[]
     return [ψ * ψ' for ψ in eigs]
 end
 
-d=GenerateEigenstatesO(["XY","XY"])
-d2=ProjectorsFromEigenstates(d)
 
-#println(d)
-#println(d2)
+
+
+paulis = ["IZ","IZ","IZ"]
+states = eigenbases_from_paulis(paulis)
+states_O = eigenbases_O_from_paulis(paulis)
+
+println("Anzahl Zustände: ", length(states))
+println(states)
+println(states_O)
+
+projectors=ProjectorsFromEigenstates(states)
+#println(projectors)
