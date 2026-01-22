@@ -4,6 +4,7 @@ include("moduleMaximumLikelihoodEstimation.jl")
 include("moduleLinearInversion.jl")
 include("moduleSeeqst.jl")
 include("StructureDensityMatrix.jl")
+include("moduleSeeqstMLE.jl")
 
 
 
@@ -14,6 +15,7 @@ using .QuantumMLE
 using .LineareInversion
 using QuantumInformation
 using .SEEQSTEigenstates
+using. SeeqstMLE
 
 n=5
 dim=2^n
@@ -23,16 +25,18 @@ RhoTrue=GenerateRandomDensityMatrix(dim)
 RhoRecreatedMLE=RecreatingDensityMatrixWithMaximumLikelihoodEstimation(RhoTrue,nMeasurements)
 RhoRecreatedLI=RecreatingDensityMatrixWithLineareInversion(RhoTrue,nMeasurements)
 RhoRecreatedSeeqst=RecreatingDensityMatrixWithSeeqst(RhoTrue,nMeasurements)
-
+RhoRecreatedSeeqstMLE=reconstructDensityMatrixWithSeeqstMLE(n,RhoTrue,nMeasurements)
 
 StructMLE=ReconstructedDensityMatrix(RhoRecreatedMLE,RhoTrue)
 StructLI=ReconstructedDensityMatrix(RhoRecreatedLI,RhoTrue)
 StructSeeqst=ReconstructedDensityMatrix(RhoRecreatedSeeqst,RhoTrue)
+StructSeeqstMLE=ReconstructedDensityMatrix(RhoRecreatedSeeqstMLE,RhoTrue)
 #println("Matrixelement-Differenzen:")
 #println(Δρ)
 println("fidelity LI :", StructLI.fidelity)
 println("fidelity MLE :", StructMLE.fidelity)
 println("fidelity Seeqst :", StructSeeqst.fidelity)
+println("fidelity SeeqstMLE :", StructSeeqstMLE.fidelity)
 
 println("purity LI : ", StructLI.purity)
 println("purity MLE : ", StructMLE.purity)

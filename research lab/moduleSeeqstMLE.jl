@@ -1,20 +1,17 @@
-module SEEQSTEigenstates
+module SeeqstMLE
 
 using LinearAlgebra
 using StatsBase
 using IterTools
+using Convex
+using SCS
 
 export GenerateSGroups,
        generateEigenstatesE,
        generateEigenstatesO,
        ProjectorsFromEigenstates,
-       PauliStringEigenvalues,
-       MatrixElementsForGroup,
-       DensityMatrixFromGroup,
        GenerateCombinations,
-       ExpectationValuesFromCounts,
-       RecreatingDensityMatrixWithSeeqst
-
+       reconstructDensityMatrixWithSeeqstMLE
 # --------------------------------------------------------------------
 # Generate all stabilizer groups
 # --------------------------------------------------------------------
@@ -237,74 +234,6 @@ function ProjectorsFromEigenstates(eigs)
     return [ψ * ψ' for ψ in eigs]
 end
 
-# --------------------------------------------------------------------
-# Pauli eigenvalues
-# --------------------------------------------------------------------
-PauliEigenvalues(p::Char) =
-    p == 'I' ? [1.0, 1.0] :
-    p in ('X','Y','Z') ? [1.0, -1.0] :
-    error("Unknown Pauli operator $p")
-
-function PauliStringEigenvalues(s::String)
-    ev = [1.0]
-    for p in reverse(s)
-        ev = vec([a*b for a in ev, b in PauliEigenvalues(p)])
-    end
-    return ev
-end
-
-# --------------------------------------------------------------------
-# Generate Pauli combinations
-# --------------------------------------------------------------------
-function GenerateCombinations(list::Vector{String})
-    combos = Iterators.product(reverse(list)...)
-    return vec([join(reverse(c)) for c in combos])
-end
-
-# --------------------------------------------------------------------
-# Expectation values
-# --------------------------------------------------------------------
-function ExpectationValuesFromCounts(paulis, cE, cO)
-    Dict(p => dot(PauliStringEigenvalues(p),
-                  occursin('Y', p) ? cO : cE)
-         for p in paulis)
-end
-
-# --------------------------------------------------------------------
-# Density matrix reconstruction
-# --------------------------------------------------------------------
-function MatrixElementsForGroup(S)
-    N = length(S)
-    dim = 2^N
-    bits = [reverse(digits(i, base=2, pad=N)) for i in 0:dim-1]
-    [(i,j) for i in 1:dim, j in 1:dim
-     if all(S[k]=="IZ" ? bits[i][k]==bits[j][k] :
-            bits[i][k]!=bits[j][k] for k in 1:N)]
-end
-
-function DensityMatrixFromGroup(evs, positions, n)
-    ρ = zeros(ComplexF64, 2^n, 2^n)
-    for (i,j) in positions
-        bi = reverse(digits(i-1, base=2, pad=n))
-        bj = reverse(digits(j-1, base=2, pad=n))
-        for (pstring, v) in evs
-            fac = 1 + 0im
-            for k in 1:n
-                p = pstring[k]
-                if p == 'Z'
-                    fac *= bi[k] == 0 ? 1 : -1
-                elseif p == 'X'
-                    fac *= bi[k] == bj[k] ? 0 : 1
-                elseif p == 'Y'
-                    bi[k] == bj[k] && (fac = 0; break)
-                    fac *= bi[k] == 0 ? -im : im
-                end
-            end
-            ρ[i,j] += fac * v
-        end
-    end
-    return ρ / 2^n
-end
 
 function simulateMeasurement(rho, projectors, n)
     isempty(projectors) && return Float64[]
@@ -314,28 +243,50 @@ function simulateMeasurement(rho, projectors, n)
     return counts ./ n
 end
 
-function RecreatingDensityMatrixWithSeeqst(rho_true, N)
-
-    dim = size(rho_true,1)
-    n = Int(round(log2(dim)))
-
-    rho_num = zeros(ComplexF64, dim, dim)
-
-    for si in GenerateSGroups(n)
+function reconstructDensityMatrixWithSeeqstMLE(n::Int, rho_true::Matrix{ComplexF64}, N::Int)
+    d = 2^n
+    
+    # 1. Gruppen generieren
+    S = GenerateSGroups(n)
+    
+    all_projectors = ComplexF64[]
+    all_counts = Float64[]
+    
+    # 2. Für jede Gruppe E/O-Basen erstellen und Messungen simulieren
+    for si in S
         SE = generateEigenstatesE(si)
         SO = generateEigenstatesO(si)
-
-        cSE = simulateMeasurement(rho_true, ProjectorsFromEigenstates(SE), N)
-        cSO = simulateMeasurement(rho_true, ProjectorsFromEigenstates(SO), N)
-
-        ev = ExpectationValuesFromCounts(
-            GenerateCombinations(si), cSE, cSO
-        )
-
-        rho_num += DensityMatrixFromGroup(ev, MatrixElementsForGroup(si), n)
+        pSE = ProjectorsFromEigenstates(SE)
+        pSO = ProjectorsFromEigenstates(SO)
+        cSE = simulateMeasurement(rho_true, pSE, N) * N
+        cSO = simulateMeasurement(rho_true, pSO, N) * N
+        
+        all_projectors = vcat(all_projectors, pSE, pSO)
+        all_counts     = vcat(all_counts, cSE, cSO)
     end
-
-    return rho_num
+    
+    # 3. Variablen und Constraints für MLE
+    ρ = ComplexVariable(d, d)
+    constraints = [
+        ρ == ρ',     # Hermitesch
+        ρ ⪰ 0,       # Positiv semidefinit
+        tr(ρ) == 1   # Spur = 1
+    ]
+    
+    eps = 1e-9
+    loglik = sum(
+        all_counts[i] * log(real(tr(ρ * all_projectors[i])) + eps)
+        for i in eachindex(all_projectors)
+    )
+    
+    # 4. Optimierungsproblem lösen
+    problem = maximize(loglik, constraints)
+    solve!(problem, SCS.Optimizer; silent_solver=true)
+    
+    # 5. Rekonstruierte Dichtematrix zurückgeben
+    rho_mle = evaluate(ρ)
+    return rho_mle
 end
+
 
 end # module

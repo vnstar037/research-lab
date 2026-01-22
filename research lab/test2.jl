@@ -9,9 +9,11 @@ using Plots
 
 include("moduleSimulateMeasurement.jl")
 include("moduleSeeqst.jl")
+include("moduleSeeqstMLE.jl")
 
 using .SimulateMeasurement
 using .SEEQSTEigenstates
+using .SeeqstMLE
 
 
 
@@ -20,7 +22,6 @@ sigma_x= [ 0 1; 1 0]
 sigma_y= [ 0 -1im; 1im 0]
 sigma_z= [ 1 0; 0 -1]
 
-#println(kron(sigma_x,sigma_0)*kron(sigma_x,sigma_z)-kron(sigma_x,sigma_z)*kron(sigma_x,sigma_0))
 
 function random_density_matrix(d)
     M = randn(ComplexF64, d, d) + 1im * randn(ComplexF64, d, d)
@@ -29,59 +30,123 @@ function random_density_matrix(d)
     return rho
 end
 
-n=2
+n=4
 d=2^n
-N=10000
+N=90000
 rho_true=random_density_matrix(d)
 
 
 
-#rho_true = [
-#    0.3  0.1+0.05im  0.05-0.02im  0.1+0.0im;
-#    0.1-0.05im  0.25  0.05+0.03im  0.05-0.01im;
-#    0.05+0.02im 0.05-0.03im 0.2  0.08+0.04im;
-#    0.1+0.0im 0.05+0.01im 0.08-0.04im 0.25
-#]
 
-#rho_true = [
-#    0.28              0.10+0.07im   0.06-0.05im   0.08+0.09im;
-#    0.10-0.07im       0.22          0.09+0.06im   0.07-0.04im;
-#    0.06+0.05im       0.09-0.06im   0.25          0.05+0.08im;
-#    0.08-0.09im       0.07+0.04im   0.05-0.08im   0.25
-#]
+
+#println(S)
+#si=S[4]
+#SE=generateEigenstatesE(si)
+#SO=generateEigenstatesO(si)
 
 
 
-S=GenerateSGroups(n)
-println(S)
-si=S[3]
-SE=generateEigenstatesE(si)
-SO=generateEigenstatesO(si)
+#pSE=ProjectorsFromEigenstates(SE)
+#pSO=ProjectorsFromEigenstates(SO)
+#println(pSE)
+#println(pSO)
+#cSE=simulateMeasurement(rho_true,pSE,N)*N
+#cSO=simulateMeasurement(rho_true,pSO,N)*N
+#SiComb=GenerateCombinations(si)
 
-pSE=ProjectorsFromEigenstates(SE)
-pSO=ProjectorsFromEigenstates(SO)
-#cSE=simulateMeasurementSeeqst(rho_true,pSE,N)
-#cSO=simulateMeasurementSeeqst(rho_true,pSO,N)
-cSE=simulateMeasurement(rho_true,pSE,N)
-cSO=simulateMeasurement(rho_true,pSO,N)
-SiComb=GenerateCombinations(si)
-println(SiComb)
+
+function reconstruct_density_matrix(n::Int, rho_true::Matrix{ComplexF64}, N::Int)
+    d = 2^n
+    
+    # 1. Gruppen generieren
+    S = GenerateSGroups(n)
+    println(S)
+    
+    all_projectors = ComplexF64[]
+    all_counts = Float64[]
+    
+    # 2. Für jede Gruppe E/O-Basen erstellen und Messungen simulieren
+    for si in S
+        SE = generateEigenstatesE(si)
+        SO = generateEigenstatesO(si)
+        pSE = ProjectorsFromEigenstates(SE)
+        pSO = ProjectorsFromEigenstates(SO)
+        cSE = simulateMeasurement(rho_true, pSE, N) * N
+        cSO = simulateMeasurement(rho_true, pSO, N) * N
+        
+        all_projectors = vcat(all_projectors, pSE, pSO)
+        all_counts     = vcat(all_counts, cSE, cSO)
+    end
+    
+    # 3. Variablen und Constraints für MLE
+    ρ = ComplexVariable(d, d)
+    constraints = [
+        ρ == ρ',     # Hermitesch
+        ρ ⪰ 0,       # Positiv semidefinit
+        tr(ρ) == 1   # Spur = 1
+    ]
+    
+    eps = 1e-12
+    loglik = sum(
+        all_counts[i] * (-log(real(tr(ρ * all_projectors[i])) + eps))
+        for i in eachindex(all_projectors)
+    )
+    
+    # 4. Optimierungsproblem lösen
+    problem = minimize(loglik, constraints)
+    solve!(problem, SCS.Optimizer)#; silent_solver=true)
+    
+    # 5. Rekonstruierte Dichtematrix zurückgeben
+    rho_mle = evaluate(ρ)
+    return rho_mle
+end
+
+# ------------------------------------------------------------
+# 6. Ergebnisse vergleichen (nur zur Validierung!)
+# ------------------------------------------------------------
+
+# Dichtematrix rekonstruieren
+#rho_mle = reconstruct_density_matrix(n, rho_true, N)
+rho_mle=reconstructDensityMatrixWithSeeqstMLE(n,rho_true,N)
+println("Rekonstruierte Dichtematrix:")
+#display(rho_mle)
+
+println("Wahre Dichtematrix:")
+#display(rho_true)
+
+F = fidelity(rho_mle,rho_true)
+println("fidelity :", F)
+
+
+
+
+#println(SiComb)
+#EV1=PauliStringEigenvalues(SiComb[1])
+#println(EV1,SiComb[1])
+#EV2=PauliStringEigenvalues(SiComb[2])
+#println(EV2,SiComb[2])
+#EV3=PauliStringEigenvalues(SiComb[3])
+#println(EV3,SiComb[3])
+#EV4=PauliStringEigenvalues(SiComb[4])
+#println(EV4,SiComb[4])
 
 #println(pSO)
-ev3=ExpectationValuesFromCounts(SiComb,cSE,cSO)
+#ev3=ExpectationValuesFromCounts(SiComb,cSE,cSO)
 #println(ev3)
-position=MatrixElementsForGroup(si)
-p_si=DensityMatrixFromGroup(ev3,position,n)
-println(p_si)
-println(rho_true)
+#position=MatrixElementsForGroup(si)
+#p_si=DensityMatrixFromGroup(ev3,position,n)
+#println(p_si)
+#println(rho_true)
 
 
-rho_num = RecreatingDensityMatrixWithSeeqst(rho_true, N)
+#rho_num = RecreatingDensityMatrixWithSeeqst(rho_true, N)
 
 #println("OG matrix",rho_true,"Ende")
 #println(rho_num-rho_true)
 
 #println(rho_num)
 
-F = fidelity(rho_num,rho_true)
-println("fidelity :", F)
+#F = fidelity(rho_num,rho_true)
+#println("fidelity :", F)
+
+#matrixelement 2x3 ist nicht stabil
