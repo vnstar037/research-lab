@@ -1,4 +1,43 @@
 using LinearAlgebra
+using StatsBase
+using IterTools
+using Convex
+using SCS
+using QuantumInformation
+
+function simulate_measurement(rho, projectors, n)
+    # 🔴 FALL: keine Projektoren → leeres Ergebnis
+    isempty(projectors) && return Float64[]
+
+    # Wahrscheinlichkeiten: p_i = Tr(rho * P_i)
+    probs = [real(tr(rho * P)) for P in projectors]
+
+    outcomes = sample(1:length(projectors), Weights(probs), n)
+
+    counts = [sum(outcomes .== i) for i in 1:length(projectors)]
+
+    return counts ./ n
+end
+
+function GenerateRandomDensityMatrixNoZerosQutrits(n::Int)
+
+    d = 3^n
+
+    # Zufällige komplexe Matrix
+    M = randn(ComplexF64, d, d) + 1im * randn(ComplexF64, d, d)
+
+    # Positiv semidefinite Matrix
+    rho = M * M'
+
+    # Spur normieren
+    rho /= tr(rho)
+
+    return rho
+end
+
+n=2
+shots=10000
+Rhotrue= GenerateRandomDensityMatrixNoZerosQutrits(2)
 
 # =========================
 # Gell-Mann-Matrizen
@@ -217,4 +256,160 @@ end
 
 lambda12=tensorBasis(basisλ1,basisλ5)
 
-println(lambda12)
+
+function GenerateLambdaGroups(N::Int)
+    groups = Vector{Vector{String}}()
+
+    labels = ["12", "38", "45", "67"]
+
+    for mask in 0:(4^N - 1)
+        S = Vector{String}(undef, N)
+
+        for qubit in 1:N
+            # base-4 "digit" extrahieren
+            digit = (mask ÷ 4^(N - qubit)) % 4
+            S[qubit] = labels[digit + 1]
+        end
+
+        push!(groups, S)
+    end
+
+    return groups
+end
+
+
+function GenerateComputationalBasisQutrit(N::Int)
+    basis = Vector{Vector{Float64}}()
+    dim = 3^N
+
+    for i in 0:(dim-1)
+        trits = reverse(digits(i, base=3, pad=N))
+        ket = [1.0]
+
+        for t in trits
+            if t == 0
+                ket = kron(ket, [1.0; 0.0; 0.0])
+            elseif t == 1
+                ket = kron(ket, [0.0; 1.0; 0.0])
+            else
+                ket = kron(ket, [0.0; 0.0; 1.0])
+            end
+        end
+
+        push!(basis, ket)
+    end
+
+    return basis
+end
+
+function GenerateEigenstates(group)
+
+    # Mapping von Label → Basis
+    basisMap = Dict(
+        "12" => basisλ1,
+        "38" => basisλ8,
+        "45" => basisλ4,
+        "67" => basisλ6
+    )
+
+    # Starte mit erster Basis
+    resultBasis = basisMap[group[1]]
+
+    # iterativ Tensorprodukte aufbauen
+    for i in 2:length(group)
+        nextBasis = basisMap[group[i]]
+        resultBasis = tensorBasis(resultBasis, nextBasis)
+    end
+
+    return resultBasis
+end
+
+function GenerateProjectors(group)
+
+    basis = GenerateEigenstates(group)
+    projs = []
+
+    for v in basis
+        push!(projs, v * v')
+    end
+
+    return projs
+end
+
+lambdagroups=GenerateLambdaGroups(2)
+
+println(lambdagroups)
+println(length(GenerateEigenstates(lambdagroups[2])))
+
+
+function ComputeMLEFromGroups(rhoTrue, shots)
+
+    # =========================
+    # 1. Dimension → N bestimmen
+    # =========================
+    d = size(rhoTrue, 1)
+    N = Int(round(log(d) / log(3)))   # weil d = 3^N
+
+    # =========================
+    # 2. Gruppen generieren
+    # =========================
+    groups = GenerateLambdaGroups(N)
+
+    allProjectors = []
+    allCounts = []
+
+    # =========================
+    # 3. Über alle Gruppen
+    # =========================
+    for group in groups
+
+        # Basis holen
+        basis = GenerateEigenstates(group)
+
+        # Projektoren
+        projectors = [v * v' for v in basis]
+
+        # Messung
+        freqs = simulate_measurement(rhoTrue, projectors, shots)
+        counts = freqs .* shots
+
+        append!(allProjectors, projectors)
+        append!(allCounts, counts)
+    end
+
+    # =========================
+    # 4. Globales MLE
+    # =========================
+    ρ = ComplexVariable(d, d)
+
+    constraints = [
+        ρ == ρ',
+        ρ ⪰ 0,
+        tr(ρ) == 1
+    ]
+
+    eps = 1e-9
+
+    loglik = sum(
+        allCounts[i] * log(real(tr(ρ * allProjectors[i])) + eps)
+        for i in eachindex(allProjectors)
+    )
+
+    problem = maximize(loglik, constraints)
+    solve!(problem, SCS.Optimizer; silent_solver=true)
+
+    ρ_est = evaluate(ρ)
+
+    return ρ_est
+end
+
+
+RhoRec=ComputeMLEFromGroups(Rhotrue,shots)
+
+println(fidelity(Rhotrue,RhoRec))
+
+println(Rhotrue)
+println(RhoRec)
+
+#matrixelement distribution
+#formalism for real eigenbasis and imaginary eigenbasis
