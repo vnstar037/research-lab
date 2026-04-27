@@ -243,50 +243,66 @@ function simulateMeasurement(rho, projectors, n)
     return counts ./ n
 end
 
-function reconstructDensityMatrixWithSeeqstMLE(n::Int, rho_true::Matrix{ComplexF64}, N::Int)
-    d = 2^n
-    
+function reconstructDensityMatrixWithSeeqstMLE(
+    rho_true::Matrix{ComplexF64},
+    N::Int
+)
+    # Dimension aus rho bestimmen
+    d1, d2 = size(rho_true)
+    d1 == d2 || error("rho_true muss quadratisch sein")
+
+    # Qubit-Zahl bestimmen
+    n_float = log2(d1)
+    n = round(Int, n_float)
+
+    isapprox(n_float, n; atol=1e-12) || 
+        error("Dimension $(d1) ist keine Zweierpotenz → kein n-Qubit-Zustand")
+
+    d = d1
+
     # 1. Gruppen generieren
     S = GenerateSGroups(n)
-    
-    all_projectors = ComplexF64[]
+
+    all_projectors = Matrix{ComplexF64}[]
     all_counts = Float64[]
-    
+
     # 2. Für jede Gruppe E/O-Basen erstellen und Messungen simulieren
     for si in S
         SE = generateEigenstatesE(si)
         SO = generateEigenstatesO(si)
+
         pSE = ProjectorsFromEigenstates(SE)
         pSO = ProjectorsFromEigenstates(SO)
-        cSE = simulateMeasurement(rho_true, pSE, N) * N
-        cSO = simulateMeasurement(rho_true, pSO, N) * N
-        
-        all_projectors = vcat(all_projectors, pSE, pSO)
-        all_counts     = vcat(all_counts, cSE, cSO)
+
+        cSE = simulateMeasurement(rho_true, pSE, N) 
+        cSO = simulateMeasurement(rho_true, pSO, N) 
+
+        append!(all_projectors, pSE)
+        append!(all_projectors, pSO)
+
+        append!(all_counts, cSE)
+        append!(all_counts, cSO)
     end
-    
-    # 3. Variablen und Constraints für MLE
+
+    # 3. MLE-Variable und Constraints
     ρ = ComplexVariable(d, d)
     constraints = [
         ρ == ρ',     # Hermitesch
         ρ ⪰ 0,       # Positiv semidefinit
-        tr(ρ) == 1   # Spur = 1
+        tr(ρ) == 1
     ]
-    
+
     eps = 1e-9
     loglik = sum(
         all_counts[i] * log(real(tr(ρ * all_projectors[i])) + eps)
         for i in eachindex(all_projectors)
     )
-    
-    # 4. Optimierungsproblem lösen
+
     problem = maximize(loglik, constraints)
-    solve!(problem, SCS.Optimizer; silent_solver=true)
-    
-    # 5. Rekonstruierte Dichtematrix zurückgeben
-    rho_mle = evaluate(ρ)
-    return rho_mle
+    solve!(problem, SCS.Optimizer; silent=true)
+    return evaluate(ρ)
 end
+
 
 
 end # module

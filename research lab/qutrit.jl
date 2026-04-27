@@ -278,6 +278,48 @@ function GenerateLambdaGroups(N::Int)
 end
 
 
+function MatrixElementsForGroupQutrit(S)
+
+    N = length(S)
+    dim = 3^N
+
+    trits = [reverse(digits(i, base=3, pad=N)) for i in 0:dim-1]
+
+    pairs = []
+
+    for i in 1:dim, j in 1:dim
+
+        valid = true
+
+        for k in 1:N
+            a = trits[i][k]
+            b = trits[j][k]
+
+            if S[k] == "38"
+                valid &= (a == b)
+
+            elseif S[k] == "12"
+                valid &= ((a == 0 && b == 1) || (a == 1 && b == 0))
+
+            elseif S[k] == "45"
+                valid &= ((a == 0 && b == 2) || (a == 2 && b == 0))
+
+            elseif S[k] == "67"
+                valid &= ((a == 1 && b == 2) || (a == 2 && b == 1))
+
+            else
+                error("Unbekanntes Label: $(S[k])")
+            end
+        end
+
+        if valid
+            push!(pairs, (i,j))
+        end
+    end
+
+    return pairs
+end
+
 function GenerateComputationalBasisQutrit(N::Int)
     basis = Vector{Vector{Float64}}()
     dim = 3^N
@@ -342,74 +384,7 @@ println(lambdagroups)
 println(length(GenerateEigenstates(lambdagroups[2])))
 
 
-function ComputeMLEFromGroups(rhoTrue, shots)
 
-    # =========================
-    # 1. Dimension → N bestimmen
-    # =========================
-    d = size(rhoTrue, 1)
-    N = Int(round(log(d) / log(3)))   # weil d = 3^N
-
-    # =========================
-    # 2. Gruppen generieren
-    # =========================
-    groups = GenerateLambdaGroups(N)
-
-    allProjectors = []
-    allCounts = []
-
-    # =========================
-    # 3. Über alle Gruppen
-    # =========================
-    for group in groups
-
-        # Basis holen
-        basis = GenerateEigenstates(group)
-
-        # Projektoren
-        projectors = [v * v' for v in basis]
-
-        # Messung
-        freqs = simulate_measurement(rhoTrue, projectors, shots)
-        counts = freqs .* shots
-
-        append!(allProjectors, projectors)
-        append!(allCounts, counts)
-    end
-
-    # =========================
-    # 4. Globales MLE
-    # =========================
-    ρ = ComplexVariable(d, d)
-
-    constraints = [
-        ρ == ρ',
-        ρ ⪰ 0,
-        tr(ρ) == 1
-    ]
-
-    eps = 1e-9
-
-    loglik = sum(
-        allCounts[i] * log(real(tr(ρ * allProjectors[i])) + eps)
-        for i in eachindex(allProjectors)
-    )
-
-    problem = maximize(loglik, constraints)
-    solve!(problem, SCS.Optimizer; silent_solver=true)
-
-    ρ_est = evaluate(ρ)
-
-    return ρ_est
-end
-
-
-RhoRec=ComputeMLEFromGroups(Rhotrue,shots)
-
-println(fidelity(Rhotrue,RhoRec))
-
-println(Rhotrue)
-println(RhoRec)
 
 #matrixelement distribution
 #formalism for real eigenbasis and imaginary eigenbasis

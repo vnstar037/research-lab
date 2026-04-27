@@ -48,14 +48,11 @@ end
 
 function _simulate_measurement(rho, projectors, n_shots)
     projectors = vec(projectors)
-
     probs = [real(tr(rho * P)) for P in projectors]
     outcomes = sample(1:length(projectors), Weights(probs), n_shots)
     counts = [sum(outcomes .== i) for i in 1:length(projectors)]
-
-    return counts
+    return counts ./ n_shots   # ← normiere zu Häufigkeiten
 end
-
 
 # ---------------------------------------------------------
 # 3) Maximum Likelihood Tomographie (extern!)
@@ -110,13 +107,11 @@ function RecreatingDensityMatrixWithMaximumLikelihoodEstimation(rho_true, n_shot
     ]
 
     logL = sum(
-        counts[i] * (-log(real(tr(rho * projector_list[i])) + 1e-12))
+        counts[i] * log(real(tr(rho * projector_list[i])) + 1e-12)
         for i in 1:length(projector_list)
     )
-
-    problem = minimize(logL, constraints)
-    solve!(problem, SCS.Optimizer)
-
+    problem = maximize(logL, constraints)
+    solve!(problem, SCS.Optimizer; silent_solver=true)
     return evaluate(rho)
 end
 
