@@ -352,14 +352,3 @@ plot(losses,
     yscale = :log10,
     legend = false)
 
-# Debug in process_data – direkt vor dem SGD Loop
-print("=== DEBUG Python ===")
-print("data shape:          ", data.shape)
-print("data sum:            ", float(data.sum()))
-print("data min:            ", float(data.min()))
-print("data max:            ", float(data.max()))
-print("Anzahl Unitaries:    ", len(unitaries_jnp))
-print("Anzahl Datenpunkte:  ", data.size)
-A = random_matrix_jax(N)
-L0 = log_loss_function(A, data.flatten(), unitaries_jnp, shots)
-print("Loss initial:        ", float(L0))

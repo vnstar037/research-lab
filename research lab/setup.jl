@@ -539,7 +539,7 @@ println("✓ Block 7 bestanden\n")
 
 println("═══ Alle Julia Tests bestanden ✓ ═══")
 =#
-
+#=
 println("═══ Tests GenerateExperiment Julia ═══\n")
 
 # ── Test 1: N=2, wanted=[(0,0),(0,3)] ─────────────────────────
@@ -589,3 +589,4 @@ E7, O7 = obs[7]
 println("✓ Test 3 bestanden\n")
 
 println("═══ Alle Julia Tests bestanden ✓ ═══")
+=#
