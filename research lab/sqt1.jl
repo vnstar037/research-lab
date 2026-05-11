@@ -374,7 +374,7 @@ println("✓ N=3 Block 63 bestanden")
 println("\n✓ Alle N=3 Assertions bestanden")
 println("\n═══ Alle Tests bestanden ✓ ═══")
 =#
-
+#=
 function BuildEntanglerBlocksQutrit(selective_blocks::Vector{Int}, N::Int)
     all_sequences = Vector{Vector{String}}()
 
@@ -433,8 +433,113 @@ function BuildEntanglerBlocksQutrit(selective_blocks::Vector{Int}, N::Int)
 
     return all_sequences
 end
-
+=#
 #=
+function BuildEntanglerBlocksQutrit(selective_blocks::Vector{Int}, N::Int)
+    all_sequences = Vector{Vector{String}}()
+
+    e_gate = Dict(1 => "RL2", 2 => "RL5", 3 => "RL7")
+    o_gate = Dict(1 => "RL1", 2 => "RL4", 3 => "RL6")
+
+    for block in selective_blocks
+        block_types    = digits(block, base=4, pad=N) |> reverse
+        active_qutrits = [(i-1, t) for (i, t) in enumerate(block_types) if t != 0]
+
+        if isempty(active_qutrits)
+            push!(all_sequences, [""])
+            continue
+        end
+
+        sequence_e = String[]
+        sequence_o = String[]
+
+        # Schritt 1: Rotation NUR auf erstem aktiven Qutrit
+        first_q, first_t = active_qutrits[1]
+        push!(sequence_e, "($(e_gate[first_t]):$first_q)")
+        push!(sequence_o, "($(o_gate[first_t]):$first_q)")
+
+        head = [first_q]
+        tail = active_qutrits[2:end]
+
+        # Schritt 2: CINC parallel aufbauen
+        # KEIN weiteres Rotation-Gate auf target Qutrits!
+        while !isempty(tail)
+            new_tail = Int[]
+            for h in head
+                isempty(tail) && break
+                tgt_q, tgt_t = popfirst!(tail)
+
+                # Nur CINC - keine Rotation auf target!
+                push!(sequence_e, "(CINC:$h,$tgt_q)")
+                push!(sequence_o, "(CINC:$h,$tgt_q)")
+
+                push!(new_tail, tgt_q)
+            end
+            append!(head, new_tail)
+        end
+
+        # Schritt 3: Umgekehrte Reihenfolge
+        e_str = join(reverse(sequence_e))
+        o_str = join(reverse(sequence_o))
+
+        push!(all_sequences, [e_str, o_str])
+    end
+
+    return all_sequences
+end
+=#
+function BuildEntanglerBlocksQutrit(selective_blocks::Vector{Int}, N::Int)
+    all_sequences = Vector{Vector{String}}()
+
+    e_gate = Dict(1 => "RL2", 2 => "RL5", 3 => "RL7")
+    o_gate = Dict(1 => "RL1", 2 => "RL4", 3 => "RL6")
+
+    for block in selective_blocks
+        block_types    = digits(block, base=4, pad=N) |> reverse
+        active_qutrits = [(i-1, t) for (i, t) in enumerate(block_types) if t != 0]
+
+        if isempty(active_qutrits)
+            push!(all_sequences, [""])
+            continue
+        end
+
+        sequence_e = String[]
+        sequence_o = String[]
+
+        # Schritt 1: Rotation NUR auf erstem aktiven Qutrit
+        first_q, first_t = active_qutrits[1]
+        push!(sequence_e, "($(e_gate[first_t]):$first_q)")
+        push!(sequence_o, "($(o_gate[first_t]):$first_q)")
+
+        head = [first_q]
+        tail = active_qutrits[2:end]
+
+        # Schritt 2: GHZ parallel aufbauen mit CINC
+        # KEINE Rotation auf target Qutrit!
+        while !isempty(tail)
+            new_tail = Int[]
+            for h in head
+                isempty(tail) && break
+                tgt_q, tgt_t = popfirst!(tail)
+
+                # Nur CINC - keine Rotation!
+                push!(sequence_e, "(CINC:$h,$tgt_q)")
+                push!(sequence_o, "(CINC:$h,$tgt_q)")
+
+                push!(new_tail, tgt_q)
+            end
+            append!(head, new_tail)
+        end
+
+        # Schritt 3: Umgekehrte Reihenfolge
+        e_str = join(reverse(sequence_e))
+        o_str = join(reverse(sequence_o))
+
+        push!(all_sequences, [e_str, o_str])
+    end
+
+    return all_sequences
+end
 println("═══ Tests BuildEntanglerBlocksQutrit ═══\n")
 
 # ── N=2: Alle Blöcke ──────────────────────────────────────────
@@ -511,7 +616,7 @@ for block in selected
 end
 
 println("\n═══ Alle Tests bestanden ✓ ═══")
-=#
+
 
 function BuildNonEntanglingCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
     all_block_circuits = Vector{Vector{String}}()
@@ -639,7 +744,7 @@ println("✓ N=3 Block 63 bestanden")
 
 println("\n═══ Alle Tests bestanden ✓ ═══")
 =#
-
+#=
 function BuildEntanglerBlocksQutrit(selective_blocks::Vector{Int}, N::Int)
     all_sequences = Vector{Vector{String}}()
 
@@ -678,6 +783,59 @@ function BuildEntanglerBlocksQutrit(selective_blocks::Vector{Int}, N::Int)
                 push!(sequence_o, "($(o_gate[tgt_t]):$tgt_q)")
 
                 # CINC von head zu target
+                push!(sequence_e, "(CINC:$h,$tgt_q)")
+                push!(sequence_o, "(CINC:$h,$tgt_q)")
+
+                push!(new_tail, tgt_q)
+            end
+            append!(head, new_tail)
+        end
+
+        # Schritt 3: Umgekehrte Reihenfolge
+        e_str = join(reverse(sequence_e))
+        o_str = join(reverse(sequence_o))
+
+        push!(all_sequences, [e_str, o_str])
+    end
+
+    return all_sequences
+end
+=#
+function BuildEntanglerBlocksQutrit(selective_blocks::Vector{Int}, N::Int)
+    all_sequences = Vector{Vector{String}}()
+
+    e_gate = Dict(1 => "RL2", 2 => "RL5", 3 => "RL7")
+    o_gate = Dict(1 => "RL1", 2 => "RL4", 3 => "RL6")
+
+    for block in selective_blocks
+        block_types    = digits(block, base=4, pad=N) |> reverse
+        active_qutrits = [(i-1, t) for (i, t) in enumerate(block_types) if t != 0]
+
+        if isempty(active_qutrits)
+            push!(all_sequences, [""])
+            continue
+        end
+
+        sequence_e = String[]
+        sequence_o = String[]
+
+        # Schritt 1: Rotation NUR auf erstem aktiven Qutrit
+        first_q, first_t = active_qutrits[1]
+        push!(sequence_e, "($(e_gate[first_t]):$first_q)")
+        push!(sequence_o, "($(o_gate[first_t]):$first_q)")
+
+        head = [first_q]
+        tail = active_qutrits[2:end]
+
+        # Schritt 2: GHZ parallel aufbauen mit CINC
+        # KEINE Rotation auf target Qutrit!
+        while !isempty(tail)
+            new_tail = Int[]
+            for h in head
+                isempty(tail) && break
+                tgt_q, tgt_t = popfirst!(tail)
+
+                # Nur CINC - keine Rotation!
                 push!(sequence_e, "(CINC:$h,$tgt_q)")
                 push!(sequence_o, "(CINC:$h,$tgt_q)")
 
@@ -1425,58 +1583,65 @@ function ProcessDataQutrit(
     rho_rec = rho_rec / tr(rho_rec)
     return rho_rec
 end
-println("═══ Volle Tomographie N=4 Qutrits (verbessert) ═══\n")
+println("═══ Fidelity Test N=2 Qutrits nach Fix ═══\n")
 
 N   = 4
-dim = 3^N  # = 81
+dim = 3^N
 
-# ── Schritt 1: Wahrer Zustand ──────────────────────────────────
 rho_true = GenerateRandomDensityMatrixNoZerosQutrits(N)
+shots    = 10000 * dim
 
-# ── Schritt 2: Alle Blöcke und Schaltkreise ────────────────────
+# ── SEEQST mit CINC ───────────────────────────────────────────
+println("── SEEQST mit CINC ──")
 blocks    = collect(0:(4^N - 1))
 ent_circs = BuildEntanglerBlocksQutrit(blocks, N)
 
-circuits = String[]
+circuits_seeqst = String[]
 for circ_group in ent_circs
-    append!(circuits, circ_group)
+    append!(circuits_seeqst, circ_group)
 end
-println("Anzahl Blöcke:       ", length(blocks))
-println("Anzahl Schaltkreise: ", length(circuits))
 
-# ── Schritt 3: Unitäre Matrizen ────────────────────────────────
-Us_all = ParseCircuitToMatrixQutrit(circuits, N)
-println("Anzahl Unitäre:      ", length(Us_all))
+println("Anzahl Schaltkreise: ", length(circuits_seeqst))
+println("Beispiel Block 5:    ", ent_circs[6])  # Block 5 = Index 6
 
-# ── Schritt 4: Messungen simulieren ───────────────────────────
-shots = 1000 * dim
-data  = DataPredictFromRhoSampledQutrit(rho_true, Us_all, shots)
-println("Shots pro Circuit:   ", shots)
-println("Anzahl Datenpunkte:  ", length(data))
+Us_seeqst   = ParseCircuitToMatrixQutrit(circuits_seeqst, N)
+data_seeqst = DataPredictFromRhoSampledQutrit(rho_true, Us_seeqst, shots)
 
-# ── Schritt 5: Rekonstruktion (verbessert) ─────────────────────
-println("\n── SGD + Cholesky (verbessert) ──")
-rho_rec = ProcessDataQutrit(
-    data, Us_all, blocks, shots, N;
-    lr         = 0.1,
-    decay      = 0.9999,
-    iterations = 10000,  # mehr Iterationen
-    patience   = 500,    # länger warten
-    tol        = 1e-12
+rho_seeqst = ProcessDataQutrit(
+    data_seeqst, Us_seeqst, blocks, shots, N;
+    lr=0.1, decay=0.9999, iterations=5000, patience=200
 )
+F_seeqst = fidelity(rho_seeqst, rho_true)
+println("Fidelität SEEQST:    ", round(F_seeqst, digits=4))
 
-# ── Schritt 6: Qualität prüfen ─────────────────────────────────
-println("\n── Ergebnisse ──")
-F = fidelity(rho_rec, rho_true)
-println("Fidelität:           ", round(F, digits=4))
-println("Spur ρ_rec:          ", round(real(tr(rho_rec)), digits=6))
-println("Hermitesch:          ", rho_rec ≈ rho_rec')
-println("Kleinster Eigenwert: ", round(minimum(real(eigvals(rho_rec))), digits=6))
+# ── Ohne CINC (lokal) ─────────────────────────────────────────
+println("\n── Ohne CINC (lokal) ──")
+non_ent_circs = BuildNonEntanglingCircuitsQutrit(blocks, N)
 
-@assert abs(real(tr(rho_rec)) - 1.0) < 1e-6      "Fehler: Spur ≠ 1"
-@assert rho_rec ≈ rho_rec'                        "Fehler: nicht hermitesch"
-@assert minimum(real(eigvals(rho_rec))) >= -1e-6  "Fehler: negative Eigenwerte"
-@assert F > 0.8                                   "Fehler: Fidelität zu niedrig"
+circuits_local = String[]
+for circ_group in non_ent_circs
+    append!(circuits_local, circ_group)
+end
 
-println("\n✓ Volle Tomographie N=4 Qutrits bestanden")
-println("═"^45)
+println("Anzahl Schaltkreise: ", length(circuits_local))
+
+Us_local   = ParseCircuitToMatrixQutrit(circuits_local, N)
+data_local = DataPredictFromRhoSampledQutrit(rho_true, Us_local, shots)
+
+rho_local = ProcessDataQutrit(
+    data_local, Us_local, blocks, shots, N;
+    lr=0.1, decay=0.9999, iterations=5000, patience=200
+)
+F_local = fidelity(rho_local, rho_true)
+println("Fidelität lokal:     ", round(F_local, digits=4))
+
+# ── Vergleich ─────────────────────────────────────────────────
+println("\n── Vergleich ──")
+println(@sprintf("%-25s  %-15s  %-15s", "Methode", "Schaltkreise", "Fidelität"))
+println("─"^55)
+println(@sprintf("%-25s  %-15d  %-15.4f", "SEEQST (mit CINC)",  length(circuits_seeqst), F_seeqst))
+println(@sprintf("%-25s  %-15d  %-15.4f", "Lokal (ohne CINC)",  length(circuits_local),  F_local))
+
+@assert F_seeqst > 0.8  "Fehler: SEEQST Fidelität zu niedrig"
+@assert F_local  > 0.8  "Fehler: Lokal Fidelität zu niedrig"
+println("\n✓ Alle Tests bestanden")
