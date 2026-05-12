@@ -3,72 +3,224 @@ using .SeeqstQutrit
 using LinearAlgebra
 using Printf
 using QuantumInformation
-println("═══ Tests BuildHybridCircuitsQutrit ═══\n")
 
-type_names = ["diag", "|0⟩↔|1⟩", "|0⟩↔|2⟩", "|1⟩↔|2⟩"]
+#=
+println("═══ Hybrid Tomographie Tests ═══\n")
 
-# ── Test 1: Block 0 → leer ────────────────────────────────────
-println("── Test 1: Block 0 ──")
-seq = BuildHybridCircuitsQutrit([0], 2)[1]
-@assert seq == [""]  "Fehler: Block 0 sollte leer sein"
-println("✓ Block 0: leer\n")
+# ── N=2 ───────────────────────────────────────────────────────
+rho_rec, rho_true, F2 = FullTomographyHybrid(2;
+    shots_per_circuit = 10000,
+    lr                = 0.1,
+    decay             = 0.9999,
+    iterations        = 3000,
+    patience          = 200
+)
 
-# ── Test 2: Block 5 = 11₄ (beide |0⟩↔|1⟩) ────────────────────
-println("── Test 2: Block 5 = 11₄ ──")
-seq = BuildHybridCircuitsQutrit([5], 2)[1]
-println("Circuits:")
-for c in seq; println("  ", c); end
-# E: RL2+RL2 (2 Y) oder RL1+RL1 (0 Y)
-# O: RL2+RL1 (1 Y) oder RL1+RL2 (1 Y)
-@assert any(startswith(c, "E:") && occursin("CINC", c) for c in seq)  "Fehler: E mit CINC fehlt"
-@assert any(startswith(c, "O:") && occursin("CINC", c) for c in seq)  "Fehler: O mit CINC fehlt"
-println("✓ Block 5: CINC + lokale Rotationen\n")
+# ── N=3 ───────────────────────────────────────────────────────
+rho_rec, rho_true, F3 = FullTomographyHybrid(3;
+    shots_per_circuit = 10000,
+    lr                = 0.1,
+    decay             = 0.9999,
+    iterations        = 5000,
+    patience          = 200
+)
 
-# ── Test 3: Block 1 = 01₄ (nur 1 aktiv) ──────────────────────
-println("── Test 3: Block 1 = 01₄ (1 aktives Qutrit) ──")
-seq = BuildHybridCircuitsQutrit([1], 2)[1]
-println("Circuits:")
-for c in seq; println("  ", c); end
-@assert !any(occursin("CINC", c) for c in seq)  "Fehler: kein CINC bei 1 Qutrit"
-println("✓ Block 1: kein CINC\n")
+# ── Vergleich alle Methoden für N=2 ───────────────────────────
+println("\n━"^50)
+println("Vergleich alle Methoden für N=2")
+println("━"^50)
 
-# ── Test 4: Block 3232₄ (dein Beispiel) ───────────────────────
-println("── Test 4: Block 3232₄ (L67×L45×L67×L45) ──")
-# Block 3232₄: 3*4³ + 2*4² + 3*4 + 2 = 192+32+12+2 = 238
-block_3232 = 3*4^3 + 2*4^2 + 3*4 + 2
-block_types = digits(block_3232, base=4, pad=4) |> reverse
-println("Block ", block_3232, " = ", join(block_types), "₄")
-println("  ", join([type_names[t+1] for t in block_types], " × "))
+N   = 4
+dim = 3^N
+rho_true = GenerateRandomDensityMatrixNoZerosQutrits(N)
+shots    = 1000
+blocks   = collect(0:(4^N-1))
 
-seq = BuildHybridCircuitsQutrit([block_3232], 4)[1]
-println("Circuits:")
-for c in seq; println("  ", c); end
+# SEEQST mit CINC
+ent_circs = BuildEntanglerBlocksQutrit(blocks, N)
+circs_ent = unique(String[c for g in ent_circs for c in g])
+Us_ent    = ParseCircuitToMatrixQutrit(circs_ent, N)
+data_ent  = DataPredictFromRhoSampledQutrit(rho_true, Us_ent, shots)
+rho_ent   = ProcessDataQutrit(data_ent, Us_ent, blocks, shots, N;
+    iterations=3000, verbose=false)
+F_ent = fidelity(rho_ent, rho_true)
 
-n_e = count(c -> startswith(c, "E:"), seq)
-n_o = count(c -> startswith(c, "O:"), seq)
-println("E-Circuits: $n_e, O-Circuits: $n_o")
-@assert any(occursin("CINC33", c) for c in seq)  "Fehler: CINC33 fehlt"
-@assert any(occursin("CINC22", c) for c in seq)  "Fehler: CINC22 fehlt"
-println("✓ Block 3232₄: CINC33 + CINC22 + lokale Rotationen\n")
+# NonEntangling
+non_circs = BuildNonEntanglingCircuitsQutrit(blocks, N)
+circs_non = unique(String[c for g in non_circs for c in g])
+Us_non    = ParseCircuitToMatrixQutrit(circs_non, N)
+data_non  = DataPredictFromRhoSampledQutrit(rho_true, Us_non, shots)
+rho_non   = ProcessDataQutrit(data_non, Us_non, blocks, shots, N;
+    iterations=3000, verbose=false)
+F_non = fidelity(rho_non, rho_true)
 
-# ── Test 5: Vergleich Anzahl Circuits ─────────────────────────
-println("── Test 5: Vergleich Anzahl Circuits ──")
-println(@sprintf("%-15s  %-12s  %-12s  %-12s",
-    "Block", "Hybrid", "NonEnt", "Entangl"))
-println("─"^55)
+# Hybrid
+hyb_circs = BuildHybridCircuitsQutrit(blocks, N)
+circs_hyb = unique(String[
+    startswith(c,"E:") || startswith(c,"O:") ? c[3:end] : c
+    for g in hyb_circs for c in g
+])
+Us_hyb   = ParseCircuitToMatrixQutrit(circs_hyb, N)
+data_hyb = DataPredictFromRhoSampledQutrit(rho_true, Us_hyb, shots)
+rho_hyb  = ProcessDataQutrit(data_hyb, Us_hyb, blocks, shots, N;
+    iterations=3000, verbose=false)
+F_hyb = fidelity(rho_hyb, rho_true)
 
-for block in [0, 1, 5, 15, block_3232]
-    N_test = block > 255 ? 4 : 2
-    hybrid   = BuildHybridCircuitsQutrit([block], N_test)[1]
-    non_ent  = BuildNonEntanglingCircuitsQutrit([block], N_test)[1]
-    entangl  = BuildEntanglerBlocksQutrit([block], N_test)[1]
+println()
+println(@sprintf("%-25s  %-12s  %-10s",
+    "Methode", "Circuits", "Fidelität"))
+println("─"^50)
+println(@sprintf("%-25s  %-12d  %-10.4f",
+    "SEEQST (Entangling)",  length(circs_ent), F_ent))
+println(@sprintf("%-25s  %-12d  %-10.4f",
+    "Hybrid",               length(circs_hyb), F_hyb))
+println(@sprintf("%-25s  %-12d  %-10.4f",
+    "NonEntangling",        length(circs_non), F_non))
+=#
+function BuildOptimalCircuitsQutrit(N::Int)
+    blocks  = collect(0:(4^N - 1))
+    y_like  = ["RL2", "RL5", "RL7"]
+    e_gate  = Dict(1 => "RL2", 2 => "RL5", 3 => "RL7")
+    o_gate  = Dict(1 => "RL1", 2 => "RL4", 3 => "RL6")
+    cinc_type = Dict(1 => "CINC", 2 => "CINC22", 3 => "CINC33")
 
-    n_h = length(hybrid)
-    n_n = length(non_ent)
-    n_e = length(entangl)
+    # Sortiere Blöcke nach Anzahl aktiver Qutrits (absteigend)
+    # → höchste Blöcke zuerst
+    sorted_blocks = sort(blocks, by = b -> begin
+        bt = digits(b, base=4, pad=N) |> reverse
+        -count(t -> t != 0, bt)  # negativ → absteigende Reihenfolge
+    end)
 
-    println(@sprintf("%-15s  %-12d  %-12d  %-12d",
-        "Block $block", n_h, n_n, n_e))
+    seen_rotations = Set{String}()  # gesehene Rotations-Kombinationen
+    all_circuits   = String[]
+
+    for block in sorted_blocks
+        block_types    = digits(block, base=4, pad=N) |> reverse
+        active_qutrits = [(i-1, t) for (i, t) in enumerate(block_types) if t != 0]
+
+        isempty(active_qutrits) && continue
+
+        # Gruppiere nach Übergangstyp
+        type_groups = Dict{Int, Vector{Int}}()
+        for (q, t) in active_qutrits
+            if !haskey(type_groups, t)
+                type_groups[t] = Int[]
+            end
+            push!(type_groups[t], q)
+        end
+
+        # Entangling Gates
+        entangling_gates = String[]
+        local_qutrits    = Int[]
+
+        for (t, qubits) in sort(collect(type_groups))
+            if length(qubits) == 1
+                push!(local_qutrits, qubits[1])
+            else
+                head = [qubits[1]]
+                tail = qubits[2:end]
+                while !isempty(tail)
+                    new_tail = Int[]
+                    for h in head
+                        isempty(tail) && break
+                        tgt = popfirst!(tail)
+                        push!(entangling_gates, "($(cinc_type[t]):$h,$tgt)")
+                        push!(new_tail, tgt)
+                    end
+                    append!(head, new_tail)
+                end
+                push!(local_qutrits, qubits[1])
+            end
+        end
+
+        local_qutrit_types = [t for (q,t) in active_qutrits if q in local_qutrits]
+        local_qutrit_idxs  = [q for (q,t) in active_qutrits if q in local_qutrits]
+
+        rot_options = [[e_gate[t], o_gate[t]] for t in local_qutrit_types]
+        rot_choices = Iterators.product(rot_options...)
+
+        for choice in rot_choices
+            # Rotations-Schlüssel: welche Rotation auf welchem Qutrit
+            rot_key = join(["($gate:$q)" for (gate,q)
+                            in zip(choice, local_qutrit_idxs)], "")
+
+            # Wenn diese Rotation schon gesehen → redundant!
+            rot_key ∈ seen_rotations && continue
+            push!(seen_rotations, rot_key)
+
+            n_y = count(r -> r in y_like, choice)
+            local_gates = ["($gate:$q)" for (gate,q)
+                           in zip(choice, local_qutrit_idxs)]
+            circuit_str = join(vcat(reverse(entangling_gates), local_gates))
+            push!(all_circuits, (n_y % 2 == 0 ? "E:" : "O:") * circuit_str)
+        end
+    end
+
+    return all_circuits
 end
 
-println("\n═══ Alle Tests bestanden ✓ ═══")
+println("═══ Test BuildOptimalCircuitsQutrit ═══\n")
+
+for N in [2, 3]
+    println("━"^50)
+    println("N=$N")
+
+    optimal  = BuildOptimalCircuitsQutrit(N)
+    blocks   = collect(0:(4^N-1))
+
+    hybrid_red = BuildHybridCircuitsQutrit(blocks, N)
+    circs_red  = unique(String[
+        startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
+        for g in hybrid_red for c in g if c != ""])
+
+    non_ent   = BuildNonEntanglingCircuitsQutrit(blocks, N)
+    circs_non = unique(String[c for g in non_ent for c in g if c != ""])
+
+    ent       = BuildEntanglerBlocksQutrit(blocks, N)
+    circs_ent = unique(String[c for g in ent for c in g if c != ""])
+
+    optimal_clean = unique(String[
+        startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
+        for c in optimal if c != ""])
+
+    println(@sprintf("%-25s  %d", "Entangling (SEEQST):", length(circs_ent)))
+    println(@sprintf("%-25s  %d", "Hybrid (mit Red.):",   length(circs_red)))
+    println(@sprintf("%-25s  %d", "Optimal (ohne Red.):", length(optimal_clean)))
+    println(@sprintf("%-25s  %d", "NonEntangling:",       length(circs_non)))
+    println()
+end
+
+# Fidelity für N=2
+println("━"^50)
+println("Fidelity Vergleich N=2")
+println("━"^50)
+
+N        = 2
+blocks   = collect(0:(4^N-1))
+rho_true = GenerateRandomDensityMatrixNoZerosQutrits(N)
+shots    = 5000
+
+methods = Dict(
+    "Entangling" => unique(String[c for g in
+        BuildEntanglerBlocksQutrit(blocks,N) for c in g if c != ""]),
+    "Hybrid"     => unique(String[
+        startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
+        for g in BuildHybridCircuitsQutrit(blocks,N) for c in g if c != ""]),
+    "Optimal"    => unique(String[
+        startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
+        for c in BuildOptimalCircuitsQutrit(N) if c != ""]),
+    "NonEnt"     => unique(String[c for g in
+        BuildNonEntanglingCircuitsQutrit(blocks,N) for c in g if c != ""]),
+)
+
+println()
+println(@sprintf("%-15s  %-10s  %-10s", "Methode", "Circuits", "Fidelität"))
+println("─"^40)
+for (name, circs) in sort(collect(methods), by=x->length(x[2]))
+    Us   = ParseCircuitToMatrixQutrit(circs, N)
+    data = DataPredictFromRhoSampledQutrit(rho_true, Us, shots)
+    rho  = ProcessDataQutrit(data, Us, blocks, shots, N;
+        iterations=3000, patience=200, verbose=false)
+    F    = fidelity(rho, rho_true)
+    println(@sprintf("%-15s  %-10d  %-10.4f", name, length(circs), F))
+end

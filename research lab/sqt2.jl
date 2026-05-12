@@ -1,9 +1,12 @@
-module SeeqstQutrit
 
+
+module SeeqstQutrit
 using LinearAlgebra
 using StatsBase
 using Zygote
 using Printf
+using QuantumInformation
+
 
 export GenerateRandomDensityMatrixNoZerosQutrits,
        GetSelectiveBlocksQutrit,
@@ -20,7 +23,10 @@ export GenerateRandomDensityMatrixNoZerosQutrits,
        densityMatrixFromTQutrit,
        DataPredictFromRhoSampledQutrit,
        ProcessDataQutrit,
-       BuildHybridCircuitsQutrit
+       BuildHybridCircuitsQutrit,
+       FullTomographyHybrid,
+       CINCDaggerGate, CINC33Gate,
+       BuildHybridCircuitsNoRedundancyQutrit
 
 # --------------------------------------------------------------------
 # Zufällige Dichtematrix
@@ -346,6 +352,12 @@ function ParseCircuitToMatrixQutrit(text_circuits::Vector{String}, n::Int)
             elseif gate_name == "CINC"
                 U = CINCGate(n, indices[1], indices[2]) * U
 
+            elseif gate_name == "CINC22"
+                U = CINCDaggerGate(n, indices[1], indices[2]) * U
+
+            elseif gate_name == "CINC33"
+                U = CINC33Gate(n, indices[1], indices[2]) * U
+
             else
                 error("Unbekanntes Gate: $gate_name")
             end
@@ -355,6 +367,47 @@ function ParseCircuitToMatrixQutrit(text_circuits::Vector{String}, n::Int)
     end
 
     return unitary_list
+end
+
+# CINC† für |0⟩↔|2⟩: target -= control mod 3
+function CINCDaggerGate(n::Int, control::Int, target::Int)
+    dim  = 3^n
+    gate = zeros(ComplexF64, dim, dim)
+
+    for state in 0:(dim-1)
+        control_trit    = (state ÷ 3^(n-1-control)) % 3
+        target_trit     = (state ÷ 3^(n-1-target))  % 3
+        new_target_trit = (target_trit - control_trit + 3) % 3  # ← minus!
+        new_state       = state - target_trit     * 3^(n-1-target) +
+                                   new_target_trit * 3^(n-1-target)
+        gate[new_state+1, state+1] = 1.0
+    end
+
+    return gate
+end
+
+# CINC33 für |1⟩↔|2⟩: nur im {1,2} Unterraum
+function CINC33Gate(n::Int, control::Int, target::Int)
+    dim  = 3^n
+    gate = zeros(ComplexF64, dim, dim)
+
+    for state in 0:(dim-1)
+        control_trit = (state ÷ 3^(n-1-control)) % 3
+        target_trit  = (state ÷ 3^(n-1-target))  % 3
+
+        new_target_trit = if control_trit == 0 || target_trit == 0
+            target_trit              # |0⟩ immer unberührt
+        else
+            # {1,2} Unterraum: +1 mod 2, verschoben um 1
+            (target_trit - 1 + 1) % 2 + 1
+        end
+
+        new_state = state - target_trit     * 3^(n-1-target) +
+                            new_target_trit * 3^(n-1-target)
+        gate[new_state+1, state+1] = 1.0
+    end
+
+    return gate
 end
 
 # --------------------------------------------------------------------
@@ -482,7 +535,6 @@ function ProcessDataQutrit(
     return rho_rec
 end
 
-end # module SeeqstQutrit
 
 function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
     all_sequences = Vector{Vector{String}}()
@@ -581,3 +633,153 @@ function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
 
     return all_sequences
 end
+
+function FullTomographyHybrid(N::Int; shots_per_circuit::Int=1000, 
+                               lr::Float64=0.1, decay::Float64=0.9999,
+                               iterations::Int=3000, patience::Int=200)
+
+    println("═══ Volle Tomographie (Hybrid) N=$N ═══\n")
+    
+    dim      = 3^N
+    rho_true = GenerateRandomDensityMatrixNoZerosQutrits(N)
+    blocks   = collect(0:(4^N - 1))
+
+    # ── Schritt 1: Hybrid Circuits ────────────────────────────
+    hybrid_circs = BuildHybridCircuitsQutrit(blocks, N)
+
+    # Flatten und E/O Prefix entfernen
+    circuits = String[]
+    for circ_group in hybrid_circs
+        for c in circ_group
+            # Entferne "E:" oder "O:" Prefix
+            circuit = startswith(c, "E:") || startswith(c, "O:") ? c[3:end] : c
+            push!(circuits, circuit)
+        end
+    end
+    # Duplikate entfernen
+    circuits = unique(circuits)
+
+    println("Anzahl Blöcke:       ", length(blocks))
+    println("Anzahl Circuits:     ", length(circuits))
+    println("Shots pro Circuit:   ", shots_per_circuit)
+    println("Datenpunkte total:   ", length(circuits) * dim)
+
+    # ── Schritt 2: Unitäre Matrizen ───────────────────────────
+    Us_all = ParseCircuitToMatrixQutrit(circuits, N)
+
+    # ── Schritt 3: Messungen simulieren ───────────────────────
+    data = DataPredictFromRhoSampledQutrit(rho_true, Us_all, shots_per_circuit)
+
+    # ── Schritt 4: Rekonstruktion ──────────────────────────────
+    println("\n── SGD + Cholesky ──")
+    rho_rec = ProcessDataQutrit(
+        data, Us_all, blocks, shots_per_circuit, N;
+        lr=lr, decay=decay, iterations=iterations,
+        patience=patience, verbose=true
+    )
+
+    # ── Schritt 5: Ergebnisse ─────────────────────────────────
+    F = fidelity(rho_rec, rho_true)
+    println("\n── Ergebnisse ──")
+    println(@sprintf("Fidelität:           %.4f", F))
+    println(@sprintf("Spur ρ_rec:          %.6f", real(tr(rho_rec))))
+    println("Hermitesch:          ", rho_rec ≈ rho_rec')
+    println(@sprintf("Kleinster Eigenwert: %.6f",
+        minimum(real(eigvals(rho_rec)))))
+
+    @assert abs(real(tr(rho_rec)) - 1.0) < 1e-6     "Fehler: Spur ≠ 1"
+    @assert minimum(real(eigvals(rho_rec))) >= -1e-6 "Fehler: neg. Eigenwerte"
+    @assert F > 0.7                                   "Fehler: Fidelität zu niedrig"
+
+    println("\n✓ Hybrid Tomographie N=$N bestanden")
+    println("═"^45)
+
+    return rho_rec, rho_true, F
+end
+
+function BuildHybridCircuitsNoRedundancyQutrit(selective_blocks::Vector{Int}, N::Int)
+    
+    y_like = ["RL2", "RL5", "RL7"]
+    e_gate = Dict(1 => "RL2", 2 => "RL5", 3 => "RL7")
+    o_gate = Dict(1 => "RL1", 2 => "RL4", 3 => "RL6")
+    cinc_type = Dict(1 => "CINC", 2 => "CINC22", 3 => "CINC33")
+
+    # Globales Set aller bereits gesehenen Circuits
+    seen_circuits = Set{String}()
+    all_sequences = Vector{Vector{String}}()
+
+    for block in selective_blocks
+        block_types    = digits(block, base=4, pad=N) |> reverse
+        active_qutrits = [(i-1, t) for (i, t) in enumerate(block_types) if t != 0]
+
+        if isempty(active_qutrits)
+            push!(all_sequences, [""])
+            continue
+        end
+
+        # ── Schritt 1: Gruppiere nach Übergangstyp ──────────────
+        type_groups = Dict{Int, Vector{Int}}()
+        for (q, t) in active_qutrits
+            if !haskey(type_groups, t)
+                type_groups[t] = Int[]
+            end
+            push!(type_groups[t], q)
+        end
+
+        # ── Schritt 2: Entangling innerhalb jeder Gruppe ────────
+        entangling_gates = String[]
+        local_qutrits    = Int[]
+
+        for (t, qubits) in sort(collect(type_groups))
+            if length(qubits) == 1
+                push!(local_qutrits, qubits[1])
+            else
+                head = [qubits[1]]
+                tail = qubits[2:end]
+                while !isempty(tail)
+                    new_tail = Int[]
+                    for h in head
+                        isempty(tail) && break
+                        tgt = popfirst!(tail)
+                        push!(entangling_gates, "($(cinc_type[t]):$h,$tgt)")
+                        push!(new_tail, tgt)
+                    end
+                    append!(head, new_tail)
+                end
+                push!(local_qutrits, qubits[1])
+            end
+        end
+
+        # ── Schritt 3: Lokale Rotationen ohne Redundanz ─────────
+        local_qutrit_types = [t for (q, t) in active_qutrits
+                               if q in local_qutrits]
+        local_qutrit_idxs  = [q for (q, t) in active_qutrits
+                               if q in local_qutrits]
+
+        rot_options  = [[e_gate[t], o_gate[t]] for t in local_qutrit_types]
+        rot_choices  = Iterators.product(rot_options...)
+
+        circuits = String[]
+        for choice in rot_choices
+            n_y = count(r -> r in y_like, choice)
+
+            local_gates = ["($gate:$q)" for (gate, q)
+                           in zip(choice, local_qutrit_idxs)]
+
+            circuit_str = join(vcat(reverse(entangling_gates), local_gates))
+
+            # ── Nur hinzufügen wenn noch nicht gesehen ──────────
+            if circuit_str ∉ seen_circuits
+                push!(seen_circuits, circuit_str)
+                push!(circuits, (n_y % 2 == 0 ? "E:" : "O:") * circuit_str)
+            end
+        end
+
+        # Wenn alle Circuits redundant waren → leeren Eintrag
+        push!(all_sequences, isempty(circuits) ? [""] : circuits)
+    end
+
+    return all_sequences
+end
+
+end # module SeeqstQutrit
