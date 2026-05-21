@@ -6,14 +6,15 @@ using Zygote
 using Printf
 using QuantumInformation
 
+
 export GenerateRandomDensityMatrixNoZerosQutrits,
        GetSelectiveBlocksQutrit,
        GenerateSelectiveElementsQutrit,
        GenerateObservableSetsQutrit,
        BuildNonEntanglingCircuitsQutrit,
        BuildHybridCircuitsQutrit,
-       CINCGate,
-       CINCDaggerGate,
+       CINC11Gate,       
+       CINC22Gate,       
        CINC33Gate,
        GellMannRotation,
        ParseCircuitToMatrixQutrit,
@@ -183,7 +184,7 @@ function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
     y_like    = ["RL2", "RL5", "RL7"]
     e_gate    = Dict(1 => "RL2", 2 => "RL5", 3 => "RL7")
     o_gate    = Dict(1 => "RL1", 2 => "RL4", 3 => "RL6")
-    cinc_type = Dict(1 => "CINC", 2 => "CINC22", 3 => "CINC33")
+    cinc_type = Dict(1 => "CINC11", 2 => "CINC22", 3 => "CINC33")
 
     for block in selective_blocks
         block_types    = digits(block, base=4, pad=N) |> reverse
@@ -201,14 +202,15 @@ function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
             push!(type_groups[t], q)
         end
 
-        # Entangling Gates + lokale Qutrits
         entangling_gates = String[]
         local_qutrits    = Int[]
 
         for (t, qubits) in sort(collect(type_groups))
             if length(qubits) == 1
+                # nur 1 Qutrit dieses Typs → kein CINC
                 push!(local_qutrits, qubits[1])
             else
+                # mehrere Qutrits gleichen Typs → CINC11/22/33
                 head = [qubits[1]]
                 tail = qubits[2:end]
                 while !isempty(tail)
@@ -221,6 +223,7 @@ function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
                     end
                     append!(head, new_tail)
                 end
+                # erstes Qutrit der Gruppe bekommt lokale Rotation
                 push!(local_qutrits, qubits[1])
             end
         end
@@ -243,46 +246,76 @@ function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
 
     return all_sequences
 end
-
 # --------------------------------------------------------------------
 # Gates
 # --------------------------------------------------------------------
-function CINCGate(n::Int, control::Int, target::Int)
+
+function CINC11Gate(n::Int, control::Int, target::Int)
+    # |0⟩↔|1⟩ Unterraum
+    # Control=1: tauscht Target 0↔1
+    # Control=0: unberührt
     dim  = 3^n
-    gate = zeros(ComplexF64, dim, dim)
+    gate = Matrix{ComplexF64}(I, dim, dim)
+
     for state in 0:(dim-1)
         ct = (state ÷ 3^(n-1-control)) % 3
         tt = (state ÷ 3^(n-1-target))  % 3
-        nt = (tt + ct) % 3
-        ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
-        gate[ns+1, state+1] = 1.0
+
+        # Nur aktiv wenn control=1 und target in {0,1}
+        if ct == 1 && tt in (0, 1)
+            nt = tt == 0 ? 1 : 0  # tausche 0↔1
+            ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
+            gate[:, state+1] .= 0
+            gate[ns+1, state+1] = 1.0
+        end
     end
+
     return gate
 end
 
-function CINCDaggerGate(n::Int, control::Int, target::Int)
+function CINC22Gate(n::Int, control::Int, target::Int)
+    # |0⟩↔|2⟩ Unterraum
+    # Control=2: tauscht Target 0↔2
+    # Control=0: unberührt
     dim  = 3^n
-    gate = zeros(ComplexF64, dim, dim)
+    gate = Matrix{ComplexF64}(I, dim, dim)
+
     for state in 0:(dim-1)
         ct = (state ÷ 3^(n-1-control)) % 3
         tt = (state ÷ 3^(n-1-target))  % 3
-        nt = (tt - ct + 3) % 3
-        ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
-        gate[ns+1, state+1] = 1.0
+
+        # Nur aktiv wenn control=2 und target in {0,2}
+        if ct == 2 && tt in (0, 2)
+            nt = tt == 0 ? 2 : 0  # tausche 0↔2
+            ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
+            gate[:, state+1] .= 0
+            gate[ns+1, state+1] = 1.0
+        end
     end
+
     return gate
 end
 
 function CINC33Gate(n::Int, control::Int, target::Int)
+    # |1⟩↔|2⟩ Unterraum
+    # Control=2: tauscht Target 1↔2
+    # Control=1: unberührt
     dim  = 3^n
-    gate = zeros(ComplexF64, dim, dim)
+    gate = Matrix{ComplexF64}(I, dim, dim)
+
     for state in 0:(dim-1)
         ct = (state ÷ 3^(n-1-control)) % 3
         tt = (state ÷ 3^(n-1-target))  % 3
-        nt = (ct == 0 || tt == 0) ? tt : (tt - 1 + 1) % 2 + 1
-        ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
-        gate[ns+1, state+1] = 1.0
+
+        # Nur aktiv wenn control=2 und target in {1,2}
+        if ct == 2 && tt in (1, 2)
+            nt = tt == 1 ? 2 : 1  # tausche 1↔2
+            ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
+            gate[:, state+1] .= 0
+            gate[ns+1, state+1] = 1.0
+        end
     end
+
     return gate
 end
 
@@ -329,10 +362,10 @@ function ParseCircuitToMatrixQutrit(text_circuits::Vector{String}, n::Int)
                     full = kron(full, q == indices[1] ? rot : Matrix{ComplexF64}(I,3,3))
                 end
                 U = full * U
-            elseif gate_name == "CINC"
-                U = CINCGate(n, indices[1], indices[2]) * U
+            elseif gate_name == "CINC11"
+                U = CINC11Gate(n, indices[1], indices[2]) * U
             elseif gate_name == "CINC22"
-                U = CINCDaggerGate(n, indices[1], indices[2]) * U
+                U = CINC22Gate(n, indices[1], indices[2]) * U
             elseif gate_name == "CINC33"
                 U = CINC33Gate(n, indices[1], indices[2]) * U
             else
@@ -444,7 +477,7 @@ function RecreatingDensityMatrixWithNonentanglingQutrit(rho_true::Matrix{Complex
                                                          shots::Int;
                                                          lr::Float64     = 0.1,
                                                          decay::Float64  = 0.9999,
-                                                         iterations::Int = 5000,
+                                                         iterations::Int = 3000,
                                                          patience::Int   = 200)
 
     N   = Int(round(log(3, size(rho_true, 1))))
@@ -478,13 +511,15 @@ function RecreatingDensityMatrixWithNonentanglingQutrit(rho_true::Matrix{Complex
     return rho_rec
 end
 
-
+# --------------------------------------------------------------------
+# Volle Tomographie: Hybrid SEEQST
+# --------------------------------------------------------------------
 function RecreatingDensityMatrixWithSeeqstQutrit(rho_true::Matrix{ComplexF64},
                                                   shots::Int;
                                                   lr::Float64     = 0.1,
                                                   decay::Float64  = 0.9999,
-                                                  iterations::Int = 50000,
-                                                  patience::Int   = 1000)
+                                                  iterations::Int = 1000,
+                                                  patience::Int   = 200)
 
     N   = Int(round(log(3, size(rho_true, 1))))
     dim = 3^N
@@ -518,4 +553,5 @@ function RecreatingDensityMatrixWithSeeqstQutrit(rho_true::Matrix{ComplexF64},
 
     return rho_rec
 end
+
 end # module SeeqstHybridQutrit

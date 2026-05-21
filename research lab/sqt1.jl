@@ -1585,7 +1585,7 @@ function ProcessDataQutrit(
 end
 println("═══ Fidelity Test N=2 Qutrits nach Fix ═══\n")
 
-N   = 4
+N   = 2
 dim = 3^N
 
 rho_true = GenerateRandomDensityMatrixNoZerosQutrits(N)

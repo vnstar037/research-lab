@@ -274,11 +274,11 @@ function ProcessData(
 
     return BlockSeparator(rho_rec, selective_blocks, N)
 end
-N = 4
+N = 2
 
 println("── ProcessData N=4 ──")
 rho_true = GenerateRandomDensityMatrixNoZeros(N)
-
+println(rho_true)
 # Automatisch generieren
 blocks    = collect(0:(2^N-1))
 ent_circs = BuildEntanglerBlocks(blocks, N)

@@ -48,7 +48,7 @@ end
 #omega= [omega_0,omega_x,omega_y,omega_z]
 
 
-#projektor z basis
+#projektor z basis.
 p_0= [1 ;0]
 p_1= [0;1]
 proj_z1=p_0*p_0'

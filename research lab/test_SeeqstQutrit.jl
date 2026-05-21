@@ -195,7 +195,7 @@ println("━"^50)
 println("Fidelity Vergleich N=2")
 println("━"^50)
 
-N        = 2
+N        = 3
 blocks   = collect(0:(4^N-1))
 rho_true = GenerateRandomDensityMatrixNoZerosQutrits(N)
 shots    = 5000
