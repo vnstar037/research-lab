@@ -477,7 +477,7 @@ function RecreatingDensityMatrixWithNonentanglingQutrit(rho_true::Matrix{Complex
                                                          shots::Int;
                                                          lr::Float64     = 0.1,
                                                          decay::Float64  = 0.9999,
-                                                         iterations::Int = 3000,
+                                                         iterations::Int = 1000,
                                                          patience::Int   = 200)
 
     N   = Int(round(log(3, size(rho_true, 1))))
