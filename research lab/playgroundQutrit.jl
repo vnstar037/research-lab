@@ -27,7 +27,7 @@ println("Zero elements:    ", count(x -> abs(x) < 1e-10, RhoTrue))
 println()
 
 # ── Shots List ─────────────────────────────────────────────────
-shots_list = collect(100:100:15000)
+shots_list = collect(100:2:15000)
 println("Number of shot steps: ", length(shots_list))
 println("Range: $(shots_list[1]) to $(shots_list[end]) in steps of 100\n")
 
@@ -44,7 +44,6 @@ times_Hybrid = Float64[]
 for (idx, shots) in enumerate(shots_list)
     println("[$idx/$(length(shots_list))] shots = $shots")
 
-    # Linear Inversion
     t0 = time()
     rho_li = LineareInversionQutrit.RecreatingDensityMatrixWithLineareInversionQutrit(
         RhoTrue, shots)
@@ -52,7 +51,6 @@ for (idx, shots) in enumerate(shots_list)
     push!(fidelities_LI,  fidelity(Matrix{ComplexF64}(rho_li), RhoTrue))
     push!(times_LI, t_li)
 
-    # MLE
     t0 = time()
     rho_mle = QuantumMLEQutrit.RecreatingDensityMatrixWithMLEQutrit(
         RhoTrue, shots)
@@ -60,7 +58,6 @@ for (idx, shots) in enumerate(shots_list)
     push!(fidelities_MLE, fidelity(Matrix{ComplexF64}(rho_mle), RhoTrue))
     push!(times_MLE, t_mle)
 
-    # SEEQST Hybrid
     t0 = time()
     rho_hyb = RecreatingDensityMatrixWithSeeqstQutrit(RhoTrue, shots)
     t_hyb = time() - t0
@@ -74,10 +71,10 @@ for (idx, shots) in enumerate(shots_list)
 end
 
 # ── Plot Settings ──────────────────────────────────────────────
-pk = (
+pk_full = (
     linewidth      = 2,
     size           = (1000, 650),
-    left_margin    = 12Plots.mm,
+    left_margin    = 25Plots.mm,
     right_margin   = 10Plots.mm,
     top_margin     = 12Plots.mm,
     bottom_margin  = 14Plots.mm,
@@ -85,6 +82,21 @@ pk = (
     tickfontsize   = 12,
     titlefontsize  = 14,
     legendfontsize = 12,
+    formatter      = :plain,
+)
+
+pk_zoom = (
+    linewidth      = 2,
+    size           = (1000, 650),
+    left_margin    = 35Plots.mm,
+    right_margin   = 10Plots.mm,
+    top_margin     = 12Plots.mm,
+    bottom_margin  = 14Plots.mm,
+    guidefontsize  = 14,
+    tickfontsize   = 12,
+    titlefontsize  = 14,
+    legendfontsize = 12,
+    formatter      = :plain,
 )
 
 # ── Plot 1: LI full ────────────────────────────────────────────
@@ -95,8 +107,8 @@ plt1 = plot(shots_list, fidelities_LI;
     legend = false,
     color  = :blue,
     ylim   = (0.0, 1.0),
-    pk...)
-savefig(plt1, "fidelity_LI_full_qutrit.png")
+    pk_full...)
+savefig(plt1, "fidelity_LI_full.png")
 display(plt1)
 println("✓ Plot 1 saved: fidelity_LI_full.png")
 
@@ -108,8 +120,8 @@ plt2 = plot(shots_list, fidelities_MLE;
     legend = false,
     color  = :red,
     ylim   = (0.0, 1.0),
-    pk...)
-savefig(plt2, "fidelity_MLE_full_qutrit.png")
+    pk_full...)
+savefig(plt2, "fidelity_MLE_full.png")
 display(plt2)
 println("✓ Plot 2 saved: fidelity_MLE_full.png")
 
@@ -121,8 +133,8 @@ plt3 = plot(shots_list, fidelities_Hybrid;
     legend = false,
     color  = :green,
     ylim   = (0.0, 1.0),
-    pk...)
-savefig(plt3, "fidelity_Hybrid_full_qutrit.png")
+    pk_full...)
+savefig(plt3, "fidelity_Hybrid_full.png")
 display(plt3)
 println("✓ Plot 3 saved: fidelity_Hybrid_full.png")
 
@@ -134,8 +146,8 @@ plt4 = plot(shots_list, fidelities_LI;
     legend = false,
     color  = :blue,
     ylim   = (0.95, 1.0),
-    pk...)
-savefig(plt4, "fidelity_LI_zoom_qutrit.png")
+    pk_zoom...)
+savefig(plt4, "fidelity_LI_zoom.png")
 display(plt4)
 println("✓ Plot 4 saved: fidelity_LI_zoom.png")
 
@@ -147,8 +159,8 @@ plt5 = plot(shots_list, fidelities_MLE;
     legend = false,
     color  = :red,
     ylim   = (0.95, 1.0),
-    pk...)
-savefig(plt5, "fidelity_MLE_zoom_qutrit.png")
+    pk_zoom...)
+savefig(plt5, "fidelity_MLE_zoom.png")
 display(plt5)
 println("✓ Plot 5 saved: fidelity_MLE_zoom.png")
 
@@ -160,8 +172,8 @@ plt6 = plot(shots_list, fidelities_Hybrid;
     legend = false,
     color  = :green,
     ylim   = (0.95, 1.0),
-    pk...)
-savefig(plt6, "fidelity_Hybrid_zoom_qutrit.png")
+    pk_zoom...)
+savefig(plt6, "fidelity_Hybrid_zoom.png")
 display(plt6)
 println("✓ Plot 6 saved: fidelity_Hybrid_zoom.png")
 
@@ -174,12 +186,12 @@ plt7 = plot(shots_list, fidelities_LI;
     color  = :blue,
     ylim   = (0.0, 1.0),
     legend = :bottomright,
-    pk...)
+    pk_full...)
 plot!(plt7, shots_list, fidelities_MLE;
-    label = "MLE",    color = :red)
+    label = "MLE",          color = :red)
 plot!(plt7, shots_list, fidelities_Hybrid;
-    label = "SEEQST", color = :green)
-savefig(plt7, "fidelity_comparison_full_qutrit.png")
+    label = "SEEQST Hybrid", color = :green)
+savefig(plt7, "fidelity_comparison_full.png")
 display(plt7)
 println("✓ Plot 7 saved: fidelity_comparison_full.png")
 
@@ -191,11 +203,11 @@ plt8 = plot(shots_list, times_LI;
     title  = "Runtime vs. Measurements (N=$N Qutrits)",
     color  = :blue,
     legend = :topleft,
-    pk...)
+    pk_full...)
 plot!(plt8, shots_list, times_MLE;
-    label = "MLE",    color = :red)
+    label = "MLE",          color = :red)
 plot!(plt8, shots_list, times_Hybrid;
-    label = "SEEQST", color = :green)
+    label = "SEEQST Hybrid", color = :green)
 savefig(plt8, "runtime_comparison.png")
 display(plt8)
 println("✓ Plot 8 saved: runtime_comparison.png")
@@ -204,7 +216,7 @@ println("✓ Plot 8 saved: runtime_comparison.png")
 println("\n" * "━"^55)
 println("Final Results at $(shots_list[end]) shots")
 println("━"^55)
-println(@sprintf("%-20s  %-10s  %-12s", "Method", "Fidelity", "Total time"))
+println(@sprintf("%-20s  %-10s  %-10s", "Method", "Fidelity", "Total time"))
 println("─"^55)
 println(@sprintf("%-20s  %-10.4f  %-8.1fs",
     "Linear Inversion", fidelities_LI[end],     sum(times_LI)))
