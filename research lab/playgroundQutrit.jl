@@ -18,18 +18,9 @@ RhoTrue_real = readdlm("RhoTrue_real.csv", ',', Float64)
 RhoTrue_imag = readdlm("RhoTrue_imag.csv", ',', Float64)
 RhoTrue = complex.(RhoTrue_real, RhoTrue_imag)
 
-println("── Properties of True Density Matrix ──")
-println("Dimension:        ", size(RhoTrue))
-println("Trace:            ", round(real(tr(RhoTrue)), digits=6))
-println("Hermitian:        ", RhoTrue ≈ RhoTrue')
-println("Min eigenvalue:   ", round(minimum(real(eigvals(RhoTrue))), digits=6))
-println("Zero elements:    ", count(x -> abs(x) < 1e-10, RhoTrue))
-println()
-
-# ── Shots List ─────────────────────────────────────────────────
-shots_list = collect(100:2:15000)
+# ── Shots List: nur 5 Punkte ───────────────────────────────────
+shots_list = [10,20,30,40,50]
 println("Number of shot steps: ", length(shots_list))
-println("Range: $(shots_list[1]) to $(shots_list[end]) in steps of 100\n")
 
 # ── Fidelity and Time Lists ────────────────────────────────────
 fidelities_LI     = Float64[]
@@ -74,13 +65,13 @@ end
 pk_full = (
     linewidth      = 2,
     size           = (1000, 650),
-    left_margin    = 25Plots.mm,
+    left_margin    = 30Plots.mm,
     right_margin   = 10Plots.mm,
     top_margin     = 12Plots.mm,
     bottom_margin  = 14Plots.mm,
     guidefontsize  = 14,
     tickfontsize   = 12,
-    titlefontsize  = 14,
+    titlefontsize  = 13,
     legendfontsize = 12,
     formatter      = :plain,
 )
@@ -88,13 +79,13 @@ pk_full = (
 pk_zoom = (
     linewidth      = 2,
     size           = (1000, 650),
-    left_margin    = 35Plots.mm,
+    left_margin    = 40Plots.mm,
     right_margin   = 10Plots.mm,
     top_margin     = 12Plots.mm,
     bottom_margin  = 14Plots.mm,
     guidefontsize  = 14,
     tickfontsize   = 12,
-    titlefontsize  = 14,
+    titlefontsize  = 13,
     legendfontsize = 12,
     formatter      = :plain,
 )
@@ -125,7 +116,7 @@ savefig(plt2, "fidelity_MLE_full.png")
 display(plt2)
 println("✓ Plot 2 saved: fidelity_MLE_full.png")
 
-# ── Plot 3: SEEQST Hybrid full ─────────────────────────────────
+# ── Plot 3: SEEQST full ────────────────────────────────────────
 plt3 = plot(shots_list, fidelities_Hybrid;
     xlabel = "Number of measurements (m)",
     ylabel = "Fidelity",
@@ -164,7 +155,7 @@ savefig(plt5, "fidelity_MLE_zoom.png")
 display(plt5)
 println("✓ Plot 5 saved: fidelity_MLE_zoom.png")
 
-# ── Plot 6: SEEQST Hybrid zoom ─────────────────────────────────
+# ── Plot 6: SEEQST zoom ────────────────────────────────────────
 plt6 = plot(shots_list, fidelities_Hybrid;
     xlabel = "Number of measurements (m)",
     ylabel = "Fidelity",
@@ -177,7 +168,7 @@ savefig(plt6, "fidelity_Hybrid_zoom.png")
 display(plt6)
 println("✓ Plot 6 saved: fidelity_Hybrid_zoom.png")
 
-# ── Plot 7: All methods combined ───────────────────────────────
+# ── Plot 7: Comparison full ────────────────────────────────────
 plt7 = plot(shots_list, fidelities_LI;
     label  = "Linear Inversion",
     xlabel = "Number of measurements (m)",
@@ -195,7 +186,7 @@ savefig(plt7, "fidelity_comparison_full.png")
 display(plt7)
 println("✓ Plot 7 saved: fidelity_comparison_full.png")
 
-# ── Plot 8: Runtime comparison ─────────────────────────────────
+# ── Plot 8: Runtime ────────────────────────────────────────────
 plt8 = plot(shots_list, times_LI;
     label  = "Linear Inversion",
     xlabel = "Number of measurements (m)",
