@@ -16,10 +16,6 @@ export GenerateRandomDensityMatrixNoZerosQutrits,
        CINC11Gate,
        CINC22Gate,
        CINC33Gate,
-       CINC12_45Gate,   # ← neu
-       CINC45_12Gate,   # ← neu
-       CINC12_67Gate,   # ← neu
-       CINC67_12Gate,
        GellMannRotation,
        ParseCircuitToMatrixQutrit,
        DataPredictFromRhoSampledQutrit,
@@ -182,7 +178,7 @@ end
 # --------------------------------------------------------------------
 # Hybrid Circuits
 # --------------------------------------------------------------------
-#=
+
 function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
     all_sequences = Vector{Vector{String}}()
 
@@ -251,104 +247,7 @@ function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
 
     return all_sequences
 end
-=#
-function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
-    all_sequences = Vector{Vector{String}}()
 
-    y_like = ["RL2", "RL5", "RL7"]
-    e_gate = Dict(1 => "RL2", 2 => "RL5", 3 => "RL7")
-    o_gate = Dict(1 => "RL1", 2 => "RL4", 3 => "RL6")
-
-    function get_cinc(control_type::Int, target_type::Int)
-        if   control_type == 1 && target_type == 1; return "CINC11"
-        elseif control_type == 2 && target_type == 2; return "CINC22"
-        elseif control_type == 3 && target_type == 3; return "CINC33"
-        elseif control_type == 1 && target_type == 2; return "CINC12_45"
-        elseif control_type == 2 && target_type == 1; return "CINC45_12"
-        elseif control_type == 1 && target_type == 3; return "CINC12_67"
-        elseif control_type == 3 && target_type == 1; return "CINC67_12"
-        elseif control_type == 2 && target_type == 3; return "CINC33"
-        elseif control_type == 3 && target_type == 2; return "CINC33"
-        end
-    end
-
-    for block in selective_blocks
-        block_types    = digits(block, base=4, pad=N) |> reverse
-        active_qutrits = [(i-1, t) for (i,t) in enumerate(block_types) if t != 0]
-
-        if isempty(active_qutrits)
-            push!(all_sequences, [""])
-            continue
-        end
-
-        # Gruppiere nach Übergangstyp
-        type_groups = Dict{Int, Vector{Int}}()
-        for (q, t) in active_qutrits
-            haskey(type_groups, t) || (type_groups[t] = Int[])
-            push!(type_groups[t], q)
-        end
-
-        entangling_gates = String[]
-        local_qutrits    = Int[]
-
-        # ── Schritt 1: Gleiche Typen entanglen ────────────────
-        # Sortiere nach erstem Qutrit-Index der Gruppe (nicht nach Typ!)
-        for (t, qubits) in sort(collect(type_groups), by = x -> x[2][1])
-            if length(qubits) == 1
-                push!(local_qutrits, qubits[1])
-            else
-                head = [qubits[1]]
-                tail = qubits[2:end]
-                while !isempty(tail)
-                    new_tail = Int[]
-                    for h in head
-                        isempty(tail) && break
-                        tgt = popfirst!(tail)
-                        cinc = get_cinc(t, t)
-                        push!(entangling_gates, "($cinc:$h,$tgt)")
-                        push!(new_tail, tgt)
-                    end
-                    append!(head, new_tail)
-                end
-                push!(local_qutrits, qubits[1])
-            end
-        end
-
-        # ── Schritt 2: Verschiedene Typen entanglen ───────────
-        # Sortiere nach Qutrit-Index → erster Qutrit = Control
-        group_heads = sort(
-            [(qubits[1], t) for (t, qubits) in type_groups],
-            by = x -> x[1])
-
-        if length(group_heads) > 1
-            ctrl_q, ctrl_t = group_heads[1]
-            for (tgt_q, tgt_t) in group_heads[2:end]
-                cinc = get_cinc(ctrl_t, tgt_t)
-                push!(entangling_gates, "($cinc:$ctrl_q,$tgt_q)")
-                # Target aus local_qutrits entfernen!
-                filter!(q -> q != tgt_q, local_qutrits)
-            end
-        end
-
-        # ── Schritt 3: Lokale Rotationen nur auf Control ──────
-        local_qutrit_types = [t for (q,t) in active_qutrits if q in local_qutrits]
-        local_qutrit_idxs  = [q for (q,t) in active_qutrits if q in local_qutrits]
-
-        rot_options = [[e_gate[t], o_gate[t]] for t in local_qutrit_types]
-
-        circuits = String[]
-        for choice in Iterators.product(rot_options...)
-            n_y         = count(r -> r in y_like, choice)
-            local_gates = ["($gate:$q)" for (gate,q) in zip(choice, local_qutrit_idxs)]
-            circuit_str = join(vcat(reverse(entangling_gates), local_gates))
-            push!(circuits, (n_y % 2 == 0 ? "E:" : "O:") * circuit_str)
-        end
-
-        push!(all_sequences, circuits)
-    end
-
-    return all_sequences
-end
 # --------------------------------------------------------------------
 # Gates
 # --------------------------------------------------------------------
@@ -422,97 +321,6 @@ function CINC33Gate(n::Int, control::Int, target::Int)
     return gate
 end
 
-function CINC12_45Gate(n::Int, control::Int, target::Int)
-    # Control=|1⟩ (|0⟩↔|1⟩ Unterraum)
-    # Target flippt 0↔2 (|0⟩↔|2⟩ Unterraum)
-    dim  = 3^n
-    gate = Matrix{ComplexF64}(I, dim, dim)
-
-    for state in 0:(dim-1)
-        ct = (state ÷ 3^(n-1-control)) % 3
-        tt = (state ÷ 3^(n-1-target))  % 3
-
-        # Nur aktiv wenn control=1 und target in {0,2}
-        if ct == 1 && tt in (0, 2)
-            nt = tt == 0 ? 2 : 0  # tausche 0↔2
-            ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
-            gate[:, state+1] .= 0
-            gate[ns+1, state+1] = 1.0
-        end
-    end
-
-    return gate
-end
-
-function CINC45_12Gate(n::Int, control::Int, target::Int)
-    # L45×L12: Control=|2⟩ (|0⟩↔|2⟩ Unterraum)
-    # Target flippt 0↔1 (|0⟩↔|1⟩ Unterraum)
-    # |20⟩↔|21⟩, alles andere unberührt
-    dim  = 3^n
-    gate = Matrix{ComplexF64}(I, dim, dim)
-
-    for state in 0:(dim-1)
-        ct = (state ÷ 3^(n-1-control)) % 3
-        tt = (state ÷ 3^(n-1-target))  % 3
-
-        # Nur aktiv wenn control=2 und target in {0,1}
-        if ct == 2 && tt in (0, 1)
-            nt = tt == 0 ? 1 : 0  # tausche 0↔1
-            ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
-            gate[:, state+1] .= 0
-            gate[ns+1, state+1] = 1.0
-        end
-    end
-
-    return gate
-end
-
-function CINC67_12Gate(n::Int, control::Int, target::Int)
-    # L67×L12: Control=|2⟩ (|1⟩↔|2⟩ Unterraum)
-    # Target flippt 0↔1 (|0⟩↔|1⟩ Unterraum)
-    # |20⟩↔|21⟩, alles andere unberührt
-    # → identisch zu CINC45_12!
-    dim  = 3^n
-    gate = Matrix{ComplexF64}(I, dim, dim)
-
-    for state in 0:(dim-1)
-        ct = (state ÷ 3^(n-1-control)) % 3
-        tt = (state ÷ 3^(n-1-target))  % 3
-
-        # Nur aktiv wenn control=2 und target in {0,1}
-        if ct == 2 && tt in (0, 1)
-            nt = tt == 0 ? 1 : 0  # tausche 0↔1
-            ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
-            gate[:, state+1] .= 0
-            gate[ns+1, state+1] = 1.0
-        end
-    end
-
-    return gate
-end
-
-function CINC12_67Gate(n::Int, control::Int, target::Int)
-    # L12×L67: Control=|1⟩ (|0⟩↔|1⟩ Unterraum)
-    # Target flippt 1↔2 (|1⟩↔|2⟩ Unterraum)
-    # |11⟩↔|12⟩, alles andere unberührt
-    dim  = 3^n
-    gate = Matrix{ComplexF64}(I, dim, dim)
-
-    for state in 0:(dim-1)
-        ct = (state ÷ 3^(n-1-control)) % 3
-        tt = (state ÷ 3^(n-1-target))  % 3
-
-        # Nur aktiv wenn control=1 und target in {1,2}
-        if ct == 1 && tt in (1, 2)
-            nt = tt == 1 ? 2 : 1  # tausche 1↔2
-            ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
-            gate[:, state+1] .= 0
-            gate[ns+1, state+1] = 1.0
-        end
-    end
-
-    return gate
-end
 
 # --------------------------------------------------------------------
 # Gell-Mann Rotation
@@ -534,7 +342,7 @@ end
 # --------------------------------------------------------------------
 # Parse Circuit to Matrix
 # --------------------------------------------------------------------
-#=
+
 function ParseCircuitToMatrixQutrit(text_circuits::Vector{String}, n::Int)
     unitary_list = Matrix{ComplexF64}[]
 
@@ -564,62 +372,6 @@ function ParseCircuitToMatrixQutrit(text_circuits::Vector{String}, n::Int)
                 U = CINC22Gate(n, indices[1], indices[2]) * U
             elseif gate_name == "CINC33"
                 U = CINC33Gate(n, indices[1], indices[2]) * U
-            else
-                error("Unbekanntes Gate: $gate_name")
-            end
-        end
-
-        push!(unitary_list, U)
-    end
-
-    return unitary_list
-end
-=#
-function ParseCircuitToMatrixQutrit(text_circuits::Vector{String}, n::Int)
-    unitary_list = Matrix{ComplexF64}[]
-
-    for circuit in text_circuits
-        U = Matrix{ComplexF64}(I, 3^n, 3^n)
-
-        operations = [strip(op, ['(', ')']) for op in split(circuit, ")")
-                      if !isempty(strip(op))]
-
-        for op in operations
-            parts     = split(op, ":")
-            length(parts) < 2 && continue
-            gate_name = String(parts[1])
-            indices   = parse.(Int, split(parts[2], ","))
-
-            if gate_name in ["RL1","RL2","RL4","RL5","RL6","RL7"]
-                k    = parse(Int, gate_name[3:end])
-                rot  = GellMannRotation(k)
-                full = ones(ComplexF64, 1, 1)
-                for q in 0:(n-1)
-                    full = kron(full, q == indices[1] ? rot : Matrix{ComplexF64}(I,3,3))
-                end
-                U = full * U
-
-            elseif gate_name == "CINC11"
-                U = CINC11Gate(n, indices[1], indices[2]) * U
-
-            elseif gate_name == "CINC22"
-                U = CINC22Gate(n, indices[1], indices[2]) * U
-
-            elseif gate_name == "CINC33"
-                U = CINC33Gate(n, indices[1], indices[2]) * U
-
-            elseif gate_name == "CINC12_45"
-                U = CINC12_45Gate(n, indices[1], indices[2]) * U
-
-            elseif gate_name == "CINC45_12"
-                U = CINC45_12Gate(n, indices[1], indices[2]) * U
-
-            elseif gate_name == "CINC12_67"
-                U = CINC12_67Gate(n, indices[1], indices[2]) * U
-
-            elseif gate_name == "CINC67_12"
-                U = CINC67_12Gate(n, indices[1], indices[2]) * U
-
             else
                 error("Unbekanntes Gate: $gate_name")
             end
@@ -807,7 +559,7 @@ function RecreatingDensityMatrixWithSeeqstQutrit(rho_true::Matrix{ComplexF64},
 end
 
 end # module SeeqstHybridQutrit
-
+#=
 include("StructureDensityMatrix.jl")
 
 
@@ -815,132 +567,102 @@ using .SeeqstHybridQutrit
 using LinearAlgebra
 using QuantumInformation
 using Printf
+function GenerateDensityMatrixOnlySameTransitions(N::Int)
+    dim = 3^N
 
-println("═══ Fidelity Test N=2 Hybrid (neue CINC Gates) ═══\n")
-
-N     = 2
-shots = 1000
-
-# ── Mehrere Testmatrizen ───────────────────────────────────────
-results = []
-
-for trial in 1:5
-    println("━"^55)
-    println("Trial $trial")
-    println("━"^55)
-
-    rho_true = GenerateRandomDensityMatrixNoZerosQutrits(N)
-
-    # NonEntangling
-    t0 = time()
-    rho_non = RecreatingDensityMatrixWithNonentanglingQutrit(rho_true, shots)
-    t_non   = time() - t0
-    F_non   = fidelity(rho_non, rho_true)
-
-    # Hybrid (mit neuen CINC Gates)
-    t0 = time()
-    rho_hyb = RecreatingDensityMatrixWithSeeqstQutrit(rho_true, shots)
-    t_hyb   = time() - t0
-    F_hyb   = fidelity(rho_hyb, rho_true)
-
-    println(@sprintf("  NonEntangling:  F=%.4f  t=%.2fs", F_non, t_non))
-    println(@sprintf("  Hybrid:         F=%.4f  t=%.2fs", F_hyb, t_hyb))
-    println()
-
-    push!(results, (F_non=F_non, F_hyb=F_hyb))
-end
-
-# ── Zusammenfassung ───────────────────────────────────────────
-println("═"^55)
-println("Zusammenfassung (N=$N, shots=$shots)")
-println("═"^55)
-println(@sprintf("%-15s  %-10s  %-10s", "Trial", "NonEnt F", "Hybrid F"))
-println("─"^40)
-for (i, r) in enumerate(results)
-    println(@sprintf("%-15d  %-10.4f  %-10.4f", i, r.F_non, r.F_hyb))
-end
-println("─"^40)
-
-F_non_mean = mean([r.F_non for r in results])
-F_hyb_mean = mean([r.F_hyb for r in results])
-println(@sprintf("%-15s  %-10.4f  %-10.4f", "Mean", F_non_mean, F_hyb_mean))
-println()
-
-# ── Circuits Vergleich ─────────────────────────────────────────
-blocks    = collect(0:(4^N-1))
-non_circs = BuildNonEntanglingCircuitsQutrit(blocks, N)
-hyb_circs = BuildHybridCircuitsQutrit(blocks, N)
-
-n_non = length(unique(String[c for g in non_circs for c in g if c != ""]))
-n_hyb = length(unique(String[
-    startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
-    for g in hyb_circs for c in g if c != ""]))
-
-println(@sprintf("%-20s  %d circuits", "NonEntangling:", n_non))
-println(@sprintf("%-20s  %d circuits", "Hybrid:",        n_hyb))
-println(@sprintf("%-20s  %.1f%%", "Circuit reduction:",
-    (1 - n_hyb/n_non) * 100))
-
-#=
-using .SeeqstHybridQutrit
-using Statistics
-
-println("═══ Debug: Hybrid Circuits N=2 ═══\n")
-
-N = 2
-type_names = ["diag", "|0⟩↔|1⟩", "|0⟩↔|2⟩", "|1⟩↔|2⟩"]
-blocks = collect(0:15)
-
-hybrid_circs = BuildHybridCircuitsQutrit(blocks, N)
-
-for (i, block) in enumerate(blocks)
-    block_types = digits(block, base=4, pad=N) |> reverse
-    desc  = join([type_names[t+1] for t in block_types], " × ")
-    circs = hybrid_circs[i]
-
-    active_types = [t for t in block_types if t != 0]
-    all_same     = length(unique(active_types)) <= 1
-
-    has_cinc = any(occursin("CINC", c) for c in circs if c != "")
-
-    println("Block $block = $(join(block_types))₄  ($desc)")
-    println("  Same types: $all_same  |  Has CINC: $has_cinc")
-    for c in circs
-        c != "" && println("    $c")
+    function transition_type(a::Int, b::Int)
+        s = Set([a, b])
+        if s == Set([0, 1]); return 1
+        elseif s == Set([0, 2]); return 2
+        elseif s == Set([1, 2]); return 3
+        else; return 0
+        end
     end
-    println()
-end
 
-
-
-println("═══ Debug: Hybrid Circuits N=2 ═══\n")
-
-N = 2
-type_names = ["diag", "|0⟩↔|1⟩", "|0⟩↔|2⟩", "|1⟩↔|2⟩"]
-blocks = collect(0:15)
-
-hybrid_circs = BuildHybridCircuitsQutrit(blocks, N)
-
-for (i, block) in enumerate(blocks)
-    block_types = digits(block, base=4, pad=N) |> reverse
-    desc  = join([type_names[t+1] for t in block_types], " × ")
-    circs = hybrid_circs[i]
-
-    active_types = [t for t in block_types if t != 0]
-    all_same     = length(unique(active_types)) <= 1
-    has_cinc     = any(occursin("CINC", c) for c in circs if c != "")
-
-    println("Block $block = $(join(block_types))₄  ($desc)")
-    println("  Same types: $all_same  |  Has CINC: $has_cinc  |  Circuits: $(length(circs))")
-    for c in circs
-        c != "" && println("    $c")
+    function allowed(i::Int, j::Int)
+        trits_i = digits(i, base=3, pad=N) |> reverse
+        trits_j = digits(j, base=3, pad=N) |> reverse
+        types   = [transition_type(trits_i[k], trits_j[k]) for k in 1:N]
+        active  = filter(t -> t != 0, types)
+        return length(unique(active)) <= 1
     end
-    println()
+
+    # ── Erlaubte Indizes anzeigen ──────────────────────────────
+    n_allowed = count(allowed(i,j) for i in 0:(dim-1), j in 0:(dim-1))
+    println("N=$N: $n_allowed / $(dim^2) Elemente erlaubt")
+
+    # ── Zufällige hermitesche Matrix nur in erlaubten Elementen
+    # Methode: starte mit Null, fülle erlaubte Elemente zufällig
+    # dann projiziere auf positiv semidefinit
+
+    # Schritt 1: zufällige hermitesche Matrix in erlaubtem Unterraum
+    H = zeros(ComplexF64, dim, dim)
+    for i in 0:(dim-1), j in i:(dim-1)
+        if allowed(i, j)
+            if i == j
+                H[i+1, i+1] = abs(randn()) + 0.1
+            else
+                v = randn(ComplexF64)
+                H[i+1, j+1] = v
+                H[j+1, i+1] = conj(v)
+            end
+        end
+    end
+
+    # Schritt 2: positiv semidefinit machen
+    # via Eigenwertzerlegung
+    eig    = eigen(H)
+    vals   = max.(real(eig.values), 0.0) .+ 0.01
+    vecs   = eig.vectors
+    rho    = vecs * Diagonal(ComplexF64.(vals)) * vecs'
+
+    # Schritt 3: erlaubte Struktur wiederherstellen
+    # (Eigenwert-Operation kann verbotene Elemente einführen!)
+    for i in 0:(dim-1), j in 0:(dim-1)
+        if !allowed(i, j)
+            rho[i+1, j+1] = 0.0
+        end
+    end
+
+    # Schritt 4: Hermitizität sicherstellen
+    rho = (rho + rho') / 2
+
+    # Schritt 5: normieren
+    rho = rho / tr(rho)
+
+    # ── Prüfungen ──────────────────────────────────────────────
+    n_nonzero    = count(abs(rho[i+1,j+1]) > 1e-10
+                         for i in 0:(dim-1), j in 0:(dim-1))
+    n_violations = count(!allowed(i,j) && abs(rho[i+1,j+1]) > 1e-10
+                         for i in 0:(dim-1), j in 0:(dim-1))
+
+    println("Nicht-Null Elemente:  $n_nonzero / $(dim^2)")
+    println("Spur:                 $(round(real(tr(rho)), digits=6))")
+    println("Hermitesch:           $(rho ≈ rho')")
+    println("Min Eigenwert:        $(round(minimum(real(eigvals(rho))), digits=8))")
+    println("Verletzungen:         $n_violations")
+
+    return rho
 end
 
-# Anzahl Circuits
-all_circs = unique(String[
-    startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
-    for g in hybrid_circs for c in g if c != ""])
-println("Total unique circuits: ", length(all_circs))
+println("═══ Test: Nur gleiche Übergänge ═══\n")
+
+for N in [2, 3]
+    println("━"^50)
+    println("N = $N")
+    println("━"^50)
+
+    rho = GenerateDensityMatrixOnlySameTransitions(N)
+
+    shots = 10000
+    rho_non = RecreatingDensityMatrixWithNonentanglingQutrit(rho, shots)
+    rho_hyb = RecreatingDensityMatrixWithSeeqstQutrit(rho, shots)
+
+    F_non = fidelity(rho_non, rho)
+    F_hyb = fidelity(rho_hyb, rho)
+
+    println("NonEntangling: F = $(round(F_non, digits=4))")
+    println("Hybrid:        F = $(round(F_hyb, digits=4))")
+    println()
+end
 =#
