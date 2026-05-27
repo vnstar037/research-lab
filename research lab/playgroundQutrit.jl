@@ -1,3 +1,5 @@
+cd(@__DIR__)  # ← ganz oben hinzufügen, vor allem anderen
+
 include("StructureDensityMatrix.jl")
 include("moduleLinearInversionQutrit.jl")
 include("moduleMaximumLikelihoodEstimationQutrit.jl")
@@ -19,7 +21,7 @@ RhoTrue_imag = readdlm("RhoTrue_imag.csv", ',', Float64)
 RhoTrue = complex.(RhoTrue_real, RhoTrue_imag)
 
 # ── Shots List: nur 5 Punkte ───────────────────────────────────
-shots_list = [10,20,30,40,50]
+shots_list = collect(100:100:15000)
 println("Number of shot steps: ", length(shots_list))
 
 # ── Fidelity and Time Lists ────────────────────────────────────
