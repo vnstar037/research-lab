@@ -40,9 +40,9 @@ log("Zero elements:    $(count(x -> abs(x) < 1e-10, RhoTrue))")
 log("")
 
 # ── Shots List ─────────────────────────────────────────────────
-shots_list = collect(100:100:15000)
+shots_list = collect(100:25:15000)
 log("Number of shot steps: $(length(shots_list))")
-log("Range: $(shots_list[1]) to $(shots_list[end]) in steps of 100")
+log("Range: $(shots_list[1]) to $(shots_list[end]) in steps of 25")
 log("")
 
 # ── Fidelity and Time Lists ────────────────────────────────────
@@ -216,7 +216,7 @@ plt8 = plot(shots_list, times_LI;
     ylabel = "Runtime (s)",
     title  = "Runtime vs. Measurements (N=$N Qutrits)",
     color  = :blue,
-    legend = :topleft,
+    legend = :outertopright, 
     pk_full...)
 plot!(plt8, shots_list, times_MLE;
     label = "MLE",           color = :red)
