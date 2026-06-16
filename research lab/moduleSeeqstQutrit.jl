@@ -6,7 +6,6 @@ using Zygote
 using Printf
 using QuantumInformation
 
-
 export GenerateRandomDensityMatrixNoZerosQutrits,
        GetSelectiveBlocksQutrit,
        GenerateSelectiveElementsQutrit,
@@ -21,11 +20,14 @@ export GenerateRandomDensityMatrixNoZerosQutrits,
        DataPredictFromRhoSampledQutrit,
        ProcessDataQutrit,
        RecreatingDensityMatrixWithNonentanglingQutrit,
-       RecreatingDensityMatrixWithSeeqstQutrit
+       RecreatingDensityMatrixWithSeeqstQutrit,
+       RecreatingDensityMatrixWithTSeeqstQutrit,
+       BlocksAboveThresholdQutrit,
+       FidelityBoundQutrit
 
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Zufällige Dichtematrix
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 function GenerateRandomDensityMatrixNoZerosQutrits(n::Int)
     d = 3^n
     M = randn(ComplexF64, d, d) + 1im * randn(ComplexF64, d, d)
@@ -34,16 +36,17 @@ function GenerateRandomDensityMatrixNoZerosQutrits(n::Int)
     return rho
 end
 
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Selective Blocks
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 function GetSelectiveBlocksQutrit(N::Int, wanted_indexes::Vector{Tuple{Int,Int}})
-    max_index = 3^N
+    max_index        = 3^N
     selective_blocks = Vector{Int}()
-    block_map = Dict{Int, Vector{Tuple{Int,Int}}}()
+    block_map        = Dict{Int, Vector{Tuple{Int,Int}}}()
 
     for (i, j) in wanted_indexes
-        @assert (0 <= i < max_index && 0 <= j < max_index) "Index ($i,$j) außerhalb des gültigen Bereichs"
+        @assert (0 <= i < max_index && 0 <= j < max_index) \
+            "Index ($i,$j) außerhalb des gültigen Bereichs"
 
         i_trits = digits(i, base=3, pad=N) |> reverse
         j_trits = digits(j, base=3, pad=N) |> reverse
@@ -70,9 +73,9 @@ function GetSelectiveBlocksQutrit(N::Int, wanted_indexes::Vector{Tuple{Int,Int}}
     return selective_blocks, block_map
 end
 
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Selective Elements
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 function GenerateSelectiveElementsQutrit(selective_blocks::Vector{Int}, N::Int)
     selective_elements = Vector{Vector{Tuple{Int,Int}}}()
 
@@ -111,9 +114,9 @@ function GenerateSelectiveElementsQutrit(selective_blocks::Vector{Int}, N::Int)
     return selective_elements
 end
 
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Observable Sets
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 function GenerateObservableSetsQutrit(selective_blocks::Vector{Int}, N::Int)
     observable_sets = Dict{Int, Tuple{Vector{String}, Vector{String}}}()
 
@@ -143,13 +146,12 @@ function GenerateObservableSetsQutrit(selective_blocks::Vector{Int}, N::Int)
     return observable_sets
 end
 
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Non-Entangling Circuits
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 function BuildNonEntanglingCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
     all_block_circuits = Vector{Vector{String}}()
-
-    gate_options = Dict(1 => ["RL2","RL1"], 2 => ["RL5","RL4"], 3 => ["RL7","RL6"])
+    gate_options       = Dict(1 => ["RL2","RL1"], 2 => ["RL5","RL4"], 3 => ["RL7","RL6"])
 
     for block in selective_blocks
         block_types    = digits(block, base=4, pad=N) |> reverse
@@ -175,17 +177,15 @@ function BuildNonEntanglingCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
     return all_block_circuits
 end
 
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Hybrid Circuits
-# --------------------------------------------------------------------
-
+# ══════════════════════════════════════════════════════════════
 function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
     all_sequences = Vector{Vector{String}}()
-
-    y_like    = ["RL2", "RL5", "RL7"]
-    e_gate    = Dict(1 => "RL2", 2 => "RL5", 3 => "RL7")
-    o_gate    = Dict(1 => "RL1", 2 => "RL4", 3 => "RL6")
-    cinc_type = Dict(1 => "CINC11", 2 => "CINC22", 3 => "CINC33")
+    y_like        = ["RL2", "RL5", "RL7"]
+    e_gate        = Dict(1 => "RL2", 2 => "RL5", 3 => "RL7")
+    o_gate        = Dict(1 => "RL1", 2 => "RL4", 3 => "RL6")
+    cinc_type     = Dict(1 => "CINC11", 2 => "CINC22", 3 => "CINC33")
 
     for block in selective_blocks
         block_types    = digits(block, base=4, pad=N) |> reverse
@@ -196,7 +196,6 @@ function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
             continue
         end
 
-        # Gruppiere nach Übergangstyp
         type_groups = Dict{Int, Vector{Int}}()
         for (q, t) in active_qutrits
             haskey(type_groups, t) || (type_groups[t] = Int[])
@@ -208,10 +207,8 @@ function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
 
         for (t, qubits) in sort(collect(type_groups))
             if length(qubits) == 1
-                # nur 1 Qutrit dieses Typs → kein CINC
                 push!(local_qutrits, qubits[1])
             else
-                # mehrere Qutrits gleichen Typs → CINC11/22/33
                 head = [qubits[1]]
                 tail = qubits[2:end]
                 while !isempty(tail)
@@ -224,15 +221,13 @@ function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
                     end
                     append!(head, new_tail)
                 end
-                # erstes Qutrit der Gruppe bekommt lokale Rotation
                 push!(local_qutrits, qubits[1])
             end
         end
 
         local_qutrit_types = [t for (q,t) in active_qutrits if q in local_qutrits]
         local_qutrit_idxs  = [q for (q,t) in active_qutrits if q in local_qutrits]
-
-        rot_options = [[e_gate[t], o_gate[t]] for t in local_qutrit_types]
+        rot_options        = [[e_gate[t], o_gate[t]] for t in local_qutrit_types]
 
         circuits = String[]
         for choice in Iterators.product(rot_options...)
@@ -248,83 +243,60 @@ function BuildHybridCircuitsQutrit(selective_blocks::Vector{Int}, N::Int)
     return all_sequences
 end
 
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Gates
-# --------------------------------------------------------------------
-
+# ══════════════════════════════════════════════════════════════
 function CINC11Gate(n::Int, control::Int, target::Int)
-    # |0⟩↔|1⟩ Unterraum
-    # Control=1: tauscht Target 0↔1
-    # Control=0: unberührt
     dim  = 3^n
     gate = Matrix{ComplexF64}(I, dim, dim)
-
     for state in 0:(dim-1)
         ct = (state ÷ 3^(n-1-control)) % 3
         tt = (state ÷ 3^(n-1-target))  % 3
-
-        # Nur aktiv wenn control=1 und target in {0,1}
         if ct == 1 && tt in (0, 1)
-            nt = tt == 0 ? 1 : 0  # tausche 0↔1
+            nt = tt == 0 ? 1 : 0
             ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
             gate[:, state+1] .= 0
             gate[ns+1, state+1] = 1.0
         end
     end
-
     return gate
 end
 
 function CINC22Gate(n::Int, control::Int, target::Int)
-    # |0⟩↔|2⟩ Unterraum
-    # Control=2: tauscht Target 0↔2
-    # Control=0: unberührt
     dim  = 3^n
     gate = Matrix{ComplexF64}(I, dim, dim)
-
     for state in 0:(dim-1)
         ct = (state ÷ 3^(n-1-control)) % 3
         tt = (state ÷ 3^(n-1-target))  % 3
-
-        # Nur aktiv wenn control=2 und target in {0,2}
         if ct == 2 && tt in (0, 2)
-            nt = tt == 0 ? 2 : 0  # tausche 0↔2
+            nt = tt == 0 ? 2 : 0
             ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
             gate[:, state+1] .= 0
             gate[ns+1, state+1] = 1.0
         end
     end
-
     return gate
 end
 
 function CINC33Gate(n::Int, control::Int, target::Int)
-    # |1⟩↔|2⟩ Unterraum
-    # Control=2: tauscht Target 1↔2
-    # Control=1: unberührt
     dim  = 3^n
     gate = Matrix{ComplexF64}(I, dim, dim)
-
     for state in 0:(dim-1)
         ct = (state ÷ 3^(n-1-control)) % 3
         tt = (state ÷ 3^(n-1-target))  % 3
-
-        # Nur aktiv wenn control=2 und target in {1,2}
         if ct == 2 && tt in (1, 2)
-            nt = tt == 1 ? 2 : 1  # tausche 1↔2
+            nt = tt == 1 ? 2 : 1
             ns = state - tt * 3^(n-1-target) + nt * 3^(n-1-target)
             gate[:, state+1] .= 0
             gate[ns+1, state+1] = 1.0
         end
     end
-
     return gate
 end
 
-
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Gell-Mann Rotation
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 function GellMannRotation(k::Int)
     λ = Dict(
         1 => [0 1 0; 1 0 0; 0 0 0] .+ 0im,
@@ -339,16 +311,14 @@ function GellMannRotation(k::Int)
     return exp(-im * π/4 * λ[k])
 end
 
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Parse Circuit to Matrix
-# --------------------------------------------------------------------
-
+# ══════════════════════════════════════════════════════════════
 function ParseCircuitToMatrixQutrit(text_circuits::Vector{String}, n::Int)
     unitary_list = Matrix{ComplexF64}[]
 
     for circuit in text_circuits
-        U = Matrix{ComplexF64}(I, 3^n, 3^n)
-
+        U          = Matrix{ComplexF64}(I, 3^n, 3^n)
         operations = [strip(op, ['(', ')']) for op in split(circuit, ")")
                       if !isempty(strip(op))]
 
@@ -383,9 +353,9 @@ function ParseCircuitToMatrixQutrit(text_circuits::Vector{String}, n::Int)
     return unitary_list
 end
 
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Simulate Measurements
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 function DataPredictFromRhoSampledQutrit(
     rho::Matrix{ComplexF64},
     unitaries::Vector{Matrix{ComplexF64}},
@@ -394,11 +364,11 @@ function DataPredictFromRhoSampledQutrit(
     all_counts = Vector{Vector{Int}}()
 
     for U in unitaries
-        probs = real(diag(U * rho * U'))
-        probs = max.(probs, 0)
-        probs = probs / sum(probs)
-
+        probs  = real(diag(U * rho * U'))
+        probs  = max.(probs, 0)
+        probs  = probs / sum(probs)
         counts = zeros(Int, length(probs))
+
         for _ in 1:shots
             r = rand(); cum = 0.0
             for (k, p) in enumerate(probs)
@@ -413,9 +383,9 @@ function DataPredictFromRhoSampledQutrit(
     return all_counts
 end
 
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Process Data (SGD + Cholesky)
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 function ProcessDataQutrit(
     data::Vector{Vector{Int}},
     unitaries::Vector{Matrix{ComplexF64}},
@@ -440,12 +410,12 @@ function ProcessDataQutrit(
         return total / shots
     end
 
-    T  = randn(3^N, 3^N) + im * randn(3^N, 3^N)
-    L0, _ = Zygote.withgradient(loss, T)
-    verbose && println("Loss initial: ", round(L0, digits=4))
+    T      = randn(3^N, 3^N) + im * randn(3^N, 3^N)
+    L0, _  = Zygote.withgradient(loss, T)
+    verbose && println("  Loss initial: ", round(L0, digits=4))
 
-    m  = zeros(ComplexF64, size(T))
-    v  = zeros(Float64,    size(T))
+    m          = zeros(ComplexF64, size(T))
+    v          = zeros(Float64,    size(T))
     β₁, β₂, ε = 0.9, 0.999, 1e-8
     losses     = Float64[]
     no_improve = 0
@@ -453,6 +423,7 @@ function ProcessDataQutrit(
     for i in 1:iterations
         L, grads = Zygote.withgradient(loss, T)
         g = grads[1]
+        g === nothing && break
         η = lr * decay^i
         m = β₁ .* m + (1-β₁) .* g
         v = β₂ .* v + (1-β₂) .* abs2.(g)
@@ -461,7 +432,8 @@ function ProcessDataQutrit(
         T = T - η .* m̂ ./ (sqrt.(v̂) .+ ε)
 
         push!(losses, L)
-        verbose && i % 500 == 0 && println("Iteration $i | Loss: $(round(L, digits=6))")
+        verbose && i % 500 == 0 &&
+            println("  Iteration $i | Loss: $(round(L, digits=6))")
 
         if length(losses) > 1
             rel = abs(losses[end]-losses[end-1]) / abs(losses[end-1])
@@ -474,61 +446,117 @@ function ProcessDataQutrit(
     return rho_rec / tr(rho_rec)
 end
 
-# --------------------------------------------------------------------
-# Volle Tomographie: NonEntangling
-# --------------------------------------------------------------------
-function RecreatingDensityMatrixWithNonentanglingQutrit(rho_true::Matrix{ComplexF64},
-                                                         shots::Int;
-                                                         lr::Float64     = 0.1,
-                                                         decay::Float64  = 0.9999,
-                                                         iterations::Int = 1000,
-                                                         patience::Int   = 200)
+# ══════════════════════════════════════════════════════════════
+# Threshold Hilfsfunktionen
+# ══════════════════════════════════════════════════════════════
+function transition_type_qutrit(x::Int, y::Int)
+    if x == y;                       return 0
+    elseif Set([x,y]) == Set([0,1]); return 1
+    elseif Set([x,y]) == Set([0,2]); return 2
+    else;                            return 3
+    end
+end
 
-    N   = Int(round(log(3, size(rho_true, 1))))
-    dim = 3^N
+function block_above_threshold_qutrit(k::Int, N::Int,
+                                        rho_diag::Vector{Float64}, t::Float64)
+    k == 0 && return true
+    tol      = max(t, 1e-10)
+    d        = 3^N
+    k_digits = digits(k, base=4, pad=N) |> reverse
 
-    println("═══ Volle Tomographie (NonEntangling) N=$N ═══\n")
+    for i in 0:d-1, j in 0:d-1
+        i == j && continue
+        di = digits(i, base=3, pad=N) |> reverse
+        dj = digits(j, base=3, pad=N) |> reverse
+        matches = all(transition_type_qutrit(di[l], dj[l]) == k_digits[l] for l in 1:N)
+        if matches
+            bound = sqrt(rho_diag[i+1] * rho_diag[j+1])
+            bound ≥ tol && return true
+        end
+    end
+    return false
+end
+
+function BlocksAboveThresholdQutrit(N::Int, rho_diag::Vector{Float64}, t::Float64)
+    return [k for k in 0:4^N-1 if block_above_threshold_qutrit(k, N, rho_diag, t)]
+end
+
+function FidelityBoundQutrit(rho_true::Matrix{ComplexF64},
+                               rho_diag::Vector{Float64}, t::Float64)
+    d         = size(rho_true, 1)
+    r         = rank(rho_true, atol=1e-10)
+    sum_below = 0.0
+    for i in 0:d-1, j in 0:d-1
+        i == j && continue
+        bound = sqrt(rho_diag[i+1] * rho_diag[j+1])
+        bound < t && (sum_below += rho_diag[i+1] * rho_diag[j+1])
+    end
+    return max(1.0 - sqrt(r * sum_below), 0.0)^2
+end
+
+# ══════════════════════════════════════════════════════════════
+# Volle Tomographie: NonEntangling (Standard SEEQST)
+# ══════════════════════════════════════════════════════════════
+function RecreatingDensityMatrixWithNonentanglingQutrit(
+    rho_true::Matrix{ComplexF64},
+    shots::Int;
+    lr::Float64     = 0.1,
+    decay::Float64  = 0.9999,
+    iterations::Int = 1000,
+    patience::Int   = 200,
+    verbose::Bool   = true
+)
+    N = Int(round(log(3, size(rho_true, 1))))
+
+    verbose && println("═══ Standard SEEQST (NonEntangling) N=$N ═══")
+    verbose && println()
 
     blocks    = collect(0:(4^N - 1))
     non_circs = BuildNonEntanglingCircuitsQutrit(blocks, N)
     circuits  = unique(String[c for g in non_circs for c in g if c != ""])
 
-    println("Anzahl Blöcke:   ", length(blocks))
-    println("Anzahl Circuits: ", length(circuits))
-    println("Shots/Circuit:   ", shots)
+    verbose && println("  Blöcke:   ", length(blocks))
+    verbose && println("  Circuits: ", length(circuits))
+    verbose && println("  Shots:    ", shots)
+    verbose && println()
 
     Us_all  = ParseCircuitToMatrixQutrit(circuits, N)
     data    = DataPredictFromRhoSampledQutrit(rho_true, Us_all, shots)
 
-    println("\n── SGD + Cholesky ──")
+    verbose && println("── SGD + Cholesky ──")
     rho_rec = ProcessDataQutrit(data, Us_all, blocks, shots, N;
         lr=lr, decay=decay, iterations=iterations,
-        patience=patience, verbose=true)
+        patience=patience, verbose=verbose)
 
-    F = fidelity(rho_rec, rho_true)
-    println("\n── Ergebnisse ──")
-    println(@sprintf("Fidelität:           %.4f", F))
-    println(@sprintf("Spur ρ_rec:          %.6f", real(tr(rho_rec))))
-    println(@sprintf("Kleinster Eigenwert: %.6f", minimum(real(eigvals(rho_rec)))))
-    println("═"^45)
+    if verbose
+        F = fidelity(rho_rec, rho_true)
+        println()
+        println("── Ergebnisse ──")
+        println(@sprintf("  Fidelität:           %.4f", F))
+        println(@sprintf("  Spur ρ_rec:          %.6f", real(tr(rho_rec))))
+        println(@sprintf("  Kleinster Eigenwert: %.6f", minimum(real(eigvals(rho_rec)))))
+        println("═"^45)
+    end
 
-    return rho_rec
+    return Matrix{ComplexF64}(rho_rec)
 end
 
-# --------------------------------------------------------------------
+# ══════════════════════════════════════════════════════════════
 # Volle Tomographie: Hybrid SEEQST
-# --------------------------------------------------------------------
-function RecreatingDensityMatrixWithSeeqstQutrit(rho_true::Matrix{ComplexF64},
-                                                  shots::Int;
-                                                  lr::Float64     = 0.1,
-                                                  decay::Float64  = 0.9999,
-                                                  iterations::Int = 1000,
-                                                  patience::Int   = 200)
+# ══════════════════════════════════════════════════════════════
+function RecreatingDensityMatrixWithSeeqstQutrit(
+    rho_true::Matrix{ComplexF64},
+    shots::Int;
+    lr::Float64     = 0.1,
+    decay::Float64  = 0.9999,
+    iterations::Int = 1000,
+    patience::Int   = 200,
+    verbose::Bool   = true
+)
+    N = Int(round(log(3, size(rho_true, 1))))
 
-    N   = Int(round(log(3, size(rho_true, 1))))
-    dim = 3^N
-
-    println("═══ Volle Tomographie (Hybrid SEEQST) N=$N ═══\n")
+    verbose && println("═══ Hybrid SEEQST N=$N ═══")
+    verbose && println()
 
     blocks       = collect(0:(4^N - 1))
     hybrid_circs = BuildHybridCircuitsQutrit(blocks, N)
@@ -536,29 +564,229 @@ function RecreatingDensityMatrixWithSeeqstQutrit(rho_true::Matrix{ComplexF64},
         startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
         for g in hybrid_circs for c in g if c != ""])
 
-    println("Anzahl Blöcke:   ", length(blocks))
-    println("Anzahl Circuits: ", length(circuits))
-    println("Shots/Circuit:   ", shots)
+    verbose && println("  Blöcke:   ", length(blocks))
+    verbose && println("  Circuits: ", length(circuits))
+    verbose && println("  Shots:    ", shots)
+    verbose && println()
 
     Us_all  = ParseCircuitToMatrixQutrit(circuits, N)
     data    = DataPredictFromRhoSampledQutrit(rho_true, Us_all, shots)
 
-    println("\n── SGD + Cholesky ──")
+    verbose && println("── SGD + Cholesky ──")
     rho_rec = ProcessDataQutrit(data, Us_all, blocks, shots, N;
         lr=lr, decay=decay, iterations=iterations,
-        patience=patience, verbose=true)
+        patience=patience, verbose=verbose)
 
-    F = fidelity(rho_rec, rho_true)
-    println("\n── Ergebnisse ──")
-    println(@sprintf("Fidelität:           %.4f", F))
-    println(@sprintf("Spur ρ_rec:          %.6f", real(tr(rho_rec))))
-    println(@sprintf("Kleinster Eigenwert: %.6f", minimum(real(eigvals(rho_rec)))))
-    println("═"^45)
+    if verbose
+        F = fidelity(rho_rec, rho_true)
+        println()
+        println("── Ergebnisse ──")
+        println(@sprintf("  Fidelität:           %.4f", F))
+        println(@sprintf("  Spur ρ_rec:          %.6f", real(tr(rho_rec))))
+        println(@sprintf("  Kleinster Eigenwert: %.6f", minimum(real(eigvals(rho_rec)))))
+        println("═"^45)
+    end
 
-    return rho_rec
+    return Matrix{ComplexF64}(rho_rec)
 end
 
+# ══════════════════════════════════════════════════════════════
+# tSEEQST: Threshold-basiertes SEEQST
+# ══════════════════════════════════════════════════════════════
+function RecreatingDensityMatrixWithTSeeqstQutrit(
+    rho_true::Matrix{ComplexF64},
+    shots::Int,
+    t::Float64;
+    lr::Float64     = 0.1,
+    decay::Float64  = 0.9999,
+    iterations::Int = 1000,
+    patience::Int   = 200,
+    verbose::Bool   = true
+)
+    N = Int(round(log(3, size(rho_true, 1))))
+    d = 3^N
+
+    verbose && println("═══ tSEEQST N=$N, t=$t ═══")
+    verbose && println()
+
+    # ── Schritt 1: Diagonale messen ────────────────────────────
+    U_identity = [Matrix{ComplexF64}(I, d, d)]
+    diag_raw   = DataPredictFromRhoSampledQutrit(rho_true, U_identity, shots)
+    rho_diag   = Float64.(diag_raw[1]) ./ shots
+
+    if verbose
+        println("── Diagonale ──")
+        for i in 0:d-1
+            abs(rho_diag[i+1]) > 1e-6 &&
+                println(@sprintf("  ρ[%d,%d] = %.4f", i, i, rho_diag[i+1]))
+        end
+        println()
+    end
+
+    # ── Schritt 2: Blöcke über Threshold ───────────────────────
+    blocks_all      = collect(0:(4^N - 1))
+    blocks_threshold = BlocksAboveThresholdQutrit(N, rho_diag, t)
+
+    # ── Schritt 3: Unterbestimmtheit prüfen und auffüllen ──────
+    min_circ = ceil(Int, (d^2 - 1) / d)
+
+    function count_hybrid_circuits(blocks::Vector{Int})
+        hyb = BuildHybridCircuitsQutrit(blocks, N)
+        return length(unique(String[
+            startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
+            for g in hyb for c in g if c != ""]))
+    end
+
+    function max_bound_for_block(k::Int)
+        k_digits = digits(k, base=4, pad=N) |> reverse
+        max_b    = 0.0
+        for i in 0:d-1, j in 0:d-1
+            i == j && continue
+            di = digits(i, base=3, pad=N) |> reverse
+            dj = digits(j, base=3, pad=N) |> reverse
+            matches = all(
+                transition_type_qutrit(di[l], dj[l]) == k_digits[l]
+                for l in 1:N)
+            if matches
+                bound = sqrt(rho_diag[i+1] * rho_diag[j+1])
+                max_b = max(max_b, bound)
+            end
+        end
+        return max_b
+    end
+
+    # Auffüllen wenn unterbestimmt
+    blocks_relevant = copy(blocks_threshold)
+    n_circ          = count_hybrid_circuits(blocks_relevant)
+    blocks_added    = Int[]
+
+    if n_circ * d < d^2 - 1
+        missing_blocks = setdiff(blocks_all, blocks_relevant)
+        sorted_missing = sort(missing_blocks,
+            by = k -> max_bound_for_block(k), rev=true)
+
+        for k in sorted_missing
+            push!(blocks_relevant, k)
+            sort!(blocks_relevant)
+            push!(blocks_added, k)
+            n_circ = count_hybrid_circuits(blocks_relevant)
+            n_circ * d ≥ d^2 - 1 && break
+        end
+    end
+
+    # ── Statistiken ────────────────────────────────────────────
+    n_circ_all = count_hybrid_circuits(blocks_all)
+    n_circ_rel = count_hybrid_circuits(blocks_relevant)
+    fb         = FidelityBoundQutrit(rho_true, rho_diag, t)
+    reduktion  = (1 - n_circ_rel / n_circ_all) * 100
+
+    if verbose
+        println("── Threshold-Entscheidung ──")
+        println(@sprintf("  Alle Blöcke:          %d", length(blocks_all)))
+        println(@sprintf("  Threshold Blöcke:     %d", length(blocks_threshold)))
+        if !isempty(blocks_added)
+            println(@sprintf("  Aufgefüllt (+%d):     %d Blöcke",
+                length(blocks_added), length(blocks_relevant)))
+            println(@sprintf("  Aufgefüllte Blöcke:  %s", string(blocks_added)))
+        end
+        println(@sprintf("  Circuits Standard:    %d", n_circ_all))
+        println(@sprintf("  Circuits tSEEQST:     %d  (min. benötigt: %d)",
+            n_circ_rel, min_circ))
+        println(@sprintf("  Reduktion:            %.1f%%", reduktion))
+        println(@sprintf("  F_bound:              %.4f", fb))
+        println(@sprintf("  Unterbestimmt:        %s",
+            n_circ_rel * d < d^2 - 1 ? "✗ JA" : "✓ nein"))
+        println()
+    end
+
+    # ── Schritt 4: Hybrid Circuits messen ──────────────────────
+    hybrid_circs = BuildHybridCircuitsQutrit(blocks_relevant, N)
+    circuits     = unique(String[
+        startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
+        for g in hybrid_circs for c in g if c != ""])
+
+    verbose && println("── Messen ──")
+    verbose && println(@sprintf("  Circuits: %d", length(circuits)))
+    verbose && println()
+
+    Us_all = ParseCircuitToMatrixQutrit(circuits, N)
+    data   = DataPredictFromRhoSampledQutrit(rho_true, Us_all, shots)
+
+    # ── Schritt 5: Rekonstruktion ──────────────────────────────
+    verbose && println("── SGD + Cholesky ──")
+    rho_rec = ProcessDataQutrit(
+        data, Us_all, blocks_relevant, shots, N;
+        lr=lr, decay=decay, iterations=iterations,
+        patience=patience, verbose=verbose)
+
+    if verbose
+        F = fidelity(rho_rec, rho_true)
+        println()
+        println("── Ergebnisse ──")
+        println(@sprintf("  Fidelität:           %.4f", F))
+        println(@sprintf("  F_bound:             %.4f", fb))
+        println(@sprintf("  Circuits verwendet:  %d / %d  (%.1f%% Reduktion)",
+            n_circ_rel, n_circ_all, reduktion))
+        println(@sprintf("  Spur ρ_rec:          %.6f", real(tr(rho_rec))))
+        println(@sprintf("  Kleinster Eigenwert: %.6f",
+            minimum(real(eigvals(rho_rec)))))
+        println("═"^45)
+    end
+
+    return Matrix{ComplexF64}(rho_rec)
+end
+
+println("═"^65)
+println("Test: tSEEQST mit automatischem Auffüllen")
+println("═"^65)
+println()
+
+N        = 2
+shots    = 5000
+rho_true = GenerateRandomDensityMatrixNoZerosQutrits(N)
+rho_diag = real.(diag(rho_true))
+d        = 3^N
+
+println(@sprintf("N=%d Qutrits, d=%d, shots=%d", N, d, shots))
+println(@sprintf("Minimale Circuits: %d", ceil(Int, (d^2-1)/d)))
+println()
+
+println(@sprintf("  %-8s  %-12s  %-12s  %-12s  %-10s",
+    "t", "Circuits", "Fidelity", "F_bound", "Aufgefüllt"))
+println("  " * "─"^58)
+
+for t in [0.0, 0.05, 0.1, 0.15, 0.2]
+    # Blöcke vor Auffüllen
+    blocks_thresh = BlocksAboveThresholdQutrit(N, rho_diag, t)
+    hyb_thresh    = BuildHybridCircuitsQutrit(blocks_thresh, N)
+    n_before      = length(unique(String[
+        startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
+        for g in hyb_thresh for c in g if c != ""]))
+
+    fb      = FidelityBoundQutrit(rho_true, rho_diag, t)
+    rho_rec = RecreatingDensityMatrixWithTSeeqstQutrit(
+        rho_true, shots, t; verbose=false)
+    F       = fidelity(rho_rec, rho_true)
+
+    # Blöcke nach Auffüllen
+    blocks_all = collect(0:4^N-1)
+    hyb_all    = BuildHybridCircuitsQutrit(blocks_all, N)
+    n_all      = length(unique(String[
+        startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
+        for g in hyb_all for c in g if c != ""]))
+    n_after = ceil(Int, (d^2-1)/d)
+
+    aufgefuellt = n_before * d < d^2 - 1 ? "✓ ja" : "nein"
+
+    println(@sprintf("  t=%.2f   %-12d  %-12.4f  %-12.4f  %s",
+        t, n_before, F, fb, aufgefuellt))
+end
+
+println()
+println("═"^65)
+
 end # module SeeqstHybridQutrit
+# module SeeqstHybridQutrit
 #=
 include("StructureDensityMatrix.jl")
 
@@ -666,3 +894,4 @@ for N in [2, 3]
     println()
 end
 =#
+
