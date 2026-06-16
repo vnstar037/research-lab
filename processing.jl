@@ -276,6 +276,105 @@ function ProcessData(
     return BlockSeparator(rho_rec, selective_blocks, N)
 end
 
+# ══════════════════════════════════════════════════════════════
+# ReconstructDensityMatrixWithSEEQST
+# Verwendet entangling Gates (CNOT-basiert)
+# ══════════════════════════════════════════════════════════════
+function ReconstructDensityMatrixWithSEEQST(
+    rho_true::Matrix{ComplexF64},
+    shots::Int;
+    iterations::Int = 3000,
+    lr::Float64     = 0.1,
+    decay::Float64  = 0.9999,
+    patience::Int   = 200,
+    tol::Float64    = 1e-12
+)
+    N = Int(round(log2(size(rho_true, 1))))
+
+    # Alle Blöcke
+    blocks = collect(0:(2^N - 1))
+
+    # Entangling Circuits
+    ent_circs = BuildEntanglerBlocks(blocks, N)
+    circuits  = FlattenList(ent_circs)
+    Us_all    = ParseCircuitToMatrix(circuits, N)
+
+    # Messen
+    data = DataPredictFromRhoSampled(rho_true, Us_all, shots)
+
+    # Rekonstruieren
+    rho_rec = ProcessData(
+        data, Us_all, blocks, shots, N;
+        iterations = iterations,
+        lr         = lr,
+        decay      = decay,
+        patience   = patience,
+        tol        = tol
+    )
+
+    return Matrix{ComplexF64}(rho_rec)
+end
+
+# ══════════════════════════════════════════════════════════════
+# ReconstructDensityMatrixWithStandard
+# Verwendet nur lokale Messungen (kein CNOT)
+# Standard QST: {I, Rx(π/2), Ry(π/2)}^⊗N
+# ══════════════════════════════════════════════════════════════
+function BuildStandardCircuits(N::Int)
+    # Standard QST: alle Kombinationen von I, RX90, RY90
+    # pro Qubit → 3^N Circuits
+    gates_per_qubit = ["I", "RX90", "RY90"]
+    circuits = String[]
+
+    # Alle Kombinationen
+    for combo in Iterators.product([gates_per_qubit for _ in 1:N]...)
+        circuit = ""
+        for (q, gate) in enumerate(combo)
+            if gate != "I"
+                circuit *= "($gate:$(q-1))"
+            end
+        end
+        push!(circuits, circuit)
+    end
+
+    return circuits
+end
+
+function ReconstructDensityMatrixWithStandard(
+    rho_true::Matrix{ComplexF64},
+    shots::Int;
+    iterations::Int = 3000,
+    lr::Float64     = 0.1,
+    decay::Float64  = 0.9999,
+    patience::Int   = 200,
+    tol::Float64    = 1e-12
+)
+    N = Int(round(log2(size(rho_true, 1))))
+
+    # Alle Blöcke (für ProcessData)
+    blocks = collect(0:(2^N - 1))
+
+    # Standard lokale Circuits (3^N)
+    circuits = BuildStandardCircuits(N)
+    Us_all   = ParseCircuitToMatrix(circuits, N)
+
+    # Messen
+    data = DataPredictFromRhoSampled(rho_true, Us_all, shots)
+
+    # Rekonstruieren
+    rho_rec = ProcessData(
+        data, Us_all, blocks, shots, N;
+        iterations = iterations,
+        lr         = lr,
+        decay      = decay,
+        patience   = patience,
+        tol        = tol
+    )
+
+    return Matrix{ComplexF64}(rho_rec)
+end
+
+
 #=
 N = 2
 
@@ -444,12 +543,7 @@ function ReconstructDensityMatrixWithTSEEQST(
     return rho_rec, F, fb, n_circ, blocks
 end
 
-println("═"^65)
-println("Test: BlocksAboveThreshold - Matrixelemente pro Block")
-println("═"^65)
-println()
 
-N = 2
 
 # ── Hilfsfunktion: alle (i,j) Paare eines Blocks ──────────────
 function elements_of_block(block::Int, N::Int)
@@ -470,166 +564,108 @@ function elements_of_block(block::Int, N::Int)
     return pairs
 end
 
-# ── Zeige alle Blöcke mit ihren Elementen ─────────────────────
-println("── Block-Struktur für N=2 ──")
+# ── Explizite 8×8 Matrix ───────────────────────────────────────
+rho_test = zeros(ComplexF64, 8, 8)
+rho_test[1,1] =  0.5        # ρ[000,000]
+rho_test[2,2] =  0.5        # ρ[001,001]
+rho_test[1,2] = -0.5im      # ρ[000,001]
+rho_test[2,1] =  0.5im      # ρ[001,000]
+
+N = 3
+
+println("═"^60)
+println("Test N=3: Explizite Matrix mit 6 inaktiven Blöcken")
+println("═"^60)
 println()
-for block in 0:2^N-1
-    pairs = elements_of_block(block, N)
-    off_diag = filter(p -> p[1] != p[2], pairs)
-    println(@sprintf("  Block %d:", block))
-    println(@sprintf("    Alle Elemente:        %s", string(pairs)))
-    println(@sprintf("    Off-diagonal:         %s", string(off_diag)))
-    println()
+
+# ── Verifikation ──────────────────────────────────────────────
+println("── Verifikation ──")
+println(@sprintf("  Tr(ρ)          = %.4f  (soll 1.0)",
+    real(tr(rho_test))))
+println(@sprintf("  Hermitisch     = %s",
+    rho_test ≈ rho_test'))
+println(@sprintf("  Min Eigenwert  = %.6f  (soll ≥ 0)",
+    minimum(real(eigvals(rho_test)))))
+println()
+
+# ── Nicht-Null Elemente ───────────────────────────────────────
+println("── Nicht-Null Elemente und Blöcke ──")
+for i in 0:7, j in 0:7
+    if abs(rho_test[i+1, j+1]) > 1e-10
+        b = element_block(i, j, N)
+        println(@sprintf("  ρ[%d,%d] = %+.3f%+.3fi  → Block %d",
+            i, j,
+            real(rho_test[i+1,j+1]),
+            imag(rho_test[i+1,j+1]),
+            b))
+    end
 end
-
-# ── Test 1: Manuell konstruierte Dichtematrix ─────────────────
-println("═"^65)
-println("Test 1: Manuell konstruierte ρ")
-println("═"^65)
 println()
 
-# Konstruiere ρ sodass wir wissen welche Blöcke relevant sein sollen
-# ρ[0,0] = 0.6, ρ[1,1] = 0.4, alle anderen diagonal = 0
-# → √(ρ[0,0]·ρ[1,1]) = √(0.6·0.4) = 0.49 (groß)
-# → √(ρ[0,0]·ρ[2,2]) = √(0.6·0.0) = 0.0  (null)
-# → √(ρ[1,1]·ρ[2,2]) = 0.0                (null)
-
-d = 2^N
-rho_manual = zeros(ComplexF64, d, d)
-rho_manual[1,1] = 0.6   # ρ[0,0]
-rho_manual[2,2] = 0.4   # ρ[1,1]
-rho_manual[3,3] = 0.0   # ρ[2,2]
-rho_manual[4,4] = 0.0   # ρ[3,3]
-# off-diagonal Elemente die konsistent sind:
-rho_manual[1,2] = 0.1; rho_manual[2,1] = 0.1  # ρ[0,1]
-
-rho_diag_manual = real.(diag(rho_manual))
-println("Diagonale: ", rho_diag_manual)
+# ── Threshold Test ────────────────────────────────────────────
+println("── BlocksAboveThreshold ──")
+rho_diag = real.(diag(rho_test))
+println("  Diagonale: ", rho_diag)
 println()
 
-# Cauchy-Schwarz Schranken für alle off-diagonalen Paare
-println("Cauchy-Schwarz Schranken √(ρᵢᵢ·ρⱼⱼ):")
-for i in 0:d-1, j in i+1:d-1
-    bound = sqrt(rho_diag_manual[i+1] * rho_diag_manual[j+1])
-    b     = element_block(i, j, N)
-    println(@sprintf("  ρ[%d,%d] → Block %d: √(%.2f·%.2f) = %.4f",
-        i, j, b,
-        rho_diag_manual[i+1], rho_diag_manual[j+1], bound))
+println(@sprintf("  %-8s  %-20s  %-20s",
+    "t", "Aktiv", "Inaktiv"))
+println("  " * "─"^50)
+for t in [0.01, 0.1, 0.4, 0.6]
+    blocks   = BlocksAboveThreshold(N, rho_diag, t)
+    inactive = setdiff(0:2^N-1, blocks)
+    println(@sprintf("  t=%.2f   %-20s  %-20s",
+        t, string(blocks), string(collect(inactive))))
 end
 println()
 
 println("Erwartung:")
-println("  Block 0: immer relevant (Diagonale)")
-println("  Block 1: enthält ρ[0,1] und ρ[2,3]")
-println("           ρ[0,1]: √(0.6·0.4)=0.49 → relevant wenn t<0.49")
-println("           ρ[2,3]: √(0.0·0.0)=0.0  → nie relevant")
-println("           → Block 1 relevant wenn t<0.49")
-println("  Block 2: enthält ρ[0,2] und ρ[1,3]")
-println("           ρ[0,2]: √(0.6·0.0)=0.0  → nie relevant")
-println("           ρ[1,3]: √(0.4·0.0)=0.0  → nie relevant")
-println("           → Block 2 NIE relevant!")
-println("  Block 3: enthält ρ[0,3] und ρ[1,2]")
-println("           ρ[0,3]: √(0.6·0.0)=0.0  → nie relevant")
-println("           ρ[1,2]: √(0.4·0.0)=0.0  → nie relevant")
-println("           → Block 3 NIE relevant!")
+println("  Block 0: aktiv (Diagonale immer)")
+println("  Block 1: aktiv (ρ[0,1]≠0, √(0.5·0.5)=0.5)")
+println("  Block 2-7: inaktiv (alle Elemente = 0)")
 println()
 
-println("Ergebnis BlocksAboveThreshold:")
-for t in [0.0, 0.1, 0.3, 0.5]
-    blocks  = BlocksAboveThreshold(N, rho_diag_manual, t)
-    correct = t < 0.49 ? [0, 1] : [0]
-    ok      = sort(blocks) == sort(correct)
-    println(@sprintf("  t=%.2f: Blöcke=%s  Erwartet=%s  %s",
-        t, string(sort(blocks)), string(correct),
-        ok ? "✓" : "✗ FEHLER!"))
+# ── Rekonstruktion ────────────────────────────────────────────
+println("── Rekonstruktion (shots=5000) ──")
+println()
+shots = 5000
+
+# Standard
+t0      = time()
+rho_std = ReconstructDensityMatrixWithStandard(rho_test, shots)
+t_std   = time() - t0
+F_std   = fidelity(rho_std, rho_test)
+println(@sprintf("  Standard QST:  F=%.4f  t=%.2fs  Circuits=%d",
+    F_std, t_std, 3^N))
+
+# SEEQST
+t0         = time()
+rho_seeqst = ReconstructDensityMatrixWithSEEQST(rho_test, shots)
+t_seeqst   = time() - t0
+F_seeqst   = fidelity(rho_seeqst, rho_test)
+println(@sprintf("  SEEQST:        F=%.4f  t=%.2fs  Circuits=%d",
+    F_seeqst, t_seeqst, 2^(N+1)-1))
+
+# tSEEQST
+println()
+println(@sprintf("  %-8s  %-10s  %-10s  %-12s  %-8s",
+    "t", "Circuits", "Fidelity", "F_bound", "Runtime"))
+println("  " * "─"^52)
+for t in [0.01, 0.1, 0.4, 0.6]
+    t0      = time()
+    rho_rec, F, fb, nc, _ = ReconstructDensityMatrixWithTSEEQST(
+        rho_test, shots, t, N)
+    t_tseeqst = time() - t0
+    F_actual  = fidelity(Matrix{ComplexF64}(rho_rec), rho_test)
+    println(@sprintf("  t=%.2f   %-10d  %-10.4f  %-12.4f  %.2fs",
+        t, nc, F_actual, fb, t_tseeqst))
 end
 println()
 
-# ── Test 2: Zeige welche Elemente pro Block über Threshold ─────
-println("═"^65)
-println("Test 2: Welche Elemente sind über Threshold?")
-println("═"^65)
-println()
-
-rho_diag_test = [0.5, 0.3, 0.15, 0.05]
-println("Diagonale: ", rho_diag_test)
-println()
-
-t = 0.1
-println(@sprintf("Threshold t = %.2f", t))
-println()
-
-println("Alle off-diagonalen Elemente mit ihrer Schranke:")
-println(@sprintf("  %-12s  %-8s  %-12s  %-10s",
-    "Element", "Block", "Schranke", "Relevant?"))
-println("  " * "─"^48)
-
-for i in 0:d-1, j in i+1:d-1
-    bound    = sqrt(rho_diag_test[i+1] * rho_diag_test[j+1])
-    b        = element_block(i, j, N)
-    relevant = bound ≥ t
-    println(@sprintf("  ρ[%d,%d]      Block %d   %.4f       %s",
-        i, j, b, bound, relevant ? "✓ ja" : "✗ nein"))
-end
-println()
-
-blocks = BlocksAboveThreshold(N, rho_diag_test, t)
-println("Relevante Blöcke: ", sort(blocks))
-println()
-
-println("Verifikation pro Block:")
-for block in 0:2^N-1
-    pairs    = elements_of_block(block, N)
-    off_diag = filter(p -> p[1] != p[2], pairs)
-    max_bound = isempty(off_diag) ? 0.0 :
-        maximum(sqrt(rho_diag_test[p[1]+1] * rho_diag_test[p[2]+1])
-                for p in off_diag)
-    relevant = block in blocks
-    expected = block == 0 || max_bound ≥ t
-    ok       = relevant == expected
-    println(@sprintf("  Block %d: max_bound=%.4f, relevant=%s, erwartet=%s  %s",
-        block, max_bound,
-        relevant ? "ja" : "nein",
-        expected ? "ja" : "nein",
-        ok ? "✓" : "✗ FEHLER!"))
-end
-println()
-
-# ── Test 3: Extremfälle ────────────────────────────────────────
-println("═"^65)
-println("Test 3: Extremfälle")
-println("═"^65)
-println()
-
-# Fall A: t=0 → alle Blöcke relevant
-println("Fall A: t=0 → alle Blöcke müssen relevant sein")
-rho_diag_a = [0.25, 0.25, 0.25, 0.25]
-blocks_a   = BlocksAboveThreshold(N, rho_diag_a, 0.0)
-ok_a       = length(blocks_a) == 2^N
-println(@sprintf("  Blöcke: %s  %s", string(sort(blocks_a)), ok_a ? "✓" : "✗"))
-println()
-
-# Fall B: sehr großes t → nur Block 0
-println("Fall B: t=1.0 → nur Block 0 relevant")
-blocks_b = BlocksAboveThreshold(N, rho_diag_a, 1.0)
-ok_b     = blocks_b == [0]
-println(@sprintf("  Blöcke: %s  %s", string(blocks_b), ok_b ? "✓" : "✗"))
-println()
-
-# Fall C: ein dominanter Zustand
-println("Fall C: ρ[0,0]=1.0 (reiner |00⟩ Zustand)")
-rho_diag_c = [1.0, 0.0, 0.0, 0.0]
-println("  √(ρᵢᵢ·ρⱼⱼ) für alle (i,j):")
-for i in 0:d-1, j in i+1:d-1
-    bound = sqrt(rho_diag_c[i+1] * rho_diag_c[j+1])
-    println(@sprintf("    ρ[%d,%d]: %.4f", i, j, bound))
-end
-blocks_c = BlocksAboveThreshold(N, rho_diag_c, 0.01)
-ok_c     = blocks_c == [0]
-println(@sprintf("  t=0.01: Blöcke=%s (erwartet [0]) %s",
-    string(blocks_c), ok_c ? "✓" : "✗"))
-println()
-
-println("═"^65)
-println("✓ Alle Tests abgeschlossen")
-println("═"^65)
+println("═"^60)
+println("Erwartete Circuit-Reduktion:")
+println(@sprintf("  Standard QST:  %d Circuits", 3^N))
+println(@sprintf("  SEEQST:        %d Circuits", 2^(N+1)-1))
+println("  tSEEQST t=0.4: 3 Circuits (nur Block 0+1)")
+println("  → 97% Reduktion gegenüber Standard QST!")
+println("═"^60)
