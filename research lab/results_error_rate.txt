@@ -1,0 +1,93 @@
+═════════════════════════════════════════════════════════════════
+Error Rate Experiment
+═════════════════════════════════════════════════════════════════
+N_values=[2, 3, 4], shots=1000, t=0.05, runs=5
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+N = 2 Qutrits
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Standard: 48 Circuits
+  SEEQST:   42 Circuits
+
+  Run 1/5
+    Standard: Δerr=0.010968  nc=48
+    SEEQST:   Δerr=0.008931  nc=42
+    tSEEQST:  Δerr=0.015242  nc=32
+  Run 2/5
+    Standard: Δerr=0.017170  nc=48
+    SEEQST:   Δerr=0.021061  nc=42
+    tSEEQST:  Δerr=0.019087  nc=42
+  Run 3/5
+    Standard: Δerr=0.000033  nc=48
+    SEEQST:   Δerr=0.000031  nc=42
+    tSEEQST:  Δerr=0.000172  nc=0
+  Run 4/5
+    Standard: Δerr=0.000737  nc=48
+    SEEQST:   Δerr=0.004557  nc=42
+    tSEEQST:  Δerr=0.006994  nc=8
+  Run 5/5
+    Standard: Δerr=0.020652  nc=48
+    SEEQST:   Δerr=0.034527  nc=42
+    tSEEQST:  Δerr=0.016780  nc=42
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+N = 3 Qutrits
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Standard: 342 Circuits
+  SEEQST:   234 Circuits
+
+  Run 1/5
+    Standard: Δerr=0.000012  nc=342
+    SEEQST:   Δerr=0.000007  nc=234
+    tSEEQST:  Δerr=0.000018  nc=0
+  Run 2/5
+    Standard: Δerr=0.000721  nc=342
+    SEEQST:   Δerr=0.003055  nc=234
+    tSEEQST:  Δerr=0.011171  nc=52
+  Run 3/5
+    Standard: Δerr=0.000805  nc=342
+    SEEQST:   Δerr=0.000722  nc=234
+    tSEEQST:  Δerr=0.001704  nc=20
+  Run 4/5
+    Standard: Δerr=0.001060  nc=342
+    SEEQST:   Δerr=0.004013  nc=234
+    tSEEQST:  Δerr=0.004116  nc=16
+  Run 5/5
+    Standard: Δerr=0.008765  nc=342
+    SEEQST:   Δerr=0.018036  nc=234
+    tSEEQST:  Δerr=0.021209  nc=152
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+N = 4 Qutrits
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Standard: 2400 Circuits
+  SEEQST:   1170 Circuits
+
+  Run 1/5
+    Standard: Δerr=0.151753  nc=2400
+    SEEQST:   Δerr=0.223336  nc=1170
+    tSEEQST:  Δerr=0.515468  nc=0
+  Run 2/5
+    Standard: Δerr=0.000003  nc=2400
+    SEEQST:   Δerr=0.000002  nc=1170
+    tSEEQST:  Δerr=0.000009  nc=0
+  Run 3/5
+    Standard: Δerr=0.082602  nc=2400
+    SEEQST:   Δerr=0.125999  nc=1170
+    tSEEQST:  Δerr=0.419141  nc=0
+  Run 4/5
+    Standard: Δerr=0.157503  nc=2400
+    SEEQST:   Δerr=0.218147  nc=1170
+    tSEEQST:  Δerr=0.522140  nc=0
+  Run 5/5
+    Standard: Δerr=0.057527  nc=2400
+    SEEQST:   Δerr=0.095708  nc=1170
+    tSEEQST:  Δerr=0.373166  nc=0
+
+✓ Plot gespeichert: error_rate_comparison_v2.png
+
+═════════════════════════════════════════════════════════════════
+Zusammenfassung (Mittelwerte)
+═════════════════════════════════════════════════════════════════
+
+── N = 2 ──
