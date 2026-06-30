@@ -4,114 +4,158 @@ using Printf
 using LinearAlgebra
 using QuantumInformation
 using Plots
+using Statistics
 using DelimitedFiles
 
-include("StructureDensityMatrix.jl")
 include("moduleSeeqstQutrit.jl")
-include("moduleTSeeqstQutrit.jl")
+include("moduleSeeqstQutrit2.jl")
+include("moduleTSeeqstQutrit2.jl")
 
 using .SeeqstHybridQutrit
-using .TSeeqstQutrit
+using .SeeqstMixedQutrit
+using .TSeeqstMixedQutrit
 
-log_file = open("results_fidelity_fixedt.txt", "w")
+log_file = open("results_comparison.txt", "w")
 function log(msg::String)
     println(msg)
     println(log_file, msg)
     flush(log_file)
 end
 
-# ── Lade Dichtematrix ──────────────────────────────────────────
-N = 3
+# ══════════════════════════════════════════════════════════════
+# Einstellungen
+# ══════════════════════════════════════════════════════════════
+N          = 3
+shots_list = collect(100:25:5000)
+t_values   = [0.02, 0.05, 0.10]
+
+# ── Dichtematrix ───────────────────────────────────────────────
 RhoTrue_real = readdlm("RhoTrue_real.csv", ',', Float64)
 RhoTrue_imag = readdlm("RhoTrue_imag.csv", ',', Float64)
 RhoTrue      = complex.(RhoTrue_real, RhoTrue_imag)
+rho_diag     = real.(diag(RhoTrue))
 
-log("Dichtematrix geladen:")
+log("═"^65)
+log("Vergleich: Standard vs SEEQST vs tSEEQST")
+log("═"^65)
+log(@sprintf("  N=%d, shots=%d..%d", N, shots_list[1], shots_list[end]))
+log(@sprintf("  t_values: %s  + adaptiv t=1/√shots", string(t_values)))
 log(@sprintf("  Spur:          %.6f", real(tr(RhoTrue))))
 log(@sprintf("  Min Eigenwert: %.6f", minimum(real(eigvals(RhoTrue)))))
 log("")
 
-# ── Fester Threshold ────────────────────────────────────────────
-t_fixed = 0.05
-log(@sprintf("Fester Threshold: t = %.3f", t_fixed))
-log("")
-
-# ── Circuit-Anzahl Standard und SEEQST ────────────────────────
+# ── Circuit-Anzahl ─────────────────────────────────────────────
 blocks_all = collect(0:(4^N - 1))
 non_circs  = BuildNonEntanglingCircuitsQutrit(blocks_all, N)
-hyb_circs  = BuildHybridCircuitsQutrit(blocks_all, N)
 
 n_standard = length(unique(String[
     c for g in non_circs for c in g if c != ""]))
-n_seeqst   = length(unique(String[
-    startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
-    for g in hyb_circs for c in g if c != ""]))
+n_seeqst   = TSeeqstMixedQutrit.count_circuits_for_blocks(blocks_all, N)
 
-log(@sprintf("Standard SEEQST: %d Circuits", n_standard))
-log(@sprintf("SEEQST Hybrid:   %d Circuits", n_seeqst))
+log(@sprintf("  Standard: %d Circuits", n_standard))
+log(@sprintf("  SEEQST:   %d Circuits", n_seeqst))
+for t in t_values
+    blocks_t = TSeeqstMixedQutrit.BlocksAboveThresholdQutrit(N, rho_diag, t)
+    n_t      = TSeeqstMixedQutrit.count_circuits_for_blocks(blocks_t, N)
+    log(@sprintf("  tSEEQST t=%.2f: %d Circuits (vor Fill-up)", t, n_t))
+end
+log(@sprintf("  tSEEQST adaptiv: t=1/√m (variabel)"))
 log("")
 
-# ── Messungen ──────────────────────────────────────────────────
-shots_list = collect(100:20:5000)
+# ══════════════════════════════════════════════════════════════
+# Hilfsfunktion: NC mit Fill-up berechnen
+# ══════════════════════════════════════════════════════════════
+function compute_nc_with_fillup(N::Int, rho_diag::Vector{Float64}, t::Float64)
+    d        = 3^N
+    blocks_t = TSeeqstMixedQutrit.BlocksAboveThresholdQutrit(N, rho_diag, t)
+    n_circ   = TSeeqstMixedQutrit.count_circuits_for_blocks(blocks_t, N)
 
-fidelities_Standard = Float64[]
-fidelities_Hybrid   = Float64[]
-fidelities_TSeeqst  = Float64[]
+    if n_circ * d < d^2 - 1
+        blocks_r = copy(blocks_t)
+        missing  = setdiff(collect(0:4^N-1), blocks_r)
+        sorted   = sort(missing,
+            by=k->TSeeqstMixedQutrit.max_bound_for_block(k, N, rho_diag),
+            rev=true)
+        for k in sorted
+            push!(blocks_r, k); sort!(blocks_r)
+            n_circ = TSeeqstMixedQutrit.count_circuits_for_blocks(blocks_r, N)
+            n_circ * d ≥ d^2 - 1 && break
+        end
+    end
 
-circuits_Standard   = Int[]
-circuits_Hybrid     = Int[]
-circuits_TSeeqst    = Int[]
+    return n_circ
+end
 
-times_Standard      = Float64[]
-times_Hybrid        = Float64[]
-times_TSeeqst       = Float64[]
-
-log("═"^65)
+# ══════════════════════════════════════════════════════════════
+# Messungen
+# ══════════════════════════════════════════════════════════════
 log("Messungen starten...")
-log("═"^65)
 log("")
+
+fid_standard  = Float64[]
+fid_seeqst    = Float64[]
+fid_tseeqst   = Dict(t => Float64[] for t in t_values)
+nc_tseeqst    = Dict(t => Int[]     for t in t_values)
+fid_adaptive  = Float64[]
+nc_adaptive   = Int[]
+t_adaptive    = Float64[]
+
+time_standard = Float64[]
+time_seeqst   = Float64[]
+time_tseeqst  = Dict(t => Float64[] for t in t_values)
+time_adaptive = Float64[]
 
 for (idx, shots) in enumerate(shots_list)
-    log(@sprintf("[%d/%d] shots=%d  t=%.3f (fest)",
-        idx, length(shots_list), shots, t_fixed))
+    log(@sprintf("[%d/%d] shots=%d", idx, length(shots_list), shots))
 
-    # ── Standard SEEQST ───────────────────────────────────────
-    local t0 = time()
-    local rho_std = RecreatingDensityMatrixWithNonentanglingQutrit(
-        RhoTrue, shots; verbose=false)
-    push!(times_Standard, time() - t0)
-    push!(fidelities_Standard, fidelity(Matrix{ComplexF64}(rho_std), RhoTrue))
-    push!(circuits_Standard, n_standard)
-
-    # ── SEEQST Hybrid ─────────────────────────────────────────
+    # ── Standard ──────────────────────────────────────────────
     t0 = time()
-    local rho_hyb = RecreatingDensityMatrixWithSeeqstQutrit(
+    rho_std = RecreatingDensityMatrixWithNonentanglingQutrit(
         RhoTrue, shots; verbose=false)
-    push!(times_Hybrid, time() - t0)
-    push!(fidelities_Hybrid, fidelity(Matrix{ComplexF64}(rho_hyb), RhoTrue))
-    push!(circuits_Hybrid, n_seeqst)
+    push!(time_standard, time() - t0)
+    push!(fid_standard, fidelity(Matrix{ComplexF64}(rho_std), RhoTrue))
 
-    # ── tSEEQST mit festem t ───────────────────────────────────
-    local rho_diag = real.(diag(RhoTrue))
-    local blocks_t = BlocksAboveThresholdQutrit(N, rho_diag, t_fixed)
-    local hyb_t    = BuildHybridCircuitsQutrit(blocks_t, N)
-    local n_circ_t = length(unique(String[
-        startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
-        for g in hyb_t for c in g if c != ""]))
-
+    # ── SEEQST ────────────────────────────────────────────────
     t0 = time()
-    local rho_t = RecreatingDensityMatrixWithTSeeqstQutrit(
-        RhoTrue, shots, t_fixed; verbose=false)
-    push!(times_TSeeqst, time() - t0)
-    push!(fidelities_TSeeqst, fidelity(Matrix{ComplexF64}(rho_t), RhoTrue))
-    push!(circuits_TSeeqst, n_circ_t)
+    rho_mix = RecreatingDensityMatrixWithMixedSeeqstQutrit(
+        RhoTrue, shots; verbose=false)
+    push!(time_seeqst, time() - t0)
+    push!(fid_seeqst, fidelity(Matrix{ComplexF64}(rho_mix), RhoTrue))
 
-    log(@sprintf("  Standard: F=%.4f  Circuits=%d  t=%.2fs",
-        fidelities_Standard[end], circuits_Standard[end], times_Standard[end]))
-    log(@sprintf("  SEEQST:   F=%.4f  Circuits=%d  t=%.2fs",
-        fidelities_Hybrid[end],   circuits_Hybrid[end],   times_Hybrid[end]))
-    log(@sprintf("  tSEEQST:  F=%.4f  Circuits=%d  t=%.2fs",
-        fidelities_TSeeqst[end],  circuits_TSeeqst[end],  times_TSeeqst[end]))
+    log(@sprintf("  Standard: F=%.4f  nc=%d  t=%.2fs",
+        fid_standard[end], n_standard, time_standard[end]))
+    log(@sprintf("  SEEQST:   F=%.4f  nc=%d  t=%.2fs",
+        fid_seeqst[end], n_seeqst, time_seeqst[end]))
+
+    # ── tSEEQST feste t-Werte ─────────────────────────────────
+    for t in t_values
+        t0 = time()
+        rho_t = RecreatingDensityMatrixWithTMixedSeeqstQutrit(
+            RhoTrue, shots, t; verbose=false)
+        push!(time_tseeqst[t], time() - t0)
+        push!(fid_tseeqst[t], fidelity(Matrix{ComplexF64}(rho_t), RhoTrue))
+
+        n_t = compute_nc_with_fillup(N, rho_diag, t)
+        push!(nc_tseeqst[t], n_t)
+
+        log(@sprintf("  tSEEQST t=%.2f: F=%.4f  nc=%d  t=%.2fs",
+            t, fid_tseeqst[t][end], n_t, time_tseeqst[t][end]))
+    end
+
+    # ── tSEEQST adaptiv t = 1/√m ──────────────────────────────
+    t_adapt = 1.0 / sqrt(shots)
+    push!(t_adaptive, t_adapt)
+    t0 = time()
+    rho_adapt = RecreatingDensityMatrixWithTMixedSeeqstQutrit(
+        RhoTrue, shots, t_adapt; verbose=false)
+    push!(time_adaptive, time() - t0)
+    push!(fid_adaptive, fidelity(Matrix{ComplexF64}(rho_adapt), RhoTrue))
+
+    n_adapt = compute_nc_with_fillup(N, rho_diag, t_adapt)
+    push!(nc_adaptive, n_adapt)
+
+    log(@sprintf("  tSEEQST t=1/√m=%.3f: F=%.4f  nc=%d  t=%.2fs",
+        t_adapt, fid_adaptive[end], n_adapt, time_adaptive[end]))
     log("")
 end
 
@@ -121,7 +165,7 @@ end
 pk = (
     size          = (1100, 700),
     left_margin   = 35Plots.mm,
-    right_margin  = 35Plots.mm,
+    right_margin  = 20Plots.mm,
     top_margin    = 12Plots.mm,
     bottom_margin = 14Plots.mm,
     guidefontsize = 14,
@@ -132,126 +176,220 @@ pk = (
     formatter     = :plain,
 )
 
-# ── Hilfsfunktion: Dual-Achsen Plot ───────────────────────────
-function dual_plot(shots, fidelities, circuits,
-                    method_name, color, ylim_f, filename, title_str)
+colors_t = [:orange, :red, :darkred]
 
-    p = plot(shots, fidelities;
-        label     = "Fidelity",
-        xlabel    = "Number of measurements (m)",
-        ylabel    = "Fidelity",
-        color     = color,
-        ylim      = ylim_f,
-        legend    = :bottomright,
-        title     = title_str,
+# ── Hilfsfunktion: full + zoom ────────────────────────────────
+function save_fidelity_plots(shots, fid, label_str, color,
+                              title_str, filename_base;
+                              ylim_zoom=(0.85, 1.01))
+    p = plot(shots, fid;
+        label   = label_str,
+        xlabel  = "Number of measurements (m)",
+        ylabel  = "Fidelity",
+        title   = "$title_str (N=$N Qutrits)",
+        color   = color,
+        legend  = :bottomright,
+        ylim    = (0.0, 1.05),
         pk...)
+    hline!(p, [1.0]; color=:black, linestyle=:dot, label="", alpha=0.5)
+    savefig(p, "$(filename_base)_full.png")
+    log("✓ Plot: $(filename_base)_full.png")
 
-    p2 = twinx(p)
-    plot!(p2, shots, circuits;
-        label     = "nc (Circuits)",
-        color     = color,
-        linestyle = :dash,
-        alpha     = 0.7,
-        ylabel    = "Number of circuits (nc)",
-        legend    = :topright,
-        ylim      = (0, maximum(circuits) * 1.2),
+    pz = plot(shots, fid;
+        label   = label_str,
+        xlabel  = "Number of measurements (m)",
+        ylabel  = "Fidelity",
+        title   = "$title_str (Zoom, N=$N)",
+        color   = color,
+        legend  = :bottomright,
+        ylim    = ylim_zoom,
         pk...)
-
-    savefig(p, filename)
-    log("✓ Plot gespeichert: $filename")
-    return p
+    hline!(pz, [1.0]; color=:black, linestyle=:dot, label="", alpha=0.5)
+    savefig(pz, "$(filename_base)_zoom.png")
+    log("✓ Plot: $(filename_base)_zoom.png")
 end
 
 # ══════════════════════════════════════════════════════════════
-# Plots: Standard SEEQST
+# Plot 1+2: Standard
 # ══════════════════════════════════════════════════════════════
 log("")
-log("── Plots Standard SEEQST ──")
-
-dual_plot(shots_list, fidelities_Standard, circuits_Standard,
-    "Standard", :purple, (0.0, 1.05),
-    "fidelity_standard_full_fixedt.png",
-    "Standard: Fidelity and Circuits vs. Measurements (N=$N)")
-
-dual_plot(shots_list, fidelities_Standard, circuits_Standard,
-    "Standard", :purple, (0.9, 1.01),
-    "fidelity_standard_zoom_fixedt.png",
-    "Standard: Fidelity and Circuits vs. Measurements (Zoom)")
+log("── Plots Standard ──")
+save_fidelity_plots(shots_list, fid_standard,
+    "Standard (nc=$n_standard)", :purple,
+    "Standard: Fidelity vs. Measurements",
+    "fidelity_standard")
 
 # ══════════════════════════════════════════════════════════════
-# Plots: SEEQST Hybrid
+# Plot 3+4: SEEQST
 # ══════════════════════════════════════════════════════════════
 log("── Plots SEEQST ──")
-
-dual_plot(shots_list, fidelities_Hybrid, circuits_Hybrid,
-    "SEEQST", :green, (0.0, 1.05),
-    "fidelity_seeqst_full_fixedt.png",
-    "SEEQST: Fidelity and Circuits vs. Measurements (N=$N)")
-
-dual_plot(shots_list, fidelities_Hybrid, circuits_Hybrid,
-    "SEEQST", :green, (0.9, 1.01),
-    "fidelity_seeqst_zoom_fixedt.png",
-    "SEEQST: Fidelity and Circuits vs. Measurements (Zoom)")
+save_fidelity_plots(shots_list, fid_seeqst,
+    "SEEQST (nc=$n_seeqst)", :blue,
+    "SEEQST: Fidelity vs. Measurements",
+    "fidelity_seeqst")
 
 # ══════════════════════════════════════════════════════════════
-# Plots: tSEEQST
+# Plot 5+6: tSEEQST (feste t-Werte)
 # ══════════════════════════════════════════════════════════════
-log("── Plots tSEEQST ──")
+log("── Plots tSEEQST (feste t) ──")
 
-dual_plot(shots_list, fidelities_TSeeqst, circuits_TSeeqst,
-    "tSEEQST", :orange, (0.0, 1.05),
-    "fidelity_tseeqst_full_fixedt.png",
-    @sprintf("tSEEQST: Fidelity and Circuits vs. Measurements (N=%d, t=%.2f)", N, t_fixed))
+for (full_zoom, ylim, suffix) in [
+        (true,  (0.0,  1.05), "full"),
+        (false, (0.85, 1.01), "zoom")]
 
-dual_plot(shots_list, fidelities_TSeeqst, circuits_TSeeqst,
-    "tSEEQST", :orange, (0.9, 1.01),
-    "fidelity_tseeqst_zoom_fixedt.png",
-    "tSEEQST: Fidelity and Circuits vs. Measurements (Zoom)")
+    p = plot(;
+        xlabel  = "Number of measurements (m)",
+        ylabel  = "Fidelity",
+        title   = full_zoom ?
+            "tSEEQST: Fidelity vs. Measurements (N=$N Qutrits)" :
+            "tSEEQST: Fidelity vs. Measurements (Zoom, N=$N)",
+        legend  = :bottomright,
+        ylim    = ylim,
+        pk...)
+
+    for (i, t) in enumerate(t_values)
+        nc_avg = round(Int, mean(nc_tseeqst[t]))
+        plot!(p, shots_list, fid_tseeqst[t];
+            label = @sprintf("tSEEQST t=%.2f (nc≈%d)", t, nc_avg),
+            color = colors_t[i])
+    end
+
+    hline!(p, [1.0]; color=:black, linestyle=:dot, label="", alpha=0.5)
+    savefig(p, "fidelity_tseeqst_$suffix.png")
+    log("✓ Plot: fidelity_tseeqst_$suffix.png")
+end
 
 # ══════════════════════════════════════════════════════════════
-# Plot: Runtime Comparison
+# Plot 7+8: tSEEQST t=1/√m
 # ══════════════════════════════════════════════════════════════
-log("── Plot: Runtime Comparison ──")
+log("── Plots tSEEQST t=1/√m ──")
+save_fidelity_plots(shots_list, fid_adaptive,
+    "tSEEQST t=1/√m", :green,
+    "tSEEQST t=1/√m: Fidelity vs. Measurements",
+    "fidelity_tseeqst_adaptive")
 
-p_runtime = plot(shots_list, times_Standard;
-    label         = "Standard SEEQST",
-    xlabel        = "Number of measurements (m)",
-    ylabel        = "Runtime (s)",
-    title         = "Runtime vs. Measurements (N=$N Qutrits)",
-    color         = :purple,
-    legend        = :topleft,
+# ══════════════════════════════════════════════════════════════
+# Plot 9: Runtime Comparison
+# Standard + SEEQST + tSEEQST t=1/√m
+# ══════════════════════════════════════════════════════════════
+log("── Plot Runtime Comparison ──")
+
+p9 = plot(shots_list, time_standard;
+    label   = "Standard (nc=$n_standard)",
+    xlabel  = "Number of measurements (m)",
+    ylabel  = "Runtime (s)",
+    title   = "Runtime vs. Measurements (N=$N Qutrits)",
+    color   = :purple,
+    legend  = :topleft,
     pk...)
-plot!(p_runtime, shots_list, times_Hybrid;
-    label = "SEEQST",   color = :green)
-plot!(p_runtime, shots_list, times_TSeeqst;
-    label = "tSEEQST",  color = :orange)
+plot!(p9, shots_list, time_seeqst;
+    label     = "SEEQST (nc=$n_seeqst)",
+    color     = :blue)
+plot!(p9, shots_list, time_adaptive;
+    label     = "tSEEQST t=1/√m",
+    color     = :green,
+    linewidth = 2.5)
+savefig(p9, "runtime_comparison.png")
+log("✓ Plot: runtime_comparison.png")
 
-savefig(p_runtime, "runtime_comparison_fixedt.png")
-log("✓ Plot gespeichert: runtime_comparison_fixedt.png")
+# ══════════════════════════════════════════════════════════════
+# Plot 10: Circuits t=1/√m vs Shots
+# ══════════════════════════════════════════════════════════════
+p10 = plot(shots_list, nc_adaptive;
+    label   = "tSEEQST t=1/√m",
+    xlabel  = "Number of measurements (m)",
+    ylabel  = "Number of circuits (nc)",
+    title   = "Circuit Reduction: tSEEQST t=1/√m (N=$N)",
+    color   = :green,
+    legend  = :topright,
+    pk...)
+hline!(p10, [n_standard]; color=:purple, linestyle=:dash,
+    label="Standard (nc=$n_standard)")
+hline!(p10, [n_seeqst]; color=:blue, linestyle=:dash,
+    label="SEEQST (nc=$n_seeqst)")
+savefig(p10, "circuits_adaptive.png")
+log("✓ Plot: circuits_adaptive.png")
+
+# ══════════════════════════════════════════════════════════════
+# Plot 11: Circuits feste t vs Shots
+# ══════════════════════════════════════════════════════════════
+p11 = plot(;
+    xlabel  = "Number of measurements (m)",
+    ylabel  = "Number of circuits (nc)",
+    title   = "Circuit Reduction: Feste t-Werte (N=$N)",
+    legend  = :topright,
+    pk...)
+hline!(p11, [n_standard]; color=:purple, linestyle=:dash,
+    label="Standard (nc=$n_standard)")
+hline!(p11, [n_seeqst]; color=:blue, linestyle=:dash,
+    label="SEEQST (nc=$n_seeqst)")
+for (i, t) in enumerate(t_values)
+    plot!(p11, shots_list, nc_tseeqst[t];
+        label = @sprintf("tSEEQST t=%.2f", t),
+        color = colors_t[i])
+end
+savefig(p11, "circuits_fixed_t.png")
+log("✓ Plot: circuits_fixed_t.png")
+
+# ══════════════════════════════════════════════════════════════
+# Plot 12: t-Wert vs Shots
+# ══════════════════════════════════════════════════════════════
+p12 = plot(shots_list, t_adaptive;
+    label   = "t = 1/√m",
+    xlabel  = "Number of measurements (m)",
+    ylabel  = "Threshold t",
+    title   = "Adaptiver Threshold t=1/√m vs. Messungen",
+    color   = :green,
+    legend  = :topright,
+    pk...)
+for t in t_values
+    hline!(p12, [t]; linestyle=:dash,
+        label=@sprintf("t=%.2f (fest)", t))
+end
+savefig(p12, "threshold_vs_shots.png")
+log("✓ Plot: threshold_vs_shots.png")
 
 # ══════════════════════════════════════════════════════════════
 # Zusammenfassung
 # ══════════════════════════════════════════════════════════════
 log("")
-log("═"^65)
-log("Zusammenfassung bei shots=$(shots_list[end]), t=$t_fixed (fest)")
-log("═"^65)
-log(@sprintf("  %-20s  %-10s  %-12s  %-10s  %-10s",
-    "Methode", "Fidelity", "Runtime (s)", "Circuits", "Total t"))
-log("  " * "─"^65)
-log(@sprintf("  %-20s  %-10.4f  %-12.2f  %-10d  %-10.1fs",
-    "Standard SEEQST",
-    fidelities_Standard[end], times_Standard[end],
-    circuits_Standard[end],   sum(times_Standard)))
-log(@sprintf("  %-20s  %-10.4f  %-12.2f  %-10d  %-10.1fs",
-    "SEEQST",
-    fidelities_Hybrid[end],   times_Hybrid[end],
-    circuits_Hybrid[end],     sum(times_Hybrid)))
-log(@sprintf("  %-20s  %-10.4f  %-12.2f  %-10d  %-10.1fs",
-    "tSEEQST (t=%.2f)" |> s -> @sprintf("tSEEQST (t=%.2f)", t_fixed),
-    fidelities_TSeeqst[end],  times_TSeeqst[end],
-    circuits_TSeeqst[end],    sum(times_TSeeqst)))
-log("═"^65)
+log("═"^70)
+log(@sprintf("Zusammenfassung bei shots=%d", shots_list[end]))
+log("═"^70)
+log(@sprintf("  %-22s  %-10s  %-10s  %-10s  %-12s",
+    "Methode", "Fidelity", "Circuits", "Zeit(s)", "Reduktion"))
+log("  " * "─"^68)
+
+log(@sprintf("  %-22s  %-10.4f  %-10d  %-10.2f  0%%",
+    "Standard", fid_standard[end], n_standard, time_standard[end]))
+
+log(@sprintf("  %-22s  %-10.4f  %-10d  %-10.2f  %.1f%%",
+    "SEEQST", fid_seeqst[end], n_seeqst, time_seeqst[end],
+    (1 - n_seeqst/n_standard)*100))
+
+for t in t_values
+    nc_t = nc_tseeqst[t][end]
+    log(@sprintf("  %-22s  %-10.4f  %-10d  %-10.2f  %.1f%%",
+        @sprintf("tSEEQST t=%.2f", t),
+        fid_tseeqst[t][end], nc_t, time_tseeqst[t][end],
+        (1 - nc_t/n_standard)*100))
+end
+
+log(@sprintf("  %-22s  %-10.4f  %-10d  %-10.2f  %.1f%%",
+    "tSEEQST t=1/√m",
+    fid_adaptive[end], nc_adaptive[end], time_adaptive[end],
+    (1 - nc_adaptive[end]/n_standard)*100))
+
+log("═"^70)
+log("")
+log(@sprintf("  Gesamtzeit Standard:        %.1fs", sum(time_standard)))
+log(@sprintf("  Gesamtzeit SEEQST:          %.1fs", sum(time_seeqst)))
+for t in t_values
+    log(@sprintf("  Gesamtzeit tSEEQST t=%.2f:  %.1fs",
+        t, sum(time_tseeqst[t])))
+end
+log(@sprintf("  Gesamtzeit tSEEQST t=1/√m:  %.1fs", sum(time_adaptive)))
+log("═"^70)
 
 close(log_file)
-println("✓ Log gespeichert: results_fidelity_fixedt.txt")
+println("✓ Fertig! Log: results_comparison.txt")

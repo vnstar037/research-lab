@@ -1,99 +1,106 @@
-using LinearAlgebra
-using QuantumInformation
-using Printf
+cd(@__DIR__)
 
 include("moduleSeeqstQutrit.jl")
-include("test3.jl")
+include("moduleTSeeqstQutrit.jl")
+include("moduleTSeeqstQutrit2.jl")
 
 using .SeeqstHybridQutrit
-using .SeeqstMixedQutrit
+using .TSeeqstQutrit
+using .TSeeqstMixedQutrit
+using QuantumInformation
+using LinearAlgebra
+using Printf
 
-labels = ["00","01","02","10","11","12","20","21","22"]
+N    = 3   # ← nur das geändert!
+d    = 3^N
 
-# ══════════════════════════════════════════════════════════════
-# Erstelle Matrix mit Elementen NUR aus einem gemischten Block
-# Nicht notwendigerweise physikalisch!
-# ══════════════════════════════════════════════════════════════
-function create_block_matrix(t1::Int, t2::Int)
-    levels = Dict(1=>(0,1), 2=>(0,2), 3=>(1,2))
-    a0,b0  = levels[t1]
-    a1,b1  = levels[t2]
-    idx(q0,q1) = q0*3 + q1 + 1
+rho_true   = SeeqstHybridQutrit.GenerateRandomDensityMatrixNoZerosQutrits(N)
+rho_diag   = real.(diag(rho_true))
+blocks_all = collect(0:4^N-1)
 
-    # 4 Eckzustände des gemischten Blocks
-    corners = [idx(a0,a1), idx(a0,b1), idx(b0,a1), idx(b0,b1)]
-
-    # Zufälliger Zustandsvektor NUR in den 4 Eckzuständen
-    psi = zeros(ComplexF64, 9)
-    v   = randn(ComplexF64, 4)
-    v  /= norm(v)
-    for (k,c) in enumerate(corners)
-        psi[c] = v[k]
-    end
-
-    # ρ = |ψ⟩⟨ψ| → nur Elemente in corners×corners
-    rho = psi * psi'
-    return rho, corners
+function count_tseeqst(blocks::Vector{Int}, N::Int)
+    hyb = SeeqstHybridQutrit.BuildHybridCircuitsQutrit(blocks, N)
+    return length(unique(String[
+        startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
+        for g in hyb for c in g if c != ""]))
 end
 
-# ══════════════════════════════════════════════════════════════
-# Zeige Matrix-Elemente
-# ══════════════════════════════════════════════════════════════
-function show_nonzero(rho, name)
-    println("── $name ──")
-    for i in 1:9, j in 1:9
-        abs(rho[i,j]) < 1e-10 && continue
-        println(@sprintf("  ρ[|%s⟩,|%s⟩] = %+.4f%+.4fi",
-            labels[i], labels[j], real(rho[i,j]), imag(rho[i,j])))
-    end
-    println()
-end
+n_std1 = count_tseeqst(blocks_all, N)
+n_std2 = TSeeqstMixedQutrit.count_circuits_for_blocks(blocks_all, N)
 
-# ══════════════════════════════════════════════════════════════
-# Test: Fidelity für alle 6 gemischten Blöcke
-# ══════════════════════════════════════════════════════════════
-mixed_blocks = [(1,2), (1,3), (2,1), (2,3), (3,1), (3,2)]
-shots        = 5000
-
-println("═"^70)
-println("Test: Rekonstruktion von Matrizen mit nur gemischten Block-Elementen")
-println("═"^70)
+println("═"^75)
+println("Vergleich Circuit-Anzahl: TSeeqstQutrit vs TSeeqstMixedQutrit")
+println("═"^75)
+println()
+println(@sprintf("  N=%d, d=%d, d²-1=%d, min=%d",
+    N, d, d^2-1, ceil(Int,(d^2-1)/d)))
+println()
+println(@sprintf("  Standard TSeeqstQutrit:      %d Circuits", n_std1))
+println(@sprintf("  Standard TSeeqstMixedQutrit: %d Circuits", n_std2))
 println()
 
-println(@sprintf("  %-10s  %-14s  %-14s  %-14s",
-    "Block", "Standard", "Hybrid", "Mixed (theor.)"))
-println("  " * "─"^58)
+println(@sprintf("  %-8s  %-20s  %-20s  %-12s",
+    "t", "TSeeqstQutrit", "TSeeqstMixedQutrit", "Diff"))
+println("  " * "─"^65)
 
-for (t1,t2) in mixed_blocks
-    rho_true, corners = create_block_matrix(t1, t2)
+for t in [0.0, 0.02, 0.05, 0.08, 0.10, 0.12, 0.15, 0.20]
 
-    println()
-    println("Block ($t1,$t2): aktive Zustände = $(join(["|"*labels[c]*"⟩" for c in corners], ", "))")
-    show_nonzero(rho_true, "Dichtematrix")
+    # ── TSeeqstQutrit ─────────────────────────────────────────
+    blocks_t1 = TSeeqstQutrit.BlocksAboveThresholdQutrit(N, rho_diag, t)
+    n_t1      = count_tseeqst(blocks_t1, N)
 
-    # Standard SEEQST
-    rho_std = RecreatingDensityMatrixWithNonentanglingQutrit(
-        rho_true, shots; verbose=false)
-    F_std = fidelity(rho_std, rho_true)
+    blocks_r1 = copy(blocks_t1)
+    n_f1      = n_t1
+    if n_f1 * d < d^2 - 1
+        missing = setdiff(blocks_all, blocks_r1)
+        sorted  = sort(missing, rev=true,
+            by = k -> begin
+                k_digits = digits(k, base=4, pad=N) |> reverse
+                max_b = 0.0
+                for i in 0:d-1, j in 0:d-1
+                    i==j && continue
+                    di = digits(i, base=3, pad=N) |> reverse
+                    dj = digits(j, base=3, pad=N) |> reverse
+                    if all(TSeeqstQutrit.transition_type_qutrit(di[l],dj[l])==k_digits[l]
+                           for l in 1:N)
+                        max_b = max(max_b, sqrt(rho_diag[i+1]*rho_diag[j+1]))
+                    end
+                end
+                max_b
+            end)
+        for k in sorted
+            push!(blocks_r1, k); sort!(blocks_r1)
+            n_f1 = count_tseeqst(blocks_r1, N)
+            n_f1 * d ≥ d^2 - 1 && break
+        end
+    end
 
-    # Hybrid SEEQST (CINC)
-    rho_hyb = RecreatingDensityMatrixWithSeeqstQutrit(
-        rho_true, shots; verbose=false)
-    F_hyb = fidelity(rho_hyb, rho_true)
+    # ── TSeeqstMixedQutrit ────────────────────────────────────
+    blocks_t2 = TSeeqstMixedQutrit.BlocksAboveThresholdQutrit(N, rho_diag, t)
+    n_t2      = TSeeqstMixedQutrit.count_circuits_for_blocks(blocks_t2, N)
 
-    # Mixed SEEQST (theoretische Gates)
-    rho_mix = RecreatingDensityMatrixWithMixedSeeqstQutrit(
-        rho_true, shots; verbose=false)
-    F_mix = fidelity(rho_mix, rho_true)
+    blocks_r2 = copy(blocks_t2)
+    n_f2      = n_t2
+    if n_f2 * d < d^2 - 1
+        missing = setdiff(blocks_all, blocks_r2)
+        sorted  = sort(missing,
+            by=k->TSeeqstMixedQutrit.max_bound_for_block(k, N, rho_diag), rev=true)
+        for k in sorted
+            push!(blocks_r2, k); sort!(blocks_r2)
+            n_f2 = TSeeqstMixedQutrit.count_circuits_for_blocks(blocks_r2, N)
+            n_f2 * d ≥ d^2 - 1 && break
+        end
+    end
 
-    println(@sprintf("  Block(%d,%d)   F=%.4f        F=%.4f        F=%.4f",
-        t1, t2, F_std, F_hyb, F_mix))
+    s1 = n_f1 > n_t1 ? @sprintf("(%d→%d)", n_t1, n_f1) : @sprintf("(%d)", n_f1)
+    s2 = n_f2 > n_t2 ? @sprintf("(%d→%d)", n_t2, n_f2) : @sprintf("(%d)", n_f2)
+
+    println(@sprintf("  t=%.2f   %-20s  %-20s  %+d",
+        t, s1, s2, n_f1 - n_f2))
 end
 
 println()
-println("═"^70)
-println("Erwartung:")
-println("  Mixed SEEQST ≥ Standard ≥ Hybrid")
-println("  Hybrid ist schlechter weil CINC Gates gemischte Blöcke")
-println("  NICHT selektiv messen können!")
-println("═"^70)
+println("Legende: (X) = kein Fill-up, (X→Y) = Fill-up von X auf Y")
+println("Diff = TSeeqstQutrit - TSeeqstMixedQutrit")
+println("Positiv = Mixed braucht weniger Circuits ✓")
+println("═"^75)
