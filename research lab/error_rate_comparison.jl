@@ -15,6 +15,23 @@ using .SeeqstMixedQutrit
 using .TSeeqstMixedQutrit
 
 # ══════════════════════════════════════════════════════════════
+# Zufällige Dichtematrix (sparse oder dense)
+# ══════════════════════════════════════════════════════════════
+function GenerateRandomDensityMatrixQutrits(N::Int)
+    d        = 3^N
+    n_active = rand(1:d)
+    active   = randperm(d)[1:n_active]
+    rho      = zeros(ComplexF64, d, d)
+    for _ in 1:n_active
+        psi         = zeros(ComplexF64, d)
+        psi[active] = randn(ComplexF64, n_active) + 1im*randn(ComplexF64, n_active)
+        psi        /= norm(psi)
+        rho        += psi * psi'
+    end
+    return rho / tr(rho)
+end
+
+# ══════════════════════════════════════════════════════════════
 # Einstellungen
 # ══════════════════════════════════════════════════════════════
 N_values = [2, 3, 4, 5]
@@ -30,7 +47,7 @@ results = Dict(
     :tseeqst  => Dict(N => Tuple{Float64,Int}[] for N in N_values),
 )
 
-# ── Circuit-Anzahl: Standard (SeeqstHybridQutrit) ──────────────
+# ── Circuit-Anzahl: Standard ────────────────────────────────────
 function get_n_circuits_standard(N::Int)
     blocks    = collect(0:(4^N - 1))
     non_circs = BuildNonEntanglingCircuitsQutrit(blocks, N)
@@ -38,23 +55,22 @@ function get_n_circuits_standard(N::Int)
         c for g in non_circs for c in g if c != ""]))
 end
 
-# ── Circuit-Anzahl: SEEQST (SeeqstMixedQutrit) ─────────────────
+# ── Circuit-Anzahl: SEEQST ──────────────────────────────────────
 function get_n_circuits_seeqst(N::Int)
     blocks = collect(0:(4^N - 1))
     return TSeeqstMixedQutrit.count_circuits_for_blocks(blocks, N)
 end
 
-# ── Circuit-Anzahl: tSEEQST (TSeeqstMixedQutrit, mit Fill-up) ──
+# ── Circuit-Anzahl: tSEEQST mit Fill-up ────────────────────────
 function get_n_circuits_tseeqst(N::Int, rho_diag::Vector{Float64}, t::Float64)
     d        = 3^N
     blocks_t = TSeeqstMixedQutrit.BlocksAboveThresholdQutrit(N, rho_diag, t)
     n_circ   = TSeeqstMixedQutrit.count_circuits_for_blocks(blocks_t, N)
 
     if n_circ * d < d^2 - 1
-        blocks_all = collect(0:4^N-1)
-        blocks_r   = copy(blocks_t)
-        missing    = setdiff(blocks_all, blocks_r)
-        sorted     = sort(missing,
+        blocks_r = copy(blocks_t)
+        missing  = setdiff(collect(0:4^N-1), blocks_r)
+        sorted   = sort(missing,
             by=k->TSeeqstMixedQutrit.max_bound_for_block(k, N, rho_diag),
             rev=true)
         for k in sorted
@@ -84,7 +100,8 @@ for N in N_values
     for run in 1:n_runs
         println(@sprintf("  Run %d/%d", run, n_runs))
 
-        rho_true = SeeqstHybridQutrit.GenerateRandomDensityMatrixNoZerosQutrits(N)
+        # ← GenerateRandomDensityMatrixQutrits statt NoZeros!
+        rho_true = GenerateRandomDensityMatrixQutrits(N)
         rho_diag = real.(diag(rho_true))
         nc_t     = get_n_circuits_tseeqst(N, rho_diag, t_fixed)
 
@@ -106,10 +123,14 @@ for N in N_values
         F_t   = fidelity(Matrix{ComplexF64}(rho_t), rho_true)
         push!(results[:tseeqst][N], (1 - F_t, nc_t))
 
-        println(@sprintf("    Standard: Δerr=%.6f  nc=%d", 1-F_std, nc_std))
-        println(@sprintf("    SEEQST:   Δerr=%.6f  nc=%d", 1-F_seeqst, nc_seeqst))
-        println(@sprintf("    tSEEQST:  Δerr=%.6f  nc=%d", 1-F_t, nc_t))
+        println(@sprintf("    Standard: Δerr=%.4f  nc=%d",
+            1-F_std, nc_std))
+        println(@sprintf("    SEEQST:   Δerr=%.4f  nc=%d",
+            1-F_seeqst, nc_seeqst))
+        println(@sprintf("    tSEEQST:  Δerr=%.4f  nc=%d (t=%.2f)",
+            1-F_t, nc_t, t_fixed))
     end
+    println()
 end
 
 # ── Colorbar-Normierung ─────────────────────────────────────────
@@ -123,7 +144,7 @@ c_max = maximum(all_circuits)
 norm_color(c) = (c - c_min) / max(c_max - c_min, 1)
 
 # ══════════════════════════════════════════════════════════════
-# Plot — Legende außerhalb, rechts neben dem Graphen
+# Plot
 # ══════════════════════════════════════════════════════════════
 pk = (
     size           = (1050, 600),
@@ -141,8 +162,9 @@ pk = (
 p = plot(;
     xlabel  = "Number of qutrits (N)",
     ylabel  = "Δerr",
-    title   = @sprintf("Average reconstruction error (shots=%d, t=%.2f)",
-                shots, t_fixed),
+    title   = @sprintf(
+        "Average reconstruction error (shots=%d, t=%.2f, sparse/dense)",
+        shots, t_fixed),
     yscale  = :log10,
     xticks  = (N_values, string.(N_values)),
     legend  = :outertopright,
@@ -183,7 +205,6 @@ for N in N_values
     end
 end
 
-# ── Colorbar ──────────────────────────────────────────────────
 scatter!(p, [NaN], [NaN];
     marker_z       = [0.0],
     color          = :coolwarm,
@@ -193,4 +214,4 @@ scatter!(p, [NaN], [NaN];
     label          = "")
 
 savefig(p, "error_rate_comparison_v3.png")
-println("✓ Plot gespeichert: error_rate_comparison_v3.png")
+println("✓ Plot saved: error_rate_comparison_v3.png")

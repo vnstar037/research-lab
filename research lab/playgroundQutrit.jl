@@ -36,12 +36,12 @@ RhoTrue      = complex.(RhoTrue_real, RhoTrue_imag)
 rho_diag     = real.(diag(RhoTrue))
 
 log("═"^65)
-log("Vergleich: Standard vs SEEQST vs tSEEQST")
+log("Comparison: Standard vs SEEQST vs tSEEQST")
 log("═"^65)
 log(@sprintf("  N=%d, shots=%d..%d", N, shots_list[1], shots_list[end]))
-log(@sprintf("  t_values: %s  + adaptiv t=1/√shots", string(t_values)))
-log(@sprintf("  Spur:          %.6f", real(tr(RhoTrue))))
-log(@sprintf("  Min Eigenwert: %.6f", minimum(real(eigvals(RhoTrue)))))
+log(@sprintf("  t_values: %s  + adaptive t=1/sqrt(shots)", string(t_values)))
+log(@sprintf("  Trace:         %.6f", real(tr(RhoTrue))))
+log(@sprintf("  Min Eigenvalue: %.6f", minimum(real(eigvals(RhoTrue)))))
 log("")
 
 # ── Circuit-Anzahl ─────────────────────────────────────────────
@@ -57,9 +57,9 @@ log(@sprintf("  SEEQST:   %d Circuits", n_seeqst))
 for t in t_values
     blocks_t = TSeeqstMixedQutrit.BlocksAboveThresholdQutrit(N, rho_diag, t)
     n_t      = TSeeqstMixedQutrit.count_circuits_for_blocks(blocks_t, N)
-    log(@sprintf("  tSEEQST t=%.2f: %d Circuits (vor Fill-up)", t, n_t))
+    log(@sprintf("  tSEEQST t=%.2f: %d Circuits (before fill-up)", t, n_t))
 end
-log(@sprintf("  tSEEQST adaptiv: t=1/√m (variabel)"))
+log(@sprintf("  tSEEQST adaptive: t=1/sqrt(m) (variable)"))
 log("")
 
 # ══════════════════════════════════════════════════════════════
@@ -89,7 +89,7 @@ end
 # ══════════════════════════════════════════════════════════════
 # Messungen
 # ══════════════════════════════════════════════════════════════
-log("Messungen starten...")
+log("Starting measurements...")
 log("")
 
 fid_standard  = Float64[]
@@ -154,7 +154,7 @@ for (idx, shots) in enumerate(shots_list)
     n_adapt = compute_nc_with_fillup(N, rho_diag, t_adapt)
     push!(nc_adaptive, n_adapt)
 
-    log(@sprintf("  tSEEQST t=1/√m=%.3f: F=%.4f  nc=%d  t=%.2fs",
+    log(@sprintf("  tSEEQST t=1/sqrt(m)=%.3f: F=%.4f  nc=%d  t=%.2fs",
         t_adapt, fid_adaptive[end], n_adapt, time_adaptive[end]))
     log("")
 end
@@ -165,7 +165,7 @@ end
 pk = (
     size          = (1100, 700),
     left_margin   = 35Plots.mm,
-    right_margin  = 20Plots.mm,
+    right_margin  = 35Plots.mm,   # ← mehr Platz für rechte y-Achse
     top_margin    = 12Plots.mm,
     bottom_margin = 14Plots.mm,
     guidefontsize = 14,
@@ -178,60 +178,105 @@ pk = (
 
 colors_t = [:orange, :red, :darkred]
 
-# ── Hilfsfunktion: full + zoom ────────────────────────────────
-function save_fidelity_plots(shots, fid, label_str, color,
-                              title_str, filename_base;
-                              ylim_zoom=(0.85, 1.01))
-    p = plot(shots, fid;
-        label   = label_str,
-        xlabel  = "Number of measurements (m)",
-        ylabel  = "Fidelity",
-        title   = "$title_str (N=$N Qutrits)",
-        color   = color,
-        legend  = :bottomright,
-        ylim    = (0.0, 1.05),
-        pk...)
-    hline!(p, [1.0]; color=:black, linestyle=:dot, label="", alpha=0.5)
-    savefig(p, "$(filename_base)_full.png")
-    log("✓ Plot: $(filename_base)_full.png")
+# ══════════════════════════════════════════════════════════════
+# Hilfsfunktion: Dual-Axis Fidelity Plot (konstante nc)
+# ══════════════════════════════════════════════════════════════
+function save_fidelity_dual_plots(shots, fid, nc_const::Int,
+                                   label_str, color,
+                                   title_str, filename_base;
+                                   ylim_zoom=(0.85, 1.01))
+    for (ylim, suffix) in [(( 0.0, 1.05), "full"),
+                            (ylim_zoom,    "zoom")]
 
-    pz = plot(shots, fid;
-        label   = label_str,
-        xlabel  = "Number of measurements (m)",
-        ylabel  = "Fidelity",
-        title   = "$title_str (Zoom, N=$N)",
-        color   = color,
-        legend  = :bottomright,
-        ylim    = ylim_zoom,
-        pk...)
-    hline!(pz, [1.0]; color=:black, linestyle=:dot, label="", alpha=0.5)
-    savefig(pz, "$(filename_base)_zoom.png")
-    log("✓ Plot: $(filename_base)_zoom.png")
+        p = plot(shots, fid;
+            label     = "$label_str (Fidelity)",
+            xlabel    = "Number of measurements (m)",
+            ylabel    = "Fidelity",
+            title     = "$title_str (N=$N Qutrits)",
+            color     = color,
+            legend    = :bottomright,
+            ylim      = ylim,
+            pk...)
+        hline!(p, [1.0]; color=:black, linestyle=:dot, label="", alpha=0.3)
+
+        # Rechte y-Achse: konstante nc
+        p2 = twinx(p)
+        plot!(p2, shots, fill(nc_const, length(shots));
+            label     = "nc (circuits)",
+            color     = color,
+            linestyle = :dash,
+            alpha     = 0.7,
+            ylabel    = "Number of circuits (nc)",
+            ylim      = (0, nc_const * 1.5),
+            legend    = :topright,
+            pk...)
+
+        savefig(p, "$(filename_base)_$suffix.png")
+        log("✓ Plot: $(filename_base)_$suffix.png")
+    end
 end
 
 # ══════════════════════════════════════════════════════════════
-# Plot 1+2: Standard
+# Hilfsfunktion: Dual-Axis Fidelity Plot (variable nc)
+# ══════════════════════════════════════════════════════════════
+function save_fidelity_dual_plots_variable(shots, fid, nc_vec::Vector{Int},
+                                            label_str, color,
+                                            title_str, filename_base;
+                                            ylim_zoom=(0.85, 1.01))
+    for (ylim, suffix) in [((0.0, 1.05), "full"),
+                            (ylim_zoom,   "zoom")]
+
+        p = plot(shots, fid;
+            label     = "$label_str (Fidelity)",
+            xlabel    = "Number of measurements (m)",
+            ylabel    = "Fidelity",
+            title     = "$title_str (N=$N Qutrits)",
+            color     = color,
+            legend    = :bottomright,
+            ylim      = ylim,
+            pk...)
+        hline!(p, [1.0]; color=:black, linestyle=:dot, label="", alpha=0.3)
+
+        # Rechte y-Achse: variable nc
+        p2 = twinx(p)
+        plot!(p2, shots, nc_vec;
+            label     = "nc (circuits)",
+            color     = color,
+            linestyle = :dash,
+            alpha     = 0.7,
+            ylabel    = "Number of circuits (nc)",
+            ylim      = (0, maximum(nc_vec) * 1.5),
+            legend    = :topright,
+            pk...)
+
+        savefig(p, "$(filename_base)_$suffix.png")
+        log("✓ Plot: $(filename_base)_$suffix.png")
+    end
+end
+
+# ══════════════════════════════════════════════════════════════
+# Plot 1+2: Standard (konstante nc)
 # ══════════════════════════════════════════════════════════════
 log("")
 log("── Plots Standard ──")
-save_fidelity_plots(shots_list, fid_standard,
-    "Standard (nc=$n_standard)", :purple,
-    "Standard: Fidelity vs. Measurements",
+save_fidelity_dual_plots(shots_list, fid_standard, n_standard,
+    "Standard", :purple,
+    "Standard: Fidelity and Circuits vs. Measurements",
     "fidelity_standard")
 
 # ══════════════════════════════════════════════════════════════
-# Plot 3+4: SEEQST
+# Plot 3+4: SEEQST (konstante nc)
 # ══════════════════════════════════════════════════════════════
 log("── Plots SEEQST ──")
-save_fidelity_plots(shots_list, fid_seeqst,
-    "SEEQST (nc=$n_seeqst)", :blue,
-    "SEEQST: Fidelity vs. Measurements",
+save_fidelity_dual_plots(shots_list, fid_seeqst, n_seeqst,
+    "SEEQST", :blue,
+    "SEEQST: Fidelity and Circuits vs. Measurements",
     "fidelity_seeqst")
 
 # ══════════════════════════════════════════════════════════════
-# Plot 5+6: tSEEQST (feste t-Werte)
+# Plot 5+6: tSEEQST (feste t, variable nc)
 # ══════════════════════════════════════════════════════════════
-log("── Plots tSEEQST (feste t) ──")
+log("── Plots tSEEQST (fixed t) ──")
 
 for (full_zoom, ylim, suffix) in [
         (true,  (0.0,  1.05), "full"),
@@ -241,8 +286,8 @@ for (full_zoom, ylim, suffix) in [
         xlabel  = "Number of measurements (m)",
         ylabel  = "Fidelity",
         title   = full_zoom ?
-            "tSEEQST: Fidelity vs. Measurements (N=$N Qutrits)" :
-            "tSEEQST: Fidelity vs. Measurements (Zoom, N=$N)",
+            "tSEEQST: Fidelity and Circuits vs. Measurements (N=$N Qutrits)" :
+            "tSEEQST: Fidelity and Circuits vs. Measurements (Zoom, N=$N)",
         legend  = :bottomright,
         ylim    = ylim,
         pk...)
@@ -250,27 +295,41 @@ for (full_zoom, ylim, suffix) in [
     for (i, t) in enumerate(t_values)
         nc_avg = round(Int, mean(nc_tseeqst[t]))
         plot!(p, shots_list, fid_tseeqst[t];
-            label = @sprintf("tSEEQST t=%.2f (nc≈%d)", t, nc_avg),
+            label = @sprintf("tSEEQST t=%.2f (Fidelity)", t),
             color = colors_t[i])
     end
+    hline!(p, [1.0]; color=:black, linestyle=:dot, label="", alpha=0.3)
 
-    hline!(p, [1.0]; color=:black, linestyle=:dot, label="", alpha=0.5)
+    # Rechte y-Achse: nc für jeden t-Wert
+    p2 = twinx(p)
+    nc_max = maximum(maximum(nc_tseeqst[t]) for t in t_values)
+    for (i, t) in enumerate(t_values)
+        plot!(p2, shots_list, nc_tseeqst[t];
+            label     = @sprintf("tSEEQST t=%.2f (nc)", t),
+            color     = colors_t[i],
+            linestyle = :dash,
+            alpha     = 0.7,
+            ylabel    = "Number of circuits (nc)",
+            ylim      = (0, nc_max * 1.5),
+            legend    = :topright,
+            pk...)
+    end
+
     savefig(p, "fidelity_tseeqst_$suffix.png")
     log("✓ Plot: fidelity_tseeqst_$suffix.png")
 end
 
 # ══════════════════════════════════════════════════════════════
-# Plot 7+8: tSEEQST t=1/√m
+# Plot 7+8: tSEEQST t=1/√m (variable nc)
 # ══════════════════════════════════════════════════════════════
-log("── Plots tSEEQST t=1/√m ──")
-save_fidelity_plots(shots_list, fid_adaptive,
+log("── Plots tSEEQST t=1/sqrt(m) ──")
+save_fidelity_dual_plots_variable(shots_list, fid_adaptive, nc_adaptive,
     "tSEEQST t=1/√m", :green,
-    "tSEEQST t=1/√m: Fidelity vs. Measurements",
+    "tSEEQST t=1/√m: Fidelity and Circuits vs. Measurements",
     "fidelity_tseeqst_adaptive")
 
 # ══════════════════════════════════════════════════════════════
 # Plot 9: Runtime Comparison
-# Standard + SEEQST + tSEEQST t=1/√m
 # ══════════════════════════════════════════════════════════════
 log("── Plot Runtime Comparison ──")
 
@@ -299,7 +358,7 @@ p10 = plot(shots_list, nc_adaptive;
     label   = "tSEEQST t=1/√m",
     xlabel  = "Number of measurements (m)",
     ylabel  = "Number of circuits (nc)",
-    title   = "Circuit Reduction: tSEEQST t=1/√m (N=$N)",
+    title   = "Circuit Reduction: tSEEQST t=1/√m (N=$N Qutrits)",
     color   = :green,
     legend  = :topright,
     pk...)
@@ -311,12 +370,12 @@ savefig(p10, "circuits_adaptive.png")
 log("✓ Plot: circuits_adaptive.png")
 
 # ══════════════════════════════════════════════════════════════
-# Plot 11: Circuits feste t vs Shots
+# Plot 11: Circuits fixed t vs Shots
 # ══════════════════════════════════════════════════════════════
 p11 = plot(;
     xlabel  = "Number of measurements (m)",
     ylabel  = "Number of circuits (nc)",
-    title   = "Circuit Reduction: Feste t-Werte (N=$N)",
+    title   = "Circuit Reduction: Fixed t Values (N=$N Qutrits)",
     legend  = :topright,
     pk...)
 hline!(p11, [n_standard]; color=:purple, linestyle=:dash,
@@ -332,19 +391,19 @@ savefig(p11, "circuits_fixed_t.png")
 log("✓ Plot: circuits_fixed_t.png")
 
 # ══════════════════════════════════════════════════════════════
-# Plot 12: t-Wert vs Shots
+# Plot 12: Adaptive Threshold vs Shots
 # ══════════════════════════════════════════════════════════════
 p12 = plot(shots_list, t_adaptive;
     label   = "t = 1/√m",
     xlabel  = "Number of measurements (m)",
     ylabel  = "Threshold t",
-    title   = "Adaptiver Threshold t=1/√m vs. Messungen",
+    title   = "Adaptive Threshold t=1/√m vs. Measurements",
     color   = :green,
     legend  = :topright,
     pk...)
 for t in t_values
     hline!(p12, [t]; linestyle=:dash,
-        label=@sprintf("t=%.2f (fest)", t))
+        label=@sprintf("t=%.2f (fixed)", t))
 end
 savefig(p12, "threshold_vs_shots.png")
 log("✓ Plot: threshold_vs_shots.png")
@@ -354,10 +413,10 @@ log("✓ Plot: threshold_vs_shots.png")
 # ══════════════════════════════════════════════════════════════
 log("")
 log("═"^70)
-log(@sprintf("Zusammenfassung bei shots=%d", shots_list[end]))
+log(@sprintf("Summary at shots=%d", shots_list[end]))
 log("═"^70)
 log(@sprintf("  %-22s  %-10s  %-10s  %-10s  %-12s",
-    "Methode", "Fidelity", "Circuits", "Zeit(s)", "Reduktion"))
+    "Method", "Fidelity", "Circuits", "Time(s)", "Reduction"))
 log("  " * "─"^68)
 
 log(@sprintf("  %-22s  %-10.4f  %-10d  %-10.2f  0%%",
@@ -382,14 +441,14 @@ log(@sprintf("  %-22s  %-10.4f  %-10d  %-10.2f  %.1f%%",
 
 log("═"^70)
 log("")
-log(@sprintf("  Gesamtzeit Standard:        %.1fs", sum(time_standard)))
-log(@sprintf("  Gesamtzeit SEEQST:          %.1fs", sum(time_seeqst)))
+log(@sprintf("  Total time Standard:        %.1fs", sum(time_standard)))
+log(@sprintf("  Total time SEEQST:          %.1fs", sum(time_seeqst)))
 for t in t_values
-    log(@sprintf("  Gesamtzeit tSEEQST t=%.2f:  %.1fs",
+    log(@sprintf("  Total time tSEEQST t=%.2f:  %.1fs",
         t, sum(time_tseeqst[t])))
 end
-log(@sprintf("  Gesamtzeit tSEEQST t=1/√m:  %.1fs", sum(time_adaptive)))
+log(@sprintf("  Total time tSEEQST t=1/√m:  %.1fs", sum(time_adaptive)))
 log("═"^70)
 
 close(log_file)
-println("✓ Fertig! Log: results_comparison.txt")
+println("✓ Done! Log: results_comparison.txt")
