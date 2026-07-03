@@ -1,1595 +1,1595 @@
 ═════════════════════════════════════════════════════════════════
-Vergleich: Standard vs SEEQST vs tSEEQST
+Comparison: Standard vs SEEQST vs tSEEQST
 ═════════════════════════════════════════════════════════════════
   N=3, shots=100..5000
-  t_values: [0.02, 0.05, 0.1]  + adaptiv t=1/√shots
-  Spur:          1.000000
-  Min Eigenwert: -0.000000
+  t_values: [0.02, 0.05, 0.1]  + adaptive t=1/sqrt(shots)
+  Trace:         1.000000
+  Min Eigenvalue: -0.000000
 
   Standard: 342 Circuits
   SEEQST:   127 Circuits
-  tSEEQST t=0.02: 119 Circuits (vor Fill-up)
-  tSEEQST t=0.05: 109 Circuits (vor Fill-up)
-  tSEEQST t=0.10: 1 Circuits (vor Fill-up)
-  tSEEQST adaptiv: t=1/√m (variabel)
+  tSEEQST t=0.02: 119 Circuits (before fill-up)
+  tSEEQST t=0.05: 109 Circuits (before fill-up)
+  tSEEQST t=0.10: 1 Circuits (before fill-up)
+  tSEEQST adaptive: t=1/sqrt(m) (variable)
 
-Messungen starten...
+Starting measurements...
 
 [1/197] shots=100
-  Standard: F=0.8516  nc=342  t=85.56s
-  SEEQST:   F=0.8417  nc=127  t=64.88s
-  tSEEQST t=0.02: F=0.8528  nc=119  t=60.21s
-  tSEEQST t=0.05: F=0.8336  nc=109  t=49.49s
-  tSEEQST t=0.10: F=0.6482  nc=27  t=13.46s
-  tSEEQST t=1/√m=0.100: F=0.5657  nc=27  t=12.49s
+  Standard: F=0.8541  nc=342  t=80.28s
+  SEEQST:   F=0.8654  nc=127  t=60.87s
+  tSEEQST t=0.02: F=0.8324  nc=119  t=52.94s
+  tSEEQST t=0.05: F=0.8612  nc=109  t=51.67s
+  tSEEQST t=0.10: F=0.6131  nc=27  t=12.02s
+  tSEEQST t=1/sqrt(m)=0.100: F=0.5266  nc=27  t=10.80s
 
 [2/197] shots=125
-  Standard: F=0.8848  nc=342  t=75.44s
-  SEEQST:   F=0.8673  nc=127  t=68.06s
-  tSEEQST t=0.02: F=0.8593  nc=119  t=63.07s
-  tSEEQST t=0.05: F=0.8409  nc=109  t=53.19s
-  tSEEQST t=0.10: F=0.5919  nc=27  t=13.73s
-  tSEEQST t=1/√m=0.089: F=0.6407  nc=27  t=12.23s
+  Standard: F=0.8811  nc=342  t=68.73s
+  SEEQST:   F=0.8538  nc=127  t=62.48s
+  tSEEQST t=0.02: F=0.8767  nc=119  t=56.27s
+  tSEEQST t=0.05: F=0.8431  nc=109  t=39.84s
+  tSEEQST t=0.10: F=0.6316  nc=27  t=9.11s
+  tSEEQST t=1/sqrt(m)=0.089: F=0.6881  nc=27  t=11.91s
 
 [3/197] shots=150
-  Standard: F=0.8828  nc=342  t=75.75s
-  SEEQST:   F=0.8910  nc=127  t=67.97s
-  tSEEQST t=0.02: F=0.8872  nc=119  t=61.91s
-  tSEEQST t=0.05: F=0.8514  nc=109  t=51.48s
-  tSEEQST t=0.10: F=0.6131  nc=27  t=12.70s
-  tSEEQST t=1/√m=0.082: F=0.6020  nc=27  t=10.11s
+  Standard: F=0.8937  nc=342  t=69.18s
+  SEEQST:   F=0.8826  nc=127  t=69.94s
+  tSEEQST t=0.02: F=0.8634  nc=119  t=62.79s
+  tSEEQST t=0.05: F=0.8614  nc=109  t=50.30s
+  tSEEQST t=0.10: F=0.6750  nc=27  t=10.91s
+  tSEEQST t=1/sqrt(m)=0.082: F=0.6687  nc=27  t=10.39s
 
 [4/197] shots=175
-  Standard: F=0.8936  nc=342  t=77.60s
-  SEEQST:   F=0.8906  nc=127  t=66.69s
-  tSEEQST t=0.02: F=0.8958  nc=119  t=62.99s
-  tSEEQST t=0.05: F=0.8846  nc=109  t=49.98s
-  tSEEQST t=0.10: F=0.6282  nc=27  t=13.22s
-  tSEEQST t=1/√m=0.076: F=0.6884  nc=27  t=11.49s
+  Standard: F=0.9077  nc=342  t=72.29s
+  SEEQST:   F=0.8746  nc=127  t=61.69s
+  tSEEQST t=0.02: F=0.9112  nc=119  t=56.34s
+  tSEEQST t=0.05: F=0.8569  nc=109  t=46.05s
+  tSEEQST t=0.10: F=0.6989  nc=27  t=11.42s
+  tSEEQST t=1/sqrt(m)=0.076: F=0.6841  nc=27  t=10.99s
 
 [5/197] shots=200
-  Standard: F=0.9150  nc=342  t=73.91s
-  SEEQST:   F=0.9143  nc=127  t=60.38s
-  tSEEQST t=0.02: F=0.8945  nc=119  t=55.88s
-  tSEEQST t=0.05: F=0.8864  nc=109  t=45.46s
-  tSEEQST t=0.10: F=0.7037  nc=27  t=10.41s
-  tSEEQST t=1/√m=0.071: F=0.8040  nc=27  t=24.64s
+  Standard: F=0.9093  nc=342  t=69.94s
+  SEEQST:   F=0.8990  nc=127  t=60.62s
+  tSEEQST t=0.02: F=0.8927  nc=119  t=59.30s
+  tSEEQST t=0.05: F=0.8951  nc=109  t=57.14s
+  tSEEQST t=0.10: F=0.5718  nc=27  t=11.57s
+  tSEEQST t=1/sqrt(m)=0.071: F=0.8164  nc=27  t=29.53s
 
 [6/197] shots=225
-  Standard: F=0.9161  nc=342  t=68.33s
-  SEEQST:   F=0.9211  nc=127  t=59.95s
-  tSEEQST t=0.02: F=0.9099  nc=119  t=54.88s
-  tSEEQST t=0.05: F=0.8911  nc=109  t=50.04s
-  tSEEQST t=0.10: F=0.7028  nc=27  t=11.10s
-  tSEEQST t=1/√m=0.067: F=0.7829  nc=45  t=19.51s
+  Standard: F=0.8948  nc=342  t=78.84s
+  SEEQST:   F=0.9149  nc=127  t=68.81s
+  tSEEQST t=0.02: F=0.9104  nc=119  t=59.10s
+  tSEEQST t=0.05: F=0.8921  nc=109  t=48.46s
+  tSEEQST t=0.10: F=0.6409  nc=27  t=12.54s
+  tSEEQST t=1/sqrt(m)=0.067: F=0.8300  nc=45  t=28.80s
 
 [7/197] shots=250
-  Standard: F=0.8934  nc=342  t=67.48s
-  SEEQST:   F=0.9144  nc=127  t=59.10s
-  tSEEQST t=0.02: F=0.9201  nc=119  t=54.89s
-  tSEEQST t=0.05: F=0.8971  nc=109  t=47.80s
-  tSEEQST t=0.10: F=0.6620  nc=27  t=7.65s
-  tSEEQST t=1/√m=0.063: F=0.8216  nc=65  t=25.86s
+  Standard: F=0.9113  nc=342  t=70.44s
+  SEEQST:   F=0.9290  nc=127  t=64.27s
+  tSEEQST t=0.02: F=0.9083  nc=119  t=60.36s
+  tSEEQST t=0.05: F=0.9085  nc=109  t=53.66s
+  tSEEQST t=0.10: F=0.7225  nc=27  t=10.02s
+  tSEEQST t=1/sqrt(m)=0.063: F=0.8106  nc=65  t=27.64s
 
 [8/197] shots=275
-  Standard: F=0.9302  nc=342  t=67.34s
-  SEEQST:   F=0.9197  nc=127  t=59.00s
-  tSEEQST t=0.02: F=0.9163  nc=119  t=54.72s
-  tSEEQST t=0.05: F=0.8948  nc=109  t=41.19s
-  tSEEQST t=0.10: F=0.6774  nc=27  t=8.59s
-  tSEEQST t=1/√m=0.060: F=0.8576  nc=81  t=32.15s
+  Standard: F=0.9119  nc=342  t=71.14s
+  SEEQST:   F=0.9189  nc=127  t=60.36s
+  tSEEQST t=0.02: F=0.9259  nc=119  t=55.81s
+  tSEEQST t=0.05: F=0.9122  nc=109  t=49.86s
+  tSEEQST t=0.10: F=0.6759  nc=27  t=10.82s
+  tSEEQST t=1/sqrt(m)=0.060: F=0.9120  nc=81  t=41.22s
 
 [9/197] shots=300
-  Standard: F=0.9332  nc=342  t=66.91s
-  SEEQST:   F=0.9246  nc=127  t=59.60s
-  tSEEQST t=0.02: F=0.9119  nc=119  t=54.95s
-  tSEEQST t=0.05: F=0.9223  nc=109  t=47.89s
-  tSEEQST t=0.10: F=0.6591  nc=27  t=12.08s
-  tSEEQST t=1/√m=0.058: F=0.8997  nc=89  t=40.43s
+  Standard: F=0.9304  nc=342  t=68.90s
+  SEEQST:   F=0.9240  nc=127  t=60.77s
+  tSEEQST t=0.02: F=0.9246  nc=119  t=56.06s
+  tSEEQST t=0.05: F=0.9131  nc=109  t=48.68s
+  tSEEQST t=0.10: F=0.6848  nc=27  t=10.14s
+  tSEEQST t=1/sqrt(m)=0.058: F=0.8648  nc=89  t=29.93s
 
 [10/197] shots=325
-  Standard: F=0.9340  nc=342  t=67.48s
-  SEEQST:   F=0.9097  nc=127  t=59.43s
-  tSEEQST t=0.02: F=0.9154  nc=119  t=55.52s
-  tSEEQST t=0.05: F=0.9245  nc=109  t=48.74s
-  tSEEQST t=0.10: F=0.7413  nc=27  t=10.47s
-  tSEEQST t=1/√m=0.055: F=0.9030  nc=97  t=44.86s
+  Standard: F=0.9264  nc=342  t=68.55s
+  SEEQST:   F=0.9154  nc=127  t=59.16s
+  tSEEQST t=0.02: F=0.9372  nc=119  t=55.23s
+  tSEEQST t=0.05: F=0.9235  nc=109  t=52.36s
+  tSEEQST t=0.10: F=0.7046  nc=27  t=9.96s
+  tSEEQST t=1/sqrt(m)=0.055: F=0.9265  nc=97  t=41.17s
 
 [11/197] shots=350
-  Standard: F=0.9348  nc=342  t=68.10s
-  SEEQST:   F=0.9288  nc=127  t=60.00s
-  tSEEQST t=0.02: F=0.9236  nc=119  t=55.78s
-  tSEEQST t=0.05: F=0.9300  nc=109  t=49.08s
-  tSEEQST t=0.10: F=0.7117  nc=27  t=10.66s
-  tSEEQST t=1/√m=0.053: F=0.9127  nc=103  t=45.93s
+  Standard: F=0.9336  nc=342  t=68.38s
+  SEEQST:   F=0.9452  nc=127  t=59.73s
+  tSEEQST t=0.02: F=0.9358  nc=119  t=55.51s
+  tSEEQST t=0.05: F=0.9133  nc=109  t=48.39s
+  tSEEQST t=0.10: F=0.7209  nc=27  t=11.47s
+  tSEEQST t=1/sqrt(m)=0.053: F=0.9018  nc=103  t=41.31s
 
 [12/197] shots=375
-  Standard: F=0.9393  nc=342  t=68.23s
-  SEEQST:   F=0.9316  nc=127  t=60.01s
-  tSEEQST t=0.02: F=0.9430  nc=119  t=54.91s
-  tSEEQST t=0.05: F=0.9220  nc=109  t=45.54s
-  tSEEQST t=0.10: F=0.7875  nc=27  t=12.34s
-  tSEEQST t=1/√m=0.052: F=0.9310  nc=105  t=50.94s
+  Standard: F=0.9226  nc=342  t=67.69s
+  SEEQST:   F=0.9459  nc=127  t=60.50s
+  tSEEQST t=0.02: F=0.9332  nc=119  t=55.45s
+  tSEEQST t=0.05: F=0.9285  nc=109  t=49.73s
+  tSEEQST t=0.10: F=0.7381  nc=27  t=12.85s
+  tSEEQST t=1/sqrt(m)=0.052: F=0.9080  nc=105  t=50.30s
 
 [13/197] shots=400
-  Standard: F=0.9383  nc=342  t=67.01s
-  SEEQST:   F=0.9447  nc=127  t=59.63s
-  tSEEQST t=0.02: F=0.9296  nc=119  t=55.15s
-  tSEEQST t=0.05: F=0.9179  nc=109  t=42.61s
-  tSEEQST t=0.10: F=0.6970  nc=27  t=9.31s
-  tSEEQST t=1/√m=0.050: F=0.9170  nc=109  t=48.51s
+  Standard: F=0.9464  nc=342  t=68.33s
+  SEEQST:   F=0.9360  nc=127  t=59.31s
+  tSEEQST t=0.02: F=0.9351  nc=119  t=55.44s
+  tSEEQST t=0.05: F=0.9274  nc=109  t=44.94s
+  tSEEQST t=0.10: F=0.7126  nc=27  t=10.65s
+  tSEEQST t=1/sqrt(m)=0.050: F=0.9265  nc=109  t=46.25s
 
 [14/197] shots=425
-  Standard: F=0.9465  nc=342  t=67.04s
-  SEEQST:   F=0.9368  nc=127  t=59.36s
-  tSEEQST t=0.02: F=0.9386  nc=119  t=55.03s
-  tSEEQST t=0.05: F=0.9218  nc=109  t=51.36s
-  tSEEQST t=0.10: F=0.7576  nc=27  t=11.45s
-  tSEEQST t=1/√m=0.049: F=0.9351  nc=111  t=50.50s
+  Standard: F=0.9532  nc=342  t=67.18s
+  SEEQST:   F=0.9337  nc=127  t=60.13s
+  tSEEQST t=0.02: F=0.9395  nc=119  t=55.13s
+  tSEEQST t=0.05: F=0.9288  nc=109  t=46.13s
+  tSEEQST t=0.10: F=0.7654  nc=27  t=10.82s
+  tSEEQST t=1/sqrt(m)=0.049: F=0.9394  nc=111  t=50.08s
 
 [15/197] shots=450
-  Standard: F=0.9572  nc=342  t=67.15s
-  SEEQST:   F=0.9437  nc=127  t=59.53s
-  tSEEQST t=0.02: F=0.9445  nc=119  t=54.97s
-  tSEEQST t=0.05: F=0.9376  nc=109  t=50.63s
-  tSEEQST t=0.10: F=0.7451  nc=27  t=9.70s
-  tSEEQST t=1/√m=0.047: F=0.9352  nc=113  t=49.73s
+  Standard: F=0.9529  nc=342  t=67.23s
+  SEEQST:   F=0.9457  nc=127  t=59.73s
+  tSEEQST t=0.02: F=0.9398  nc=119  t=55.78s
+  tSEEQST t=0.05: F=0.9248  nc=109  t=45.71s
+  tSEEQST t=0.10: F=0.7527  nc=27  t=9.73s
+  tSEEQST t=1/sqrt(m)=0.047: F=0.9428  nc=113  t=52.44s
 
 [16/197] shots=475
-  Standard: F=0.9409  nc=342  t=67.13s
-  SEEQST:   F=0.9419  nc=127  t=59.63s
-  tSEEQST t=0.02: F=0.9536  nc=119  t=55.15s
-  tSEEQST t=0.05: F=0.9138  nc=109  t=48.32s
-  tSEEQST t=0.10: F=0.7463  nc=27  t=11.13s
-  tSEEQST t=1/√m=0.046: F=0.9296  nc=115  t=51.44s
+  Standard: F=0.9356  nc=342  t=67.91s
+  SEEQST:   F=0.9407  nc=127  t=60.00s
+  tSEEQST t=0.02: F=0.9413  nc=119  t=55.49s
+  tSEEQST t=0.05: F=0.9268  nc=109  t=46.04s
+  tSEEQST t=0.10: F=0.7753  nc=27  t=9.77s
+  tSEEQST t=1/sqrt(m)=0.046: F=0.9302  nc=115  t=51.38s
 
 [17/197] shots=500
-  Standard: F=0.9473  nc=342  t=68.16s
-  SEEQST:   F=0.9544  nc=127  t=60.20s
-  tSEEQST t=0.02: F=0.9556  nc=119  t=55.88s
-  tSEEQST t=0.05: F=0.9295  nc=109  t=42.61s
-  tSEEQST t=0.10: F=0.7648  nc=27  t=10.87s
-  tSEEQST t=1/√m=0.045: F=0.9443  nc=115  t=52.00s
+  Standard: F=0.9498  nc=342  t=67.35s
+  SEEQST:   F=0.9364  nc=127  t=59.78s
+  tSEEQST t=0.02: F=0.9511  nc=119  t=55.27s
+  tSEEQST t=0.05: F=0.9458  nc=109  t=51.99s
+  tSEEQST t=0.10: F=0.7884  nc=27  t=12.11s
+  tSEEQST t=1/sqrt(m)=0.045: F=0.9294  nc=115  t=51.75s
 
 [18/197] shots=525
-  Standard: F=0.9541  nc=342  t=67.04s
-  SEEQST:   F=0.9487  nc=127  t=59.94s
-  tSEEQST t=0.02: F=0.9391  nc=119  t=54.96s
-  tSEEQST t=0.05: F=0.9414  nc=109  t=50.69s
-  tSEEQST t=0.10: F=0.7905  nc=27  t=10.72s
-  tSEEQST t=1/√m=0.044: F=0.9509  nc=117  t=52.29s
+  Standard: F=0.9509  nc=342  t=67.61s
+  SEEQST:   F=0.9557  nc=127  t=59.65s
+  tSEEQST t=0.02: F=0.9433  nc=119  t=55.66s
+  tSEEQST t=0.05: F=0.9326  nc=109  t=49.60s
+  tSEEQST t=0.10: F=0.8048  nc=27  t=12.53s
+  tSEEQST t=1/sqrt(m)=0.044: F=0.9333  nc=117  t=55.44s
 
 [19/197] shots=550
-  Standard: F=0.9565  nc=342  t=66.97s
-  SEEQST:   F=0.9546  nc=127  t=59.50s
-  tSEEQST t=0.02: F=0.9475  nc=119  t=55.45s
-  tSEEQST t=0.05: F=0.9354  nc=109  t=49.51s
-  tSEEQST t=0.10: F=0.7717  nc=27  t=10.71s
-  tSEEQST t=1/√m=0.043: F=0.9512  nc=117  t=51.10s
+  Standard: F=0.9598  nc=342  t=68.04s
+  SEEQST:   F=0.9477  nc=127  t=60.38s
+  tSEEQST t=0.02: F=0.9539  nc=119  t=55.68s
+  tSEEQST t=0.05: F=0.9498  nc=109  t=49.56s
+  tSEEQST t=0.10: F=0.7665  nc=27  t=8.65s
+  tSEEQST t=1/sqrt(m)=0.043: F=0.9491  nc=117  t=55.46s
 
 [20/197] shots=575
-  Standard: F=0.9619  nc=342  t=67.18s
-  SEEQST:   F=0.9519  nc=127  t=59.69s
-  tSEEQST t=0.02: F=0.9561  nc=119  t=55.05s
-  tSEEQST t=0.05: F=0.9325  nc=109  t=49.08s
-  tSEEQST t=0.10: F=0.7723  nc=27  t=13.18s
-  tSEEQST t=1/√m=0.042: F=0.9515  nc=117  t=52.37s
+  Standard: F=0.9534  nc=342  t=68.95s
+  SEEQST:   F=0.9564  nc=127  t=59.97s
+  tSEEQST t=0.02: F=0.9485  nc=119  t=55.93s
+  tSEEQST t=0.05: F=0.9551  nc=109  t=49.35s
+  tSEEQST t=0.10: F=0.7806  nc=27  t=11.10s
+  tSEEQST t=1/sqrt(m)=0.042: F=0.9580  nc=117  t=55.74s
 
 [21/197] shots=600
-  Standard: F=0.9538  nc=342  t=67.75s
-  SEEQST:   F=0.9567  nc=127  t=59.88s
-  tSEEQST t=0.02: F=0.9495  nc=119  t=55.51s
-  tSEEQST t=0.05: F=0.9586  nc=109  t=52.79s
-  tSEEQST t=0.10: F=0.7708  nc=27  t=12.22s
-  tSEEQST t=1/√m=0.041: F=0.9535  nc=117  t=53.34s
+  Standard: F=0.9568  nc=342  t=67.72s
+  SEEQST:   F=0.9486  nc=127  t=60.78s
+  tSEEQST t=0.02: F=0.9407  nc=119  t=56.06s
+  tSEEQST t=0.05: F=0.9428  nc=109  t=45.28s
+  tSEEQST t=0.10: F=0.7750  nc=27  t=11.69s
+  tSEEQST t=1/sqrt(m)=0.041: F=0.9498  nc=117  t=53.32s
 
 [22/197] shots=625
-  Standard: F=0.9582  nc=342  t=67.77s
-  SEEQST:   F=0.9513  nc=127  t=59.38s
-  tSEEQST t=0.02: F=0.9491  nc=119  t=55.26s
-  tSEEQST t=0.05: F=0.9466  nc=109  t=45.46s
-  tSEEQST t=0.10: F=0.7681  nc=27  t=10.74s
-  tSEEQST t=1/√m=0.040: F=0.9575  nc=119  t=52.69s
+  Standard: F=0.9653  nc=342  t=69.00s
+  SEEQST:   F=0.9568  nc=127  t=60.63s
+  tSEEQST t=0.02: F=0.9647  nc=119  t=55.61s
+  tSEEQST t=0.05: F=0.9495  nc=109  t=50.89s
+  tSEEQST t=0.10: F=0.7779  nc=27  t=12.51s
+  tSEEQST t=1/sqrt(m)=0.040: F=0.9588  nc=119  t=53.82s
 
 [23/197] shots=650
-  Standard: F=0.9618  nc=342  t=67.82s
-  SEEQST:   F=0.9562  nc=127  t=59.39s
-  tSEEQST t=0.02: F=0.9550  nc=119  t=55.09s
-  tSEEQST t=0.05: F=0.9583  nc=109  t=50.46s
-  tSEEQST t=0.10: F=0.7376  nc=27  t=11.11s
-  tSEEQST t=1/√m=0.039: F=0.9559  nc=119  t=51.55s
+  Standard: F=0.9554  nc=342  t=67.98s
+  SEEQST:   F=0.9523  nc=127  t=60.27s
+  tSEEQST t=0.02: F=0.9534  nc=119  t=56.01s
+  tSEEQST t=0.05: F=0.9431  nc=109  t=48.26s
+  tSEEQST t=0.10: F=0.7694  nc=27  t=11.77s
+  tSEEQST t=1/sqrt(m)=0.039: F=0.9487  nc=119  t=53.63s
 
 [24/197] shots=675
-  Standard: F=0.9650  nc=342  t=67.82s
-  SEEQST:   F=0.9618  nc=127  t=59.45s
-  tSEEQST t=0.02: F=0.9572  nc=119  t=55.52s
-  tSEEQST t=0.05: F=0.9602  nc=109  t=49.99s
-  tSEEQST t=0.10: F=0.7817  nc=27  t=10.77s
-  tSEEQST t=1/√m=0.038: F=0.9527  nc=119  t=53.51s
+  Standard: F=0.9584  nc=342  t=67.70s
+  SEEQST:   F=0.9531  nc=127  t=59.86s
+  tSEEQST t=0.02: F=0.9547  nc=119  t=55.01s
+  tSEEQST t=0.05: F=0.9388  nc=109  t=49.99s
+  tSEEQST t=0.10: F=0.7531  nc=27  t=10.35s
+  tSEEQST t=1/sqrt(m)=0.038: F=0.9581  nc=119  t=55.05s
 
 [25/197] shots=700
-  Standard: F=0.9593  nc=342  t=67.81s
-  SEEQST:   F=0.9574  nc=127  t=59.51s
-  tSEEQST t=0.02: F=0.9559  nc=119  t=55.12s
-  tSEEQST t=0.05: F=0.9467  nc=109  t=52.18s
-  tSEEQST t=0.10: F=0.7707  nc=27  t=11.79s
-  tSEEQST t=1/√m=0.038: F=0.9529  nc=119  t=55.37s
+  Standard: F=0.9570  nc=342  t=67.53s
+  SEEQST:   F=0.9596  nc=127  t=59.95s
+  tSEEQST t=0.02: F=0.9666  nc=119  t=55.52s
+  tSEEQST t=0.05: F=0.9503  nc=109  t=50.82s
+  tSEEQST t=0.10: F=0.7564  nc=27  t=9.11s
+  tSEEQST t=1/sqrt(m)=0.038: F=0.9576  nc=119  t=52.93s
 
 [26/197] shots=725
-  Standard: F=0.9642  nc=342  t=67.73s
-  SEEQST:   F=0.9542  nc=127  t=59.56s
-  tSEEQST t=0.02: F=0.9556  nc=119  t=55.18s
-  tSEEQST t=0.05: F=0.9495  nc=109  t=49.00s
-  tSEEQST t=0.10: F=0.7465  nc=27  t=9.43s
-  tSEEQST t=1/√m=0.037: F=0.9600  nc=119  t=54.68s
+  Standard: F=0.9602  nc=342  t=68.59s
+  SEEQST:   F=0.9635  nc=127  t=59.94s
+  tSEEQST t=0.02: F=0.9589  nc=119  t=55.60s
+  tSEEQST t=0.05: F=0.9433  nc=109  t=48.96s
+  tSEEQST t=0.10: F=0.7712  nc=27  t=10.74s
+  tSEEQST t=1/sqrt(m)=0.037: F=0.9567  nc=119  t=55.35s
 
 [27/197] shots=750
-  Standard: F=0.9663  nc=342  t=67.73s
-  SEEQST:   F=0.9538  nc=127  t=59.36s
-  tSEEQST t=0.02: F=0.9609  nc=119  t=55.23s
-  tSEEQST t=0.05: F=0.9619  nc=109  t=48.50s
-  tSEEQST t=0.10: F=0.7787  nc=27  t=12.49s
-  tSEEQST t=1/√m=0.037: F=0.9568  nc=119  t=55.14s
+  Standard: F=0.9602  nc=342  t=68.31s
+  SEEQST:   F=0.9501  nc=127  t=59.86s
+  tSEEQST t=0.02: F=0.9623  nc=119  t=55.81s
+  tSEEQST t=0.05: F=0.9442  nc=109  t=48.32s
+  tSEEQST t=0.10: F=0.7460  nc=27  t=10.72s
+  tSEEQST t=1/sqrt(m)=0.037: F=0.9593  nc=119  t=55.47s
 
 [28/197] shots=775
-  Standard: F=0.9684  nc=342  t=67.68s
-  SEEQST:   F=0.9603  nc=127  t=59.28s
-  tSEEQST t=0.02: F=0.9577  nc=119  t=55.07s
-  tSEEQST t=0.05: F=0.9604  nc=109  t=51.42s
-  tSEEQST t=0.10: F=0.7861  nc=27  t=11.77s
-  tSEEQST t=1/√m=0.036: F=0.9659  nc=119  t=53.36s
+  Standard: F=0.9632  nc=342  t=68.44s
+  SEEQST:   F=0.9555  nc=127  t=60.24s
+  tSEEQST t=0.02: F=0.9668  nc=119  t=55.90s
+  tSEEQST t=0.05: F=0.9679  nc=109  t=51.16s
+  tSEEQST t=0.10: F=0.7463  nc=27  t=10.82s
+  tSEEQST t=1/sqrt(m)=0.036: F=0.9660  nc=119  t=55.62s
 
 [29/197] shots=800
-  Standard: F=0.9602  nc=342  t=67.42s
-  SEEQST:   F=0.9703  nc=127  t=59.93s
-  tSEEQST t=0.02: F=0.9625  nc=119  t=55.20s
-  tSEEQST t=0.05: F=0.9612  nc=109  t=51.06s
-  tSEEQST t=0.10: F=0.7618  nc=27  t=10.45s
-  tSEEQST t=1/√m=0.035: F=0.9656  nc=119  t=55.19s
+  Standard: F=0.9637  nc=342  t=68.22s
+  SEEQST:   F=0.9599  nc=127  t=60.21s
+  tSEEQST t=0.02: F=0.9592  nc=119  t=55.99s
+  tSEEQST t=0.05: F=0.9562  nc=109  t=51.62s
+  tSEEQST t=0.10: F=0.8338  nc=27  t=13.11s
+  tSEEQST t=1/sqrt(m)=0.035: F=0.9606  nc=119  t=56.53s
 
 [30/197] shots=825
-  Standard: F=0.9604  nc=342  t=67.54s
-  SEEQST:   F=0.9513  nc=127  t=59.87s
-  tSEEQST t=0.02: F=0.9624  nc=119  t=55.41s
-  tSEEQST t=0.05: F=0.9500  nc=109  t=45.07s
-  tSEEQST t=0.10: F=0.7943  nc=27  t=12.16s
-  tSEEQST t=1/√m=0.035: F=0.9590  nc=119  t=55.15s
+  Standard: F=0.9630  nc=342  t=69.00s
+  SEEQST:   F=0.9624  nc=127  t=60.38s
+  tSEEQST t=0.02: F=0.9646  nc=119  t=56.17s
+  tSEEQST t=0.05: F=0.9462  nc=109  t=46.21s
+  tSEEQST t=0.10: F=0.7828  nc=27  t=13.29s
+  tSEEQST t=1/sqrt(m)=0.035: F=0.9589  nc=119  t=55.62s
 
 [31/197] shots=850
-  Standard: F=0.9665  nc=342  t=67.41s
-  SEEQST:   F=0.9702  nc=127  t=59.54s
-  tSEEQST t=0.02: F=0.9622  nc=119  t=54.96s
-  tSEEQST t=0.05: F=0.9533  nc=109  t=47.83s
-  tSEEQST t=0.10: F=0.7166  nc=27  t=8.65s
-  tSEEQST t=1/√m=0.034: F=0.9643  nc=119  t=54.85s
+  Standard: F=0.9705  nc=342  t=67.76s
+  SEEQST:   F=0.9653  nc=127  t=59.77s
+  tSEEQST t=0.02: F=0.9627  nc=119  t=55.49s
+  tSEEQST t=0.05: F=0.9597  nc=109  t=45.41s
+  tSEEQST t=0.10: F=0.8187  nc=27  t=11.51s
+  tSEEQST t=1/sqrt(m)=0.034: F=0.9680  nc=119  t=55.43s
 
 [32/197] shots=875
-  Standard: F=0.9665  nc=342  t=67.06s
-  SEEQST:   F=0.9707  nc=127  t=59.87s
-  tSEEQST t=0.02: F=0.9618  nc=119  t=55.36s
-  tSEEQST t=0.05: F=0.9524  nc=109  t=51.30s
-  tSEEQST t=0.10: F=0.7922  nc=27  t=9.34s
-  tSEEQST t=1/√m=0.034: F=0.9547  nc=119  t=54.96s
+  Standard: F=0.9639  nc=342  t=67.82s
+  SEEQST:   F=0.9688  nc=127  t=59.69s
+  tSEEQST t=0.02: F=0.9640  nc=119  t=55.54s
+  tSEEQST t=0.05: F=0.9658  nc=109  t=50.42s
+  tSEEQST t=0.10: F=0.7374  nc=27  t=10.43s
+  tSEEQST t=1/sqrt(m)=0.034: F=0.9596  nc=119  t=55.42s
 
 [33/197] shots=900
-  Standard: F=0.9677  nc=342  t=67.17s
-  SEEQST:   F=0.9690  nc=127  t=59.47s
-  tSEEQST t=0.02: F=0.9679  nc=119  t=55.17s
-  tSEEQST t=0.05: F=0.9592  nc=109  t=45.43s
-  tSEEQST t=0.10: F=0.8167  nc=27  t=12.12s
-  tSEEQST t=1/√m=0.033: F=0.9608  nc=119  t=53.69s
+  Standard: F=0.9636  nc=342  t=67.48s
+  SEEQST:   F=0.9712  nc=127  t=59.55s
+  tSEEQST t=0.02: F=0.9692  nc=119  t=54.93s
+  tSEEQST t=0.05: F=0.9561  nc=109  t=50.82s
+  tSEEQST t=0.10: F=0.8125  nc=27  t=11.35s
+  tSEEQST t=1/sqrt(m)=0.033: F=0.9649  nc=119  t=54.86s
 
 [34/197] shots=925
-  Standard: F=0.9716  nc=342  t=67.80s
-  SEEQST:   F=0.9672  nc=127  t=59.61s
-  tSEEQST t=0.02: F=0.9673  nc=119  t=55.43s
-  tSEEQST t=0.05: F=0.9687  nc=109  t=49.87s
-  tSEEQST t=0.10: F=0.7882  nc=27  t=9.78s
-  tSEEQST t=1/√m=0.033: F=0.9616  nc=119  t=55.24s
+  Standard: F=0.9652  nc=342  t=67.62s
+  SEEQST:   F=0.9717  nc=127  t=59.62s
+  tSEEQST t=0.02: F=0.9644  nc=119  t=55.32s
+  tSEEQST t=0.05: F=0.9641  nc=109  t=49.83s
+  tSEEQST t=0.10: F=0.8063  nc=27  t=11.38s
+  tSEEQST t=1/sqrt(m)=0.033: F=0.9720  nc=119  t=55.18s
 
 [35/197] shots=950
-  Standard: F=0.9678  nc=342  t=68.22s
-  SEEQST:   F=0.9686  nc=127  t=59.89s
-  tSEEQST t=0.02: F=0.9672  nc=119  t=55.51s
-  tSEEQST t=0.05: F=0.9565  nc=109  t=51.71s
-  tSEEQST t=0.10: F=0.8034  nc=27  t=11.49s
-  tSEEQST t=1/√m=0.032: F=0.9684  nc=119  t=55.43s
+  Standard: F=0.9630  nc=342  t=68.26s
+  SEEQST:   F=0.9702  nc=127  t=60.10s
+  tSEEQST t=0.02: F=0.9701  nc=119  t=55.95s
+  tSEEQST t=0.05: F=0.9668  nc=109  t=50.60s
+  tSEEQST t=0.10: F=0.7873  nc=27  t=11.11s
+  tSEEQST t=1/sqrt(m)=0.032: F=0.9664  nc=119  t=55.65s
 
 [36/197] shots=975
-  Standard: F=0.9674  nc=342  t=67.74s
-  SEEQST:   F=0.9635  nc=127  t=60.05s
-  tSEEQST t=0.02: F=0.9658  nc=119  t=55.81s
-  tSEEQST t=0.05: F=0.9619  nc=109  t=50.22s
-  tSEEQST t=0.10: F=0.8174  nc=27  t=12.32s
-  tSEEQST t=1/√m=0.032: F=0.9568  nc=119  t=55.56s
+  Standard: F=0.9690  nc=342  t=68.61s
+  SEEQST:   F=0.9679  nc=127  t=60.73s
+  tSEEQST t=0.02: F=0.9664  nc=119  t=56.01s
+  tSEEQST t=0.05: F=0.9549  nc=109  t=50.63s
+  tSEEQST t=0.10: F=0.7854  nc=27  t=10.74s
+  tSEEQST t=1/sqrt(m)=0.032: F=0.9676  nc=119  t=55.73s
 
 [37/197] shots=1000
-  Standard: F=0.9689  nc=342  t=67.94s
-  SEEQST:   F=0.9706  nc=127  t=59.75s
-  tSEEQST t=0.02: F=0.9665  nc=119  t=55.48s
-  tSEEQST t=0.05: F=0.9693  nc=109  t=54.13s
-  tSEEQST t=0.10: F=0.7692  nc=27  t=11.88s
-  tSEEQST t=1/√m=0.032: F=0.9662  nc=119  t=55.38s
+  Standard: F=0.9703  nc=342  t=69.08s
+  SEEQST:   F=0.9644  nc=127  t=60.62s
+  tSEEQST t=0.02: F=0.9614  nc=119  t=56.05s
+  tSEEQST t=0.05: F=0.9631  nc=109  t=54.10s
+  tSEEQST t=0.10: F=0.8476  nc=27  t=12.87s
+  tSEEQST t=1/sqrt(m)=0.032: F=0.9648  nc=119  t=55.76s
 
 [38/197] shots=1025
-  Standard: F=0.9754  nc=342  t=67.61s
-  SEEQST:   F=0.9702  nc=127  t=59.83s
-  tSEEQST t=0.02: F=0.9684  nc=119  t=55.31s
-  tSEEQST t=0.05: F=0.9571  nc=109  t=50.44s
-  tSEEQST t=0.10: F=0.7829  nc=27  t=12.81s
-  tSEEQST t=1/√m=0.031: F=0.9681  nc=119  t=54.83s
+  Standard: F=0.9695  nc=342  t=68.72s
+  SEEQST:   F=0.9690  nc=127  t=59.95s
+  tSEEQST t=0.02: F=0.9664  nc=119  t=55.69s
+  tSEEQST t=0.05: F=0.9600  nc=109  t=48.78s
+  tSEEQST t=0.10: F=0.8470  nc=27  t=12.13s
+  tSEEQST t=1/sqrt(m)=0.031: F=0.9725  nc=119  t=55.53s
 
 [39/197] shots=1050
-  Standard: F=0.9696  nc=342  t=67.10s
-  SEEQST:   F=0.9694  nc=127  t=59.54s
-  tSEEQST t=0.02: F=0.9711  nc=119  t=55.27s
-  tSEEQST t=0.05: F=0.9684  nc=109  t=46.64s
-  tSEEQST t=0.10: F=0.8014  nc=27  t=11.93s
-  tSEEQST t=1/√m=0.031: F=0.9648  nc=119  t=55.28s
+  Standard: F=0.9632  nc=342  t=67.82s
+  SEEQST:   F=0.9710  nc=127  t=59.57s
+  tSEEQST t=0.02: F=0.9700  nc=119  t=55.35s
+  tSEEQST t=0.05: F=0.9633  nc=109  t=49.23s
+  tSEEQST t=0.10: F=0.8132  nc=27  t=12.53s
+  tSEEQST t=1/sqrt(m)=0.031: F=0.9666  nc=119  t=55.46s
 
 [40/197] shots=1075
-  Standard: F=0.9758  nc=342  t=67.76s
-  SEEQST:   F=0.9686  nc=127  t=59.58s
-  tSEEQST t=0.02: F=0.9727  nc=119  t=55.33s
-  tSEEQST t=0.05: F=0.9594  nc=109  t=45.87s
-  tSEEQST t=0.10: F=0.8128  nc=27  t=11.16s
-  tSEEQST t=1/√m=0.030: F=0.9711  nc=119  t=55.58s
+  Standard: F=0.9760  nc=342  t=68.24s
+  SEEQST:   F=0.9717  nc=127  t=60.34s
+  tSEEQST t=0.02: F=0.9640  nc=119  t=55.61s
+  tSEEQST t=0.05: F=0.9582  nc=109  t=50.93s
+  tSEEQST t=0.10: F=0.7778  nc=27  t=10.12s
+  tSEEQST t=1/sqrt(m)=0.030: F=0.9643  nc=119  t=55.58s
 
 [41/197] shots=1100
-  Standard: F=0.9694  nc=342  t=67.72s
-  SEEQST:   F=0.9713  nc=127  t=59.82s
-  tSEEQST t=0.02: F=0.9700  nc=119  t=55.06s
-  tSEEQST t=0.05: F=0.9553  nc=109  t=44.71s
-  tSEEQST t=0.10: F=0.7853  nc=27  t=10.76s
-  tSEEQST t=1/√m=0.030: F=0.9672  nc=119  t=54.88s
+  Standard: F=0.9731  nc=342  t=68.07s
+  SEEQST:   F=0.9749  nc=127  t=59.89s
+  tSEEQST t=0.02: F=0.9691  nc=119  t=55.31s
+  tSEEQST t=0.05: F=0.9654  nc=109  t=48.67s
+  tSEEQST t=0.10: F=0.8205  nc=27  t=12.15s
+  tSEEQST t=1/sqrt(m)=0.030: F=0.9630  nc=119  t=55.33s
 
 [42/197] shots=1125
-  Standard: F=0.9667  nc=342  t=67.18s
-  SEEQST:   F=0.9743  nc=127  t=59.73s
-  tSEEQST t=0.02: F=0.9747  nc=119  t=55.48s
-  tSEEQST t=0.05: F=0.9641  nc=109  t=50.38s
-  tSEEQST t=0.10: F=0.8002  nc=27  t=10.34s
-  tSEEQST t=1/√m=0.030: F=0.9743  nc=119  t=54.83s
+  Standard: F=0.9682  nc=342  t=68.17s
+  SEEQST:   F=0.9750  nc=127  t=59.75s
+  tSEEQST t=0.02: F=0.9710  nc=119  t=55.57s
+  tSEEQST t=0.05: F=0.9652  nc=109  t=48.28s
+  tSEEQST t=0.10: F=0.7896  nc=27  t=11.42s
+  tSEEQST t=1/sqrt(m)=0.030: F=0.9698  nc=119  t=55.45s
 
 [43/197] shots=1150
-  Standard: F=0.9725  nc=342  t=67.27s
-  SEEQST:   F=0.9722  nc=127  t=59.42s
-  tSEEQST t=0.02: F=0.9687  nc=119  t=55.24s
-  tSEEQST t=0.05: F=0.9686  nc=109  t=50.48s
-  tSEEQST t=0.10: F=0.7663  nc=27  t=10.14s
-  tSEEQST t=1/√m=0.029: F=0.9659  nc=119  t=55.04s
+  Standard: F=0.9724  nc=342  t=67.75s
+  SEEQST:   F=0.9704  nc=127  t=60.14s
+  tSEEQST t=0.02: F=0.9772  nc=119  t=55.42s
+  tSEEQST t=0.05: F=0.9661  nc=109  t=49.04s
+  tSEEQST t=0.10: F=0.8308  nc=27  t=11.78s
+  tSEEQST t=1/sqrt(m)=0.029: F=0.9683  nc=119  t=55.34s
 
 [44/197] shots=1175
-  Standard: F=0.9795  nc=342  t=67.73s
-  SEEQST:   F=0.9617  nc=127  t=59.67s
-  tSEEQST t=0.02: F=0.9739  nc=119  t=55.41s
-  tSEEQST t=0.05: F=0.9690  nc=109  t=49.97s
-  tSEEQST t=0.10: F=0.8188  nc=27  t=12.61s
-  tSEEQST t=1/√m=0.029: F=0.9694  nc=119  t=55.27s
+  Standard: F=0.9749  nc=342  t=68.03s
+  SEEQST:   F=0.9763  nc=127  t=59.27s
+  tSEEQST t=0.02: F=0.9736  nc=119  t=55.60s
+  tSEEQST t=0.05: F=0.9610  nc=109  t=50.16s
+  tSEEQST t=0.10: F=0.7858  nc=27  t=11.14s
+  tSEEQST t=1/sqrt(m)=0.029: F=0.9745  nc=119  t=55.61s
 
 [45/197] shots=1200
-  Standard: F=0.9679  nc=342  t=67.79s
-  SEEQST:   F=0.9646  nc=127  t=59.70s
-  tSEEQST t=0.02: F=0.9688  nc=119  t=55.46s
-  tSEEQST t=0.05: F=0.9604  nc=109  t=49.94s
-  tSEEQST t=0.10: F=0.8040  nc=27  t=12.60s
-  tSEEQST t=1/√m=0.029: F=0.9701  nc=119  t=55.61s
+  Standard: F=0.9794  nc=342  t=67.50s
+  SEEQST:   F=0.9745  nc=127  t=59.55s
+  tSEEQST t=0.02: F=0.9688  nc=119  t=55.59s
+  tSEEQST t=0.05: F=0.9569  nc=109  t=47.52s
+  tSEEQST t=0.10: F=0.8030  nc=27  t=11.54s
+  tSEEQST t=1/sqrt(m)=0.029: F=0.9721  nc=119  t=55.24s
 
 [46/197] shots=1225
-  Standard: F=0.9735  nc=342  t=67.79s
-  SEEQST:   F=0.9758  nc=127  t=59.58s
-  tSEEQST t=0.02: F=0.9705  nc=119  t=55.79s
-  tSEEQST t=0.05: F=0.9702  nc=109  t=48.38s
-  tSEEQST t=0.10: F=0.7994  nc=27  t=10.08s
-  tSEEQST t=1/√m=0.029: F=0.9697  nc=119  t=55.70s
+  Standard: F=0.9756  nc=342  t=67.61s
+  SEEQST:   F=0.9717  nc=127  t=59.79s
+  tSEEQST t=0.02: F=0.9692  nc=119  t=55.59s
+  tSEEQST t=0.05: F=0.9699  nc=109  t=50.28s
+  tSEEQST t=0.10: F=0.8279  nc=27  t=12.85s
+  tSEEQST t=1/sqrt(m)=0.029: F=0.9657  nc=119  t=55.12s
 
 [47/197] shots=1250
-  Standard: F=0.9770  nc=342  t=68.40s
-  SEEQST:   F=0.9713  nc=127  t=59.08s
-  tSEEQST t=0.02: F=0.9746  nc=119  t=54.90s
-  tSEEQST t=0.05: F=0.9733  nc=109  t=51.96s
-  tSEEQST t=0.10: F=0.7977  nc=27  t=11.39s
-  tSEEQST t=1/√m=0.028: F=0.9736  nc=119  t=54.78s
+  Standard: F=0.9768  nc=342  t=67.73s
+  SEEQST:   F=0.9731  nc=127  t=59.86s
+  tSEEQST t=0.02: F=0.9757  nc=119  t=55.23s
+  tSEEQST t=0.05: F=0.9666  nc=109  t=51.00s
+  tSEEQST t=0.10: F=0.8342  nc=27  t=11.44s
+  tSEEQST t=1/sqrt(m)=0.028: F=0.9660  nc=119  t=55.00s
 
 [48/197] shots=1275
-  Standard: F=0.9760  nc=342  t=67.28s
-  SEEQST:   F=0.9692  nc=127  t=59.84s
-  tSEEQST t=0.02: F=0.9781  nc=119  t=55.11s
-  tSEEQST t=0.05: F=0.9670  nc=109  t=49.80s
-  tSEEQST t=0.10: F=0.7742  nc=27  t=10.76s
-  tSEEQST t=1/√m=0.028: F=0.9716  nc=119  t=55.02s
+  Standard: F=0.9754  nc=342  t=68.09s
+  SEEQST:   F=0.9721  nc=127  t=59.51s
+  tSEEQST t=0.02: F=0.9736  nc=119  t=55.24s
+  tSEEQST t=0.05: F=0.9720  nc=109  t=49.90s
+  tSEEQST t=0.10: F=0.8181  nc=27  t=10.44s
+  tSEEQST t=1/sqrt(m)=0.028: F=0.9742  nc=119  t=55.41s
 
 [49/197] shots=1300
-  Standard: F=0.9743  nc=342  t=67.11s
-  SEEQST:   F=0.9716  nc=127  t=59.24s
-  tSEEQST t=0.02: F=0.9713  nc=119  t=55.52s
-  tSEEQST t=0.05: F=0.9708  nc=109  t=48.74s
-  tSEEQST t=0.10: F=0.8149  nc=27  t=12.78s
-  tSEEQST t=1/√m=0.028: F=0.9744  nc=119  t=54.75s
+  Standard: F=0.9777  nc=342  t=67.61s
+  SEEQST:   F=0.9736  nc=127  t=59.45s
+  tSEEQST t=0.02: F=0.9721  nc=119  t=55.70s
+  tSEEQST t=0.05: F=0.9603  nc=109  t=48.43s
+  tSEEQST t=0.10: F=0.7753  nc=27  t=10.76s
+  tSEEQST t=1/sqrt(m)=0.028: F=0.9745  nc=119  t=55.67s
 
 [50/197] shots=1325
-  Standard: F=0.9717  nc=342  t=66.98s
-  SEEQST:   F=0.9754  nc=127  t=59.75s
-  tSEEQST t=0.02: F=0.9696  nc=119  t=55.12s
-  tSEEQST t=0.05: F=0.9676  nc=109  t=50.02s
-  tSEEQST t=0.10: F=0.8131  nc=27  t=12.79s
-  tSEEQST t=1/√m=0.027: F=0.9781  nc=119  t=54.73s
+  Standard: F=0.9764  nc=342  t=68.23s
+  SEEQST:   F=0.9773  nc=127  t=60.14s
+  tSEEQST t=0.02: F=0.9781  nc=119  t=56.35s
+  tSEEQST t=0.05: F=0.9612  nc=109  t=48.92s
+  tSEEQST t=0.10: F=0.8261  nc=27  t=10.34s
+  tSEEQST t=1/sqrt(m)=0.027: F=0.9756  nc=119  t=55.77s
 
 [51/197] shots=1350
-  Standard: F=0.9777  nc=342  t=67.25s
-  SEEQST:   F=0.9678  nc=127  t=60.04s
-  tSEEQST t=0.02: F=0.9785  nc=119  t=55.50s
-  tSEEQST t=0.05: F=0.9649  nc=109  t=47.85s
-  tSEEQST t=0.10: F=0.8179  nc=27  t=11.74s
-  tSEEQST t=1/√m=0.027: F=0.9744  nc=119  t=54.83s
+  Standard: F=0.9795  nc=342  t=68.28s
+  SEEQST:   F=0.9775  nc=127  t=60.48s
+  tSEEQST t=0.02: F=0.9692  nc=119  t=55.88s
+  tSEEQST t=0.05: F=0.9572  nc=109  t=48.61s
+  tSEEQST t=0.10: F=0.7999  nc=27  t=12.21s
+  tSEEQST t=1/sqrt(m)=0.027: F=0.9730  nc=119  t=56.17s
 
 [52/197] shots=1375
-  Standard: F=0.9719  nc=342  t=67.78s
-  SEEQST:   F=0.9809  nc=127  t=59.41s
-  tSEEQST t=0.02: F=0.9765  nc=119  t=54.94s
-  tSEEQST t=0.05: F=0.9679  nc=109  t=49.77s
-  tSEEQST t=0.10: F=0.7828  nc=27  t=12.49s
-  tSEEQST t=1/√m=0.027: F=0.9702  nc=119  t=55.02s
+  Standard: F=0.9766  nc=342  t=68.21s
+  SEEQST:   F=0.9740  nc=127  t=60.43s
+  tSEEQST t=0.02: F=0.9719  nc=119  t=56.14s
+  tSEEQST t=0.05: F=0.9687  nc=109  t=49.71s
+  tSEEQST t=0.10: F=0.7484  nc=27  t=11.59s
+  tSEEQST t=1/sqrt(m)=0.027: F=0.9770  nc=119  t=55.98s
 
 [53/197] shots=1400
-  Standard: F=0.9818  nc=342  t=67.59s
-  SEEQST:   F=0.9769  nc=127  t=59.49s
-  tSEEQST t=0.02: F=0.9721  nc=119  t=55.27s
-  tSEEQST t=0.05: F=0.9643  nc=109  t=49.14s
-  tSEEQST t=0.10: F=0.8469  nc=27  t=12.22s
-  tSEEQST t=1/√m=0.027: F=0.9728  nc=119  t=55.07s
+  Standard: F=0.9780  nc=342  t=68.83s
+  SEEQST:   F=0.9760  nc=127  t=60.63s
+  tSEEQST t=0.02: F=0.9712  nc=119  t=56.43s
+  tSEEQST t=0.05: F=0.9739  nc=109  t=52.61s
+  tSEEQST t=0.10: F=0.7724  nc=27  t=10.89s
+  tSEEQST t=1/sqrt(m)=0.027: F=0.9720  nc=119  t=56.59s
 
 [54/197] shots=1425
-  Standard: F=0.9786  nc=342  t=67.53s
-  SEEQST:   F=0.9722  nc=127  t=59.43s
-  tSEEQST t=0.02: F=0.9750  nc=119  t=54.91s
-  tSEEQST t=0.05: F=0.9680  nc=109  t=47.80s
-  tSEEQST t=0.10: F=0.7865  nc=27  t=10.05s
-  tSEEQST t=1/√m=0.026: F=0.9709  nc=119  t=55.27s
+  Standard: F=0.9781  nc=342  t=68.11s
+  SEEQST:   F=0.9742  nc=127  t=60.00s
+  tSEEQST t=0.02: F=0.9734  nc=119  t=55.38s
+  tSEEQST t=0.05: F=0.9705  nc=109  t=51.76s
+  tSEEQST t=0.10: F=0.8101  nc=27  t=9.41s
+  tSEEQST t=1/sqrt(m)=0.026: F=0.9744  nc=119  t=55.53s
 
 [55/197] shots=1450
-  Standard: F=0.9727  nc=342  t=67.87s
-  SEEQST:   F=0.9766  nc=127  t=59.72s
-  tSEEQST t=0.02: F=0.9742  nc=119  t=55.28s
-  tSEEQST t=0.05: F=0.9724  nc=109  t=50.70s
-  tSEEQST t=0.10: F=0.8032  nc=27  t=9.68s
-  tSEEQST t=1/√m=0.026: F=0.9728  nc=119  t=55.05s
+  Standard: F=0.9775  nc=342  t=68.25s
+  SEEQST:   F=0.9730  nc=127  t=59.86s
+  tSEEQST t=0.02: F=0.9779  nc=119  t=55.54s
+  tSEEQST t=0.05: F=0.9693  nc=109  t=52.52s
+  tSEEQST t=0.10: F=0.8001  nc=27  t=12.88s
+  tSEEQST t=1/sqrt(m)=0.026: F=0.9777  nc=119  t=55.59s
 
 [56/197] shots=1475
-  Standard: F=0.9756  nc=342  t=68.03s
-  SEEQST:   F=0.9756  nc=127  t=59.56s
-  tSEEQST t=0.02: F=0.9758  nc=119  t=55.45s
-  tSEEQST t=0.05: F=0.9628  nc=109  t=46.51s
-  tSEEQST t=0.10: F=0.7893  nc=27  t=10.85s
-  tSEEQST t=1/√m=0.026: F=0.9769  nc=119  t=55.22s
+  Standard: F=0.9765  nc=342  t=68.47s
+  SEEQST:   F=0.9742  nc=127  t=59.77s
+  tSEEQST t=0.02: F=0.9710  nc=119  t=55.80s
+  tSEEQST t=0.05: F=0.9658  nc=109  t=45.17s
+  tSEEQST t=0.10: F=0.8104  nc=27  t=11.90s
+  tSEEQST t=1/sqrt(m)=0.026: F=0.9723  nc=119  t=55.42s
 
 [57/197] shots=1500
-  Standard: F=0.9771  nc=342  t=67.37s
-  SEEQST:   F=0.9795  nc=127  t=59.67s
-  tSEEQST t=0.02: F=0.9783  nc=119  t=55.36s
-  tSEEQST t=0.05: F=0.9651  nc=109  t=50.15s
-  tSEEQST t=0.10: F=0.8283  nc=27  t=11.35s
-  tSEEQST t=1/√m=0.026: F=0.9751  nc=119  t=54.82s
+  Standard: F=0.9704  nc=342  t=68.56s
+  SEEQST:   F=0.9795  nc=127  t=59.78s
+  tSEEQST t=0.02: F=0.9817  nc=119  t=55.78s
+  tSEEQST t=0.05: F=0.9764  nc=109  t=53.18s
+  tSEEQST t=0.10: F=0.8324  nc=27  t=11.99s
+  tSEEQST t=1/sqrt(m)=0.026: F=0.9807  nc=119  t=55.58s
 
 [58/197] shots=1525
-  Standard: F=0.9786  nc=342  t=67.64s
-  SEEQST:   F=0.9681  nc=127  t=59.16s
-  tSEEQST t=0.02: F=0.9717  nc=119  t=55.17s
-  tSEEQST t=0.05: F=0.9693  nc=109  t=50.48s
-  tSEEQST t=0.10: F=0.8022  nc=27  t=10.36s
-  tSEEQST t=1/√m=0.026: F=0.9748  nc=119  t=54.96s
+  Standard: F=0.9738  nc=342  t=68.70s
+  SEEQST:   F=0.9782  nc=127  t=59.55s
+  tSEEQST t=0.02: F=0.9767  nc=119  t=55.15s
+  tSEEQST t=0.05: F=0.9723  nc=109  t=50.83s
+  tSEEQST t=0.10: F=0.7827  nc=27  t=11.15s
+  tSEEQST t=1/sqrt(m)=0.026: F=0.9751  nc=119  t=55.21s
 
 [59/197] shots=1550
-  Standard: F=0.9814  nc=342  t=67.67s
-  SEEQST:   F=0.9793  nc=127  t=59.56s
-  tSEEQST t=0.02: F=0.9776  nc=119  t=55.37s
-  tSEEQST t=0.05: F=0.9793  nc=109  t=51.02s
-  tSEEQST t=0.10: F=0.8616  nc=27  t=12.85s
-  tSEEQST t=1/√m=0.025: F=0.9790  nc=119  t=55.26s
+  Standard: F=0.9791  nc=342  t=67.60s
+  SEEQST:   F=0.9775  nc=127  t=59.70s
+  tSEEQST t=0.02: F=0.9804  nc=119  t=55.43s
+  tSEEQST t=0.05: F=0.9749  nc=109  t=52.67s
+  tSEEQST t=0.10: F=0.8036  nc=27  t=11.16s
+  tSEEQST t=1/sqrt(m)=0.025: F=0.9782  nc=119  t=55.47s
 
 [60/197] shots=1575
-  Standard: F=0.9799  nc=342  t=67.89s
-  SEEQST:   F=0.9730  nc=127  t=59.80s
-  tSEEQST t=0.02: F=0.9784  nc=119  t=55.51s
-  tSEEQST t=0.05: F=0.9725  nc=109  t=50.39s
-  tSEEQST t=0.10: F=0.7826  nc=27  t=12.56s
-  tSEEQST t=1/√m=0.025: F=0.9784  nc=119  t=55.40s
+  Standard: F=0.9826  nc=342  t=68.12s
+  SEEQST:   F=0.9792  nc=127  t=59.50s
+  tSEEQST t=0.02: F=0.9770  nc=119  t=55.43s
+  tSEEQST t=0.05: F=0.9755  nc=109  t=52.33s
+  tSEEQST t=0.10: F=0.7870  nc=27  t=11.15s
+  tSEEQST t=1/sqrt(m)=0.025: F=0.9749  nc=119  t=55.32s
 
 [61/197] shots=1600
-  Standard: F=0.9790  nc=342  t=67.68s
-  SEEQST:   F=0.9817  nc=127  t=59.68s
-  tSEEQST t=0.02: F=0.9742  nc=119  t=55.37s
-  tSEEQST t=0.05: F=0.9739  nc=109  t=52.31s
-  tSEEQST t=0.10: F=0.7916  nc=27  t=12.52s
-  tSEEQST t=1/√m=0.025: F=0.9792  nc=119  t=55.32s
+  Standard: F=0.9779  nc=342  t=68.65s
+  SEEQST:   F=0.9781  nc=127  t=60.33s
+  tSEEQST t=0.02: F=0.9785  nc=119  t=56.19s
+  tSEEQST t=0.05: F=0.9745  nc=109  t=52.22s
+  tSEEQST t=0.10: F=0.7585  nc=27  t=10.82s
+  tSEEQST t=1/sqrt(m)=0.025: F=0.9725  nc=119  t=56.24s
 
 [62/197] shots=1625
-  Standard: F=0.9770  nc=342  t=68.08s
-  SEEQST:   F=0.9729  nc=127  t=59.95s
-  tSEEQST t=0.02: F=0.9730  nc=119  t=55.42s
-  tSEEQST t=0.05: F=0.9700  nc=109  t=52.14s
-  tSEEQST t=0.10: F=0.8481  nc=27  t=12.21s
-  tSEEQST t=1/√m=0.025: F=0.9812  nc=119  t=55.18s
+  Standard: F=0.9769  nc=342  t=70.10s
+  SEEQST:   F=0.9791  nc=127  t=59.96s
+  tSEEQST t=0.02: F=0.9799  nc=119  t=56.09s
+  tSEEQST t=0.05: F=0.9669  nc=109  t=49.68s
+  tSEEQST t=0.10: F=0.8202  nc=27  t=11.19s
+  tSEEQST t=1/sqrt(m)=0.025: F=0.9762  nc=119  t=56.20s
 
 [63/197] shots=1650
-  Standard: F=0.9847  nc=342  t=67.42s
-  SEEQST:   F=0.9772  nc=127  t=59.87s
-  tSEEQST t=0.02: F=0.9809  nc=119  t=55.29s
-  tSEEQST t=0.05: F=0.9758  nc=109  t=49.63s
-  tSEEQST t=0.10: F=0.7904  nc=27  t=10.81s
-  tSEEQST t=1/√m=0.025: F=0.9780  nc=119  t=55.28s
+  Standard: F=0.9810  nc=342  t=69.27s
+  SEEQST:   F=0.9777  nc=127  t=60.14s
+  tSEEQST t=0.02: F=0.9753  nc=119  t=55.77s
+  tSEEQST t=0.05: F=0.9773  nc=109  t=50.99s
+  tSEEQST t=0.10: F=0.8454  nc=27  t=12.51s
+  tSEEQST t=1/sqrt(m)=0.025: F=0.9817  nc=119  t=55.73s
 
 [64/197] shots=1675
-  Standard: F=0.9826  nc=342  t=67.36s
-  SEEQST:   F=0.9771  nc=127  t=59.93s
-  tSEEQST t=0.02: F=0.9779  nc=119  t=55.13s
-  tSEEQST t=0.05: F=0.9744  nc=109  t=48.04s
-  tSEEQST t=0.10: F=0.7911  nc=27  t=12.12s
-  tSEEQST t=1/√m=0.024: F=0.9761  nc=119  t=54.92s
+  Standard: F=0.9808  nc=342  t=68.64s
+  SEEQST:   F=0.9768  nc=127  t=60.79s
+  tSEEQST t=0.02: F=0.9792  nc=119  t=56.30s
+  tSEEQST t=0.05: F=0.9684  nc=109  t=50.78s
+  tSEEQST t=0.10: F=0.7778  nc=27  t=10.93s
+  tSEEQST t=1/sqrt(m)=0.024: F=0.9811  nc=119  t=56.09s
 
 [65/197] shots=1700
-  Standard: F=0.9728  nc=342  t=67.35s
-  SEEQST:   F=0.9756  nc=127  t=59.80s
-  tSEEQST t=0.02: F=0.9779  nc=119  t=55.22s
-  tSEEQST t=0.05: F=0.9653  nc=109  t=49.78s
-  tSEEQST t=0.10: F=0.8149  nc=27  t=11.83s
-  tSEEQST t=1/√m=0.024: F=0.9756  nc=119  t=55.53s
+  Standard: F=0.9836  nc=342  t=69.15s
+  SEEQST:   F=0.9771  nc=127  t=60.53s
+  tSEEQST t=0.02: F=0.9788  nc=119  t=56.21s
+  tSEEQST t=0.05: F=0.9740  nc=109  t=53.99s
+  tSEEQST t=0.10: F=0.7946  nc=27  t=11.89s
+  tSEEQST t=1/sqrt(m)=0.024: F=0.9775  nc=119  t=56.22s
 
 [66/197] shots=1725
-  Standard: F=0.9845  nc=342  t=67.38s
-  SEEQST:   F=0.9785  nc=127  t=59.69s
-  tSEEQST t=0.02: F=0.9801  nc=119  t=55.47s
-  tSEEQST t=0.05: F=0.9809  nc=109  t=51.70s
-  tSEEQST t=0.10: F=0.8093  nc=27  t=13.37s
-  tSEEQST t=1/√m=0.024: F=0.9803  nc=119  t=55.73s
+  Standard: F=0.9748  nc=342  t=69.07s
+  SEEQST:   F=0.9779  nc=127  t=60.53s
+  tSEEQST t=0.02: F=0.9788  nc=119  t=56.19s
+  tSEEQST t=0.05: F=0.9743  nc=109  t=52.22s
+  tSEEQST t=0.10: F=0.7917  nc=27  t=11.30s
+  tSEEQST t=1/sqrt(m)=0.024: F=0.9756  nc=119  t=56.12s
 
 [67/197] shots=1750
-  Standard: F=0.9830  nc=342  t=68.23s
-  SEEQST:   F=0.9795  nc=127  t=59.75s
-  tSEEQST t=0.02: F=0.9785  nc=119  t=55.78s
-  tSEEQST t=0.05: F=0.9827  nc=109  t=51.86s
-  tSEEQST t=0.10: F=0.7934  nc=27  t=10.84s
-  tSEEQST t=1/√m=0.024: F=0.9745  nc=119  t=55.64s
+  Standard: F=0.9796  nc=342  t=69.38s
+  SEEQST:   F=0.9797  nc=127  t=60.08s
+  tSEEQST t=0.02: F=0.9816  nc=119  t=55.36s
+  tSEEQST t=0.05: F=0.9782  nc=109  t=51.74s
+  tSEEQST t=0.10: F=0.8233  nc=27  t=12.64s
+  tSEEQST t=1/sqrt(m)=0.024: F=0.9784  nc=119  t=55.47s
 
 [68/197] shots=1775
-  Standard: F=0.9820  nc=342  t=67.72s
-  SEEQST:   F=0.9826  nc=127  t=59.95s
-  tSEEQST t=0.02: F=0.9784  nc=119  t=55.43s
-  tSEEQST t=0.05: F=0.9816  nc=109  t=51.63s
-  tSEEQST t=0.10: F=0.8040  nc=27  t=12.64s
-  tSEEQST t=1/√m=0.024: F=0.9782  nc=119  t=55.40s
+  Standard: F=0.9794  nc=342  t=68.06s
+  SEEQST:   F=0.9741  nc=127  t=60.11s
+  tSEEQST t=0.02: F=0.9770  nc=119  t=55.36s
+  tSEEQST t=0.05: F=0.9743  nc=109  t=45.90s
+  tSEEQST t=0.10: F=0.7840  nc=27  t=10.80s
+  tSEEQST t=1/sqrt(m)=0.024: F=0.9736  nc=119  t=55.37s
 
 [69/197] shots=1800
-  Standard: F=0.9799  nc=342  t=67.65s
-  SEEQST:   F=0.9811  nc=127  t=59.50s
-  tSEEQST t=0.02: F=0.9777  nc=119  t=55.35s
-  tSEEQST t=0.05: F=0.9722  nc=109  t=51.39s
-  tSEEQST t=0.10: F=0.8275  nc=27  t=11.83s
-  tSEEQST t=1/√m=0.024: F=0.9748  nc=119  t=55.29s
+  Standard: F=0.9802  nc=342  t=68.43s
+  SEEQST:   F=0.9787  nc=127  t=59.96s
+  tSEEQST t=0.02: F=0.9828  nc=119  t=55.65s
+  tSEEQST t=0.05: F=0.9702  nc=109  t=48.53s
+  tSEEQST t=0.10: F=0.8207  nc=27  t=12.92s
+  tSEEQST t=1/sqrt(m)=0.024: F=0.9775  nc=119  t=55.91s
 
 [70/197] shots=1825
-  Standard: F=0.9817  nc=342  t=67.69s
-  SEEQST:   F=0.9790  nc=127  t=59.32s
-  tSEEQST t=0.02: F=0.9767  nc=119  t=55.20s
-  tSEEQST t=0.05: F=0.9809  nc=109  t=52.60s
-  tSEEQST t=0.10: F=0.8054  nc=27  t=12.17s
-  tSEEQST t=1/√m=0.023: F=0.9739  nc=119  t=55.20s
+  Standard: F=0.9833  nc=342  t=68.68s
+  SEEQST:   F=0.9776  nc=127  t=60.61s
+  tSEEQST t=0.02: F=0.9810  nc=119  t=55.64s
+  tSEEQST t=0.05: F=0.9693  nc=109  t=50.18s
+  tSEEQST t=0.10: F=0.7936  nc=27  t=10.80s
+  tSEEQST t=1/sqrt(m)=0.023: F=0.9751  nc=119  t=55.59s
 
 [71/197] shots=1850
-  Standard: F=0.9826  nc=342  t=67.32s
-  SEEQST:   F=0.9811  nc=127  t=60.03s
-  tSEEQST t=0.02: F=0.9807  nc=119  t=55.07s
-  tSEEQST t=0.05: F=0.9782  nc=109  t=51.37s
-  tSEEQST t=0.10: F=0.8223  nc=27  t=11.50s
-  tSEEQST t=1/√m=0.023: F=0.9818  nc=119  t=55.18s
+  Standard: F=0.9833  nc=342  t=68.45s
+  SEEQST:   F=0.9822  nc=127  t=59.73s
+  tSEEQST t=0.02: F=0.9765  nc=119  t=56.25s
+  tSEEQST t=0.05: F=0.9724  nc=109  t=51.04s
+  tSEEQST t=0.10: F=0.7625  nc=27  t=10.77s
+  tSEEQST t=1/sqrt(m)=0.023: F=0.9771  nc=119  t=56.15s
 
 [72/197] shots=1875
-  Standard: F=0.9813  nc=342  t=67.98s
-  SEEQST:   F=0.9811  nc=127  t=59.43s
-  tSEEQST t=0.02: F=0.9761  nc=119  t=55.19s
-  tSEEQST t=0.05: F=0.9704  nc=109  t=49.29s
-  tSEEQST t=0.10: F=0.8213  nc=27  t=12.51s
-  tSEEQST t=1/√m=0.023: F=0.9767  nc=119  t=55.16s
+  Standard: F=0.9829  nc=342  t=68.69s
+  SEEQST:   F=0.9778  nc=127  t=60.06s
+  tSEEQST t=0.02: F=0.9824  nc=119  t=55.91s
+  tSEEQST t=0.05: F=0.9761  nc=109  t=51.35s
+  tSEEQST t=0.10: F=0.7937  nc=27  t=10.97s
+  tSEEQST t=1/sqrt(m)=0.023: F=0.9800  nc=119  t=55.72s
 
 [73/197] shots=1900
-  Standard: F=0.9835  nc=342  t=67.55s
-  SEEQST:   F=0.9835  nc=127  t=59.55s
-  tSEEQST t=0.02: F=0.9825  nc=119  t=55.31s
-  tSEEQST t=0.05: F=0.9792  nc=109  t=50.13s
-  tSEEQST t=0.10: F=0.7986  nc=27  t=10.83s
-  tSEEQST t=1/√m=0.023: F=0.9798  nc=119  t=55.37s
+  Standard: F=0.9794  nc=342  t=67.77s
+  SEEQST:   F=0.9792  nc=127  t=60.06s
+  tSEEQST t=0.02: F=0.9814  nc=119  t=55.31s
+  tSEEQST t=0.05: F=0.9738  nc=109  t=49.81s
+  tSEEQST t=0.10: F=0.7967  nc=27  t=12.54s
+  tSEEQST t=1/sqrt(m)=0.023: F=0.9797  nc=119  t=55.42s
 
 [74/197] shots=1925
-  Standard: F=0.9835  nc=342  t=67.51s
-  SEEQST:   F=0.9830  nc=127  t=59.71s
-  tSEEQST t=0.02: F=0.9841  nc=119  t=55.31s
-  tSEEQST t=0.05: F=0.9733  nc=109  t=50.08s
-  tSEEQST t=0.10: F=0.7866  nc=27  t=11.44s
-  tSEEQST t=1/√m=0.023: F=0.9814  nc=119  t=55.06s
+  Standard: F=0.9848  nc=342  t=68.03s
+  SEEQST:   F=0.9758  nc=127  t=59.65s
+  tSEEQST t=0.02: F=0.9785  nc=119  t=55.56s
+  tSEEQST t=0.05: F=0.9834  nc=109  t=51.04s
+  tSEEQST t=0.10: F=0.7838  nc=27  t=11.29s
+  tSEEQST t=1/sqrt(m)=0.023: F=0.9834  nc=119  t=55.55s
 
 [75/197] shots=1950
-  Standard: F=0.9807  nc=342  t=67.24s
-  SEEQST:   F=0.9768  nc=127  t=59.54s
-  tSEEQST t=0.02: F=0.9843  nc=119  t=55.38s
-  tSEEQST t=0.05: F=0.9751  nc=109  t=50.45s
-  tSEEQST t=0.10: F=0.8213  nc=27  t=12.64s
-  tSEEQST t=1/√m=0.023: F=0.9819  nc=119  t=55.34s
+  Standard: F=0.9826  nc=342  t=68.62s
+  SEEQST:   F=0.9852  nc=127  t=60.27s
+  tSEEQST t=0.02: F=0.9797  nc=119  t=56.08s
+  tSEEQST t=0.05: F=0.9757  nc=109  t=52.99s
+  tSEEQST t=0.10: F=0.8129  nc=27  t=11.83s
+  tSEEQST t=1/sqrt(m)=0.023: F=0.9740  nc=119  t=56.03s
 
 [76/197] shots=1975
-  Standard: F=0.9785  nc=342  t=67.82s
-  SEEQST:   F=0.9828  nc=127  t=59.59s
-  tSEEQST t=0.02: F=0.9794  nc=119  t=55.45s
-  tSEEQST t=0.05: F=0.9770  nc=109  t=53.12s
-  tSEEQST t=0.10: F=0.8462  nc=27  t=12.94s
-  tSEEQST t=1/√m=0.023: F=0.9832  nc=119  t=55.36s
+  Standard: F=0.9814  nc=342  t=68.51s
+  SEEQST:   F=0.9802  nc=127  t=60.53s
+  tSEEQST t=0.02: F=0.9807  nc=119  t=55.69s
+  tSEEQST t=0.05: F=0.9665  nc=109  t=48.53s
+  tSEEQST t=0.10: F=0.7961  nc=27  t=10.46s
+  tSEEQST t=1/sqrt(m)=0.023: F=0.9840  nc=119  t=55.62s
 
 [77/197] shots=2000
-  Standard: F=0.9833  nc=342  t=67.59s
-  SEEQST:   F=0.9796  nc=127  t=60.14s
-  tSEEQST t=0.02: F=0.9807  nc=119  t=55.29s
-  tSEEQST t=0.05: F=0.9705  nc=109  t=45.86s
-  tSEEQST t=0.10: F=0.8035  nc=27  t=11.45s
-  tSEEQST t=1/√m=0.022: F=0.9829  nc=119  t=55.11s
+  Standard: F=0.9799  nc=342  t=68.30s
+  SEEQST:   F=0.9801  nc=127  t=60.69s
+  tSEEQST t=0.02: F=0.9808  nc=119  t=56.36s
+  tSEEQST t=0.05: F=0.9781  nc=109  t=52.33s
+  tSEEQST t=0.10: F=0.8029  nc=27  t=11.65s
+  tSEEQST t=1/sqrt(m)=0.022: F=0.9833  nc=119  t=56.38s
 
 [78/197] shots=2025
-  Standard: F=0.9817  nc=342  t=67.01s
-  SEEQST:   F=0.9837  nc=127  t=59.79s
-  tSEEQST t=0.02: F=0.9755  nc=119  t=55.34s
-  tSEEQST t=0.05: F=0.9770  nc=109  t=50.74s
-  tSEEQST t=0.10: F=0.8345  nc=27  t=13.19s
-  tSEEQST t=1/√m=0.022: F=0.9824  nc=119  t=55.41s
+  Standard: F=0.9829  nc=342  t=69.28s
+  SEEQST:   F=0.9821  nc=127  t=61.28s
+  tSEEQST t=0.02: F=0.9806  nc=119  t=57.07s
+  tSEEQST t=0.05: F=0.9751  nc=109  t=52.05s
+  tSEEQST t=0.10: F=0.8064  nc=27  t=11.90s
+  tSEEQST t=1/sqrt(m)=0.022: F=0.9834  nc=119  t=55.92s
 
 [79/197] shots=2050
-  Standard: F=0.9828  nc=342  t=68.11s
-  SEEQST:   F=0.9817  nc=127  t=60.04s
-  tSEEQST t=0.02: F=0.9787  nc=119  t=55.60s
-  tSEEQST t=0.05: F=0.9805  nc=109  t=51.04s
-  tSEEQST t=0.10: F=0.7808  nc=27  t=11.91s
-  tSEEQST t=1/√m=0.022: F=0.9820  nc=119  t=55.51s
+  Standard: F=0.9818  nc=342  t=68.28s
+  SEEQST:   F=0.9850  nc=127  t=60.32s
+  tSEEQST t=0.02: F=0.9780  nc=119  t=55.69s
+  tSEEQST t=0.05: F=0.9843  nc=109  t=51.83s
+  tSEEQST t=0.10: F=0.8111  nc=27  t=12.51s
+  tSEEQST t=1/sqrt(m)=0.022: F=0.9804  nc=119  t=55.36s
 
 [80/197] shots=2075
-  Standard: F=0.9804  nc=342  t=67.74s
-  SEEQST:   F=0.9768  nc=127  t=59.59s
-  tSEEQST t=0.02: F=0.9808  nc=119  t=55.32s
-  tSEEQST t=0.05: F=0.9664  nc=109  t=45.79s
-  tSEEQST t=0.10: F=0.8169  nc=27  t=12.43s
-  tSEEQST t=1/√m=0.022: F=0.9833  nc=119  t=55.02s
+  Standard: F=0.9848  nc=342  t=69.21s
+  SEEQST:   F=0.9823  nc=127  t=60.86s
+  tSEEQST t=0.02: F=0.9768  nc=119  t=56.24s
+  tSEEQST t=0.05: F=0.9850  nc=109  t=52.27s
+  tSEEQST t=0.10: F=0.7911  nc=27  t=13.20s
+  tSEEQST t=1/sqrt(m)=0.022: F=0.9812  nc=119  t=56.16s
 
 [81/197] shots=2100
-  Standard: F=0.9819  nc=342  t=67.39s
-  SEEQST:   F=0.9826  nc=127  t=59.60s
-  tSEEQST t=0.02: F=0.9803  nc=119  t=55.79s
-  tSEEQST t=0.05: F=0.9758  nc=109  t=48.80s
-  tSEEQST t=0.10: F=0.8302  nc=27  t=12.43s
-  tSEEQST t=1/√m=0.022: F=0.9839  nc=119  t=54.90s
+  Standard: F=0.9809  nc=342  t=68.27s
+  SEEQST:   F=0.9810  nc=127  t=60.71s
+  tSEEQST t=0.02: F=0.9820  nc=119  t=56.09s
+  tSEEQST t=0.05: F=0.9704  nc=109  t=46.19s
+  tSEEQST t=0.10: F=0.7732  nc=27  t=12.10s
+  tSEEQST t=1/sqrt(m)=0.022: F=0.9841  nc=119  t=55.37s
 
 [82/197] shots=2125
-  Standard: F=0.9852  nc=342  t=67.27s
-  SEEQST:   F=0.9849  nc=127  t=59.77s
-  tSEEQST t=0.02: F=0.9843  nc=119  t=55.68s
-  tSEEQST t=0.05: F=0.9663  nc=109  t=48.49s
-  tSEEQST t=0.10: F=0.8273  nc=27  t=13.16s
-  tSEEQST t=1/√m=0.022: F=0.9849  nc=119  t=54.97s
+  Standard: F=0.9852  nc=342  t=68.50s
+  SEEQST:   F=0.9789  nc=127  t=60.53s
+  tSEEQST t=0.02: F=0.9850  nc=119  t=55.96s
+  tSEEQST t=0.05: F=0.9715  nc=109  t=48.42s
+  tSEEQST t=0.10: F=0.8115  nc=27  t=12.16s
+  tSEEQST t=1/sqrt(m)=0.022: F=0.9811  nc=119  t=55.80s
 
 [83/197] shots=2150
-  Standard: F=0.9837  nc=342  t=67.44s
-  SEEQST:   F=0.9813  nc=127  t=59.79s
-  tSEEQST t=0.02: F=0.9809  nc=119  t=55.37s
-  tSEEQST t=0.05: F=0.9795  nc=109  t=50.49s
-  tSEEQST t=0.10: F=0.8307  nc=27  t=12.47s
-  tSEEQST t=1/√m=0.022: F=0.9844  nc=119  t=54.98s
+  Standard: F=0.9789  nc=342  t=68.72s
+  SEEQST:   F=0.9815  nc=127  t=60.74s
+  tSEEQST t=0.02: F=0.9829  nc=119  t=55.55s
+  tSEEQST t=0.05: F=0.9820  nc=109  t=51.91s
+  tSEEQST t=0.10: F=0.8318  nc=27  t=12.23s
+  tSEEQST t=1/sqrt(m)=0.022: F=0.9825  nc=119  t=55.64s
 
 [84/197] shots=2175
-  Standard: F=0.9809  nc=342  t=67.46s
-  SEEQST:   F=0.9828  nc=127  t=59.67s
-  tSEEQST t=0.02: F=0.9844  nc=119  t=55.25s
-  tSEEQST t=0.05: F=0.9732  nc=109  t=48.90s
-  tSEEQST t=0.10: F=0.8179  nc=27  t=12.48s
-  tSEEQST t=1/√m=0.021: F=0.9850  nc=119  t=55.17s
+  Standard: F=0.9810  nc=342  t=68.59s
+  SEEQST:   F=0.9846  nc=127  t=59.90s
+  tSEEQST t=0.02: F=0.9813  nc=119  t=56.17s
+  tSEEQST t=0.05: F=0.9773  nc=109  t=50.33s
+  tSEEQST t=0.10: F=0.8193  nc=27  t=12.27s
+  tSEEQST t=1/sqrt(m)=0.021: F=0.9817  nc=119  t=55.76s
 
 [85/197] shots=2200
-  Standard: F=0.9818  nc=342  t=67.66s
-  SEEQST:   F=0.9839  nc=127  t=59.40s
-  tSEEQST t=0.02: F=0.9833  nc=119  t=55.59s
-  tSEEQST t=0.05: F=0.9798  nc=109  t=49.79s
-  tSEEQST t=0.10: F=0.8152  nc=27  t=12.52s
-  tSEEQST t=1/√m=0.021: F=0.9842  nc=119  t=55.09s
+  Standard: F=0.9835  nc=342  t=68.22s
+  SEEQST:   F=0.9811  nc=127  t=60.46s
+  tSEEQST t=0.02: F=0.9842  nc=119  t=55.40s
+  tSEEQST t=0.05: F=0.9785  nc=109  t=48.21s
+  tSEEQST t=0.10: F=0.7677  nc=27  t=10.07s
+  tSEEQST t=1/sqrt(m)=0.021: F=0.9870  nc=119  t=55.53s
 
 [86/197] shots=2225
-  Standard: F=0.9852  nc=342  t=68.09s
-  SEEQST:   F=0.9827  nc=127  t=59.96s
-  tSEEQST t=0.02: F=0.9815  nc=119  t=55.54s
-  tSEEQST t=0.05: F=0.9813  nc=109  t=51.87s
-  tSEEQST t=0.10: F=0.7930  nc=27  t=11.91s
-  tSEEQST t=1/√m=0.021: F=0.9791  nc=119  t=55.48s
+  Standard: F=0.9816  nc=342  t=68.47s
+  SEEQST:   F=0.9833  nc=127  t=59.47s
+  tSEEQST t=0.02: F=0.9851  nc=119  t=55.16s
+  tSEEQST t=0.05: F=0.9688  nc=109  t=47.94s
+  tSEEQST t=0.10: F=0.7610  nc=27  t=9.39s
+  tSEEQST t=1/sqrt(m)=0.021: F=0.9790  nc=119  t=55.03s
 
 [87/197] shots=2250
-  Standard: F=0.9842  nc=342  t=67.94s
-  SEEQST:   F=0.9836  nc=127  t=59.64s
-  tSEEQST t=0.02: F=0.9834  nc=119  t=55.36s
-  tSEEQST t=0.05: F=0.9653  nc=109  t=48.18s
-  tSEEQST t=0.10: F=0.8468  nc=27  t=11.53s
-  tSEEQST t=1/√m=0.021: F=0.9820  nc=119  t=55.15s
+  Standard: F=0.9834  nc=342  t=67.68s
+  SEEQST:   F=0.9827  nc=127  t=60.64s
+  tSEEQST t=0.02: F=0.9803  nc=119  t=55.53s
+  tSEEQST t=0.05: F=0.9773  nc=109  t=51.87s
+  tSEEQST t=0.10: F=0.8279  nc=27  t=14.23s
+  tSEEQST t=1/sqrt(m)=0.021: F=0.9852  nc=119  t=56.16s
 
 [88/197] shots=2275
-  Standard: F=0.9846  nc=342  t=67.57s
-  SEEQST:   F=0.9802  nc=127  t=60.02s
-  tSEEQST t=0.02: F=0.9825  nc=119  t=55.47s
-  tSEEQST t=0.05: F=0.9759  nc=109  t=50.87s
-  tSEEQST t=0.10: F=0.8124  nc=27  t=11.13s
-  tSEEQST t=1/√m=0.021: F=0.9832  nc=119  t=55.23s
+  Standard: F=0.9833  nc=342  t=67.87s
+  SEEQST:   F=0.9819  nc=127  t=60.10s
+  tSEEQST t=0.02: F=0.9806  nc=119  t=55.47s
+  tSEEQST t=0.05: F=0.9805  nc=109  t=51.72s
+  tSEEQST t=0.10: F=0.8165  nc=27  t=11.53s
+  tSEEQST t=1/sqrt(m)=0.021: F=0.9825  nc=119  t=55.41s
 
 [89/197] shots=2300
-  Standard: F=0.9829  nc=342  t=67.47s
-  SEEQST:   F=0.9847  nc=127  t=59.68s
-  tSEEQST t=0.02: F=0.9797  nc=119  t=55.55s
-  tSEEQST t=0.05: F=0.9747  nc=109  t=50.02s
-  tSEEQST t=0.10: F=0.8037  nc=27  t=11.55s
-  tSEEQST t=1/√m=0.021: F=0.9780  nc=119  t=55.67s
+  Standard: F=0.9832  nc=342  t=67.93s
+  SEEQST:   F=0.9775  nc=127  t=59.73s
+  tSEEQST t=0.02: F=0.9839  nc=119  t=56.27s
+  tSEEQST t=0.05: F=0.9780  nc=109  t=50.53s
+  tSEEQST t=0.10: F=0.8252  nc=27  t=12.96s
+  tSEEQST t=1/sqrt(m)=0.021: F=0.9757  nc=119  t=55.79s
 
 [90/197] shots=2325
-  Standard: F=0.9876  nc=342  t=67.47s
-  SEEQST:   F=0.9806  nc=127  t=60.11s
-  tSEEQST t=0.02: F=0.9844  nc=119  t=55.23s
-  tSEEQST t=0.05: F=0.9701  nc=109  t=48.23s
-  tSEEQST t=0.10: F=0.8506  nc=27  t=12.58s
-  tSEEQST t=1/√m=0.021: F=0.9830  nc=119  t=55.28s
+  Standard: F=0.9841  nc=342  t=68.01s
+  SEEQST:   F=0.9827  nc=127  t=60.26s
+  tSEEQST t=0.02: F=0.9847  nc=119  t=56.12s
+  tSEEQST t=0.05: F=0.9802  nc=109  t=53.28s
+  tSEEQST t=0.10: F=0.8015  nc=27  t=12.62s
+  tSEEQST t=1/sqrt(m)=0.021: F=0.9823  nc=119  t=56.30s
 
 [91/197] shots=2350
-  Standard: F=0.9828  nc=342  t=67.88s
-  SEEQST:   F=0.9848  nc=127  t=59.93s
-  tSEEQST t=0.02: F=0.9838  nc=119  t=55.80s
-  tSEEQST t=0.05: F=0.9788  nc=109  t=50.08s
-  tSEEQST t=0.10: F=0.8196  nc=27  t=12.62s
-  tSEEQST t=1/√m=0.021: F=0.9824  nc=119  t=55.68s
+  Standard: F=0.9827  nc=342  t=69.21s
+  SEEQST:   F=0.9808  nc=127  t=60.49s
+  tSEEQST t=0.02: F=0.9861  nc=119  t=56.31s
+  tSEEQST t=0.05: F=0.9794  nc=109  t=50.30s
+  tSEEQST t=0.10: F=0.8280  nc=27  t=13.72s
+  tSEEQST t=1/sqrt(m)=0.021: F=0.9819  nc=119  t=55.84s
 
 [92/197] shots=2375
-  Standard: F=0.9826  nc=342  t=68.41s
-  SEEQST:   F=0.9820  nc=127  t=59.72s
-  tSEEQST t=0.02: F=0.9836  nc=119  t=55.27s
-  tSEEQST t=0.05: F=0.9807  nc=109  t=52.35s
-  tSEEQST t=0.10: F=0.7895  nc=27  t=11.55s
-  tSEEQST t=1/√m=0.021: F=0.9802  nc=119  t=55.35s
+  Standard: F=0.9872  nc=342  t=68.87s
+  SEEQST:   F=0.9822  nc=127  t=60.97s
+  tSEEQST t=0.02: F=0.9812  nc=119  t=56.02s
+  tSEEQST t=0.05: F=0.9768  nc=109  t=51.27s
+  tSEEQST t=0.10: F=0.8309  nc=27  t=12.60s
+  tSEEQST t=1/sqrt(m)=0.021: F=0.9807  nc=119  t=55.82s
 
 [93/197] shots=2400
-  Standard: F=0.9763  nc=342  t=67.57s
-  SEEQST:   F=0.9877  nc=127  t=59.86s
-  tSEEQST t=0.02: F=0.9835  nc=119  t=55.42s
-  tSEEQST t=0.05: F=0.9792  nc=109  t=50.09s
-  tSEEQST t=0.10: F=0.8040  nc=27  t=11.46s
-  tSEEQST t=1/√m=0.020: F=0.9847  nc=119  t=55.25s
+  Standard: F=0.9849  nc=342  t=68.45s
+  SEEQST:   F=0.9834  nc=127  t=60.92s
+  tSEEQST t=0.02: F=0.9815  nc=119  t=56.24s
+  tSEEQST t=0.05: F=0.9802  nc=109  t=48.89s
+  tSEEQST t=0.10: F=0.7823  nc=27  t=12.50s
+  tSEEQST t=1/sqrt(m)=0.020: F=0.9847  nc=119  t=55.80s
 
 [94/197] shots=2425
-  Standard: F=0.9847  nc=342  t=67.81s
-  SEEQST:   F=0.9819  nc=127  t=59.75s
-  tSEEQST t=0.02: F=0.9818  nc=119  t=55.51s
-  tSEEQST t=0.05: F=0.9803  nc=109  t=50.11s
-  tSEEQST t=0.10: F=0.8000  nc=27  t=11.93s
-  tSEEQST t=1/√m=0.020: F=0.9818  nc=119  t=55.38s
+  Standard: F=0.9875  nc=342  t=68.44s
+  SEEQST:   F=0.9828  nc=127  t=60.79s
+  tSEEQST t=0.02: F=0.9848  nc=119  t=55.81s
+  tSEEQST t=0.05: F=0.9781  nc=109  t=50.21s
+  tSEEQST t=0.10: F=0.8255  nc=27  t=12.56s
+  tSEEQST t=1/sqrt(m)=0.020: F=0.9823  nc=119  t=55.59s
 
 [95/197] shots=2450
-  Standard: F=0.9846  nc=342  t=68.22s
-  SEEQST:   F=0.9807  nc=127  t=59.53s
-  tSEEQST t=0.02: F=0.9849  nc=119  t=55.44s
-  tSEEQST t=0.05: F=0.9790  nc=109  t=48.33s
-  tSEEQST t=0.10: F=0.8272  nc=27  t=11.86s
-  tSEEQST t=1/√m=0.020: F=0.9835  nc=119  t=55.16s
+  Standard: F=0.9883  nc=342  t=68.20s
+  SEEQST:   F=0.9824  nc=127  t=60.41s
+  tSEEQST t=0.02: F=0.9833  nc=119  t=56.21s
+  tSEEQST t=0.05: F=0.9731  nc=109  t=46.68s
+  tSEEQST t=0.10: F=0.7616  nc=27  t=12.53s
+  tSEEQST t=1/sqrt(m)=0.020: F=0.9862  nc=119  t=55.56s
 
 [96/197] shots=2475
-  Standard: F=0.9854  nc=342  t=67.86s
-  SEEQST:   F=0.9851  nc=127  t=59.54s
-  tSEEQST t=0.02: F=0.9851  nc=119  t=55.33s
-  tSEEQST t=0.05: F=0.9795  nc=109  t=51.54s
-  tSEEQST t=0.10: F=0.8120  nc=27  t=14.40s
-  tSEEQST t=1/√m=0.020: F=0.9855  nc=119  t=55.34s
+  Standard: F=0.9854  nc=342  t=68.48s
+  SEEQST:   F=0.9842  nc=127  t=60.12s
+  tSEEQST t=0.02: F=0.9830  nc=119  t=55.76s
+  tSEEQST t=0.05: F=0.9778  nc=109  t=50.06s
+  tSEEQST t=0.10: F=0.8072  nc=27  t=11.87s
+  tSEEQST t=1/sqrt(m)=0.020: F=0.9854  nc=119  t=55.75s
 
 [97/197] shots=2500
-  Standard: F=0.9859  nc=342  t=68.01s
-  SEEQST:   F=0.9832  nc=127  t=59.80s
-  tSEEQST t=0.02: F=0.9839  nc=119  t=55.37s
-  tSEEQST t=0.05: F=0.9833  nc=109  t=52.58s
-  tSEEQST t=0.10: F=0.8353  nc=27  t=12.89s
-  tSEEQST t=1/√m=0.020: F=0.9829  nc=119  t=55.25s
+  Standard: F=0.9795  nc=342  t=68.83s
+  SEEQST:   F=0.9877  nc=127  t=60.31s
+  tSEEQST t=0.02: F=0.9888  nc=119  t=55.37s
+  tSEEQST t=0.05: F=0.9774  nc=109  t=50.04s
+  tSEEQST t=0.10: F=0.8311  nc=27  t=13.64s
+  tSEEQST t=1/sqrt(m)=0.020: F=0.9865  nc=119  t=55.50s
 
 [98/197] shots=2525
-  Standard: F=0.9860  nc=342  t=67.72s
-  SEEQST:   F=0.9863  nc=127  t=59.76s
-  tSEEQST t=0.02: F=0.9829  nc=119  t=55.49s
-  tSEEQST t=0.05: F=0.9808  nc=109  t=51.18s
-  tSEEQST t=0.10: F=0.8373  nc=27  t=12.91s
-  tSEEQST t=1/√m=0.020: F=0.9819  nc=119  t=55.61s
+  Standard: F=0.9866  nc=342  t=67.79s
+  SEEQST:   F=0.9866  nc=127  t=59.91s
+  tSEEQST t=0.02: F=0.9810  nc=119  t=55.42s
+  tSEEQST t=0.05: F=0.9850  nc=109  t=51.00s
+  tSEEQST t=0.10: F=0.8075  nc=27  t=11.10s
+  tSEEQST t=1/sqrt(m)=0.020: F=0.9847  nc=119  t=55.08s
 
 [99/197] shots=2550
-  Standard: F=0.9834  nc=342  t=67.96s
-  SEEQST:   F=0.9863  nc=127  t=59.78s
-  tSEEQST t=0.02: F=0.9821  nc=119  t=55.72s
-  tSEEQST t=0.05: F=0.9716  nc=109  t=46.70s
-  tSEEQST t=0.10: F=0.8091  nc=27  t=12.30s
-  tSEEQST t=1/√m=0.020: F=0.9859  nc=119  t=55.85s
+  Standard: F=0.9873  nc=342  t=67.66s
+  SEEQST:   F=0.9873  nc=127  t=60.29s
+  tSEEQST t=0.02: F=0.9849  nc=119  t=56.07s
+  tSEEQST t=0.05: F=0.9838  nc=109  t=50.48s
+  tSEEQST t=0.10: F=0.8021  nc=27  t=10.94s
+  tSEEQST t=1/sqrt(m)=0.020: F=0.9832  nc=119  t=55.86s
 
 [100/197] shots=2575
-  Standard: F=0.9813  nc=342  t=68.20s
-  SEEQST:   F=0.9831  nc=127  t=59.72s
-  tSEEQST t=0.02: F=0.9866  nc=119  t=55.21s
-  tSEEQST t=0.05: F=0.9843  nc=109  t=52.34s
-  tSEEQST t=0.10: F=0.8047  nc=27  t=12.18s
-  tSEEQST t=1/√m=0.020: F=0.9785  nc=119  t=55.19s
+  Standard: F=0.9860  nc=342  t=68.24s
+  SEEQST:   F=0.9834  nc=127  t=60.03s
+  tSEEQST t=0.02: F=0.9803  nc=119  t=55.87s
+  tSEEQST t=0.05: F=0.9842  nc=109  t=52.64s
+  tSEEQST t=0.10: F=0.7956  nc=27  t=11.87s
+  tSEEQST t=1/sqrt(m)=0.020: F=0.9858  nc=119  t=55.71s
 
 [101/197] shots=2600
-  Standard: F=0.9847  nc=342  t=67.50s
-  SEEQST:   F=0.9862  nc=127  t=59.79s
-  tSEEQST t=0.02: F=0.9895  nc=119  t=55.59s
-  tSEEQST t=0.05: F=0.9853  nc=109  t=52.73s
-  tSEEQST t=0.10: F=0.8059  nc=27  t=11.44s
-  tSEEQST t=1/√m=0.020: F=0.9863  nc=119  t=55.11s
+  Standard: F=0.9872  nc=342  t=68.57s
+  SEEQST:   F=0.9838  nc=127  t=59.93s
+  tSEEQST t=0.02: F=0.9834  nc=119  t=55.63s
+  tSEEQST t=0.05: F=0.9730  nc=109  t=48.29s
+  tSEEQST t=0.10: F=0.8180  nc=27  t=12.20s
+  tSEEQST t=1/sqrt(m)=0.020: F=0.9840  nc=119  t=55.79s
 
 [102/197] shots=2625
-  Standard: F=0.9878  nc=342  t=67.49s
-  SEEQST:   F=0.9842  nc=127  t=59.83s
-  tSEEQST t=0.02: F=0.9859  nc=119  t=55.31s
-  tSEEQST t=0.05: F=0.9788  nc=109  t=49.95s
-  tSEEQST t=0.10: F=0.7980  nc=27  t=11.51s
-  tSEEQST t=1/√m=0.020: F=0.9828  nc=119  t=55.33s
+  Standard: F=0.9883  nc=342  t=68.33s
+  SEEQST:   F=0.9823  nc=127  t=60.67s
+  tSEEQST t=0.02: F=0.9849  nc=119  t=56.16s
+  tSEEQST t=0.05: F=0.9774  nc=109  t=48.63s
+  tSEEQST t=0.10: F=0.8205  nc=27  t=11.85s
+  tSEEQST t=1/sqrt(m)=0.020: F=0.9837  nc=119  t=55.96s
 
 [103/197] shots=2650
-  Standard: F=0.9875  nc=342  t=68.07s
-  SEEQST:   F=0.9866  nc=127  t=60.04s
-  tSEEQST t=0.02: F=0.9852  nc=119  t=55.50s
-  tSEEQST t=0.05: F=0.9830  nc=109  t=51.68s
-  tSEEQST t=0.10: F=0.8068  nc=27  t=13.01s
-  tSEEQST t=1/√m=0.019: F=0.9857  nc=119  t=55.62s
+  Standard: F=0.9882  nc=342  t=68.35s
+  SEEQST:   F=0.9879  nc=127  t=60.31s
+  tSEEQST t=0.02: F=0.9860  nc=119  t=56.10s
+  tSEEQST t=0.05: F=0.9807  nc=109  t=50.46s
+  tSEEQST t=0.10: F=0.8075  nc=27  t=13.29s
+  tSEEQST t=1/sqrt(m)=0.019: F=0.9851  nc=119  t=56.00s
 
 [104/197] shots=2675
-  Standard: F=0.9832  nc=342  t=68.02s
-  SEEQST:   F=0.9863  nc=127  t=60.03s
-  tSEEQST t=0.02: F=0.9873  nc=119  t=55.50s
-  tSEEQST t=0.05: F=0.9829  nc=109  t=52.49s
-  tSEEQST t=0.10: F=0.8023  nc=27  t=11.93s
-  tSEEQST t=1/√m=0.019: F=0.9829  nc=119  t=55.51s
+  Standard: F=0.9816  nc=342  t=68.94s
+  SEEQST:   F=0.9845  nc=127  t=60.49s
+  tSEEQST t=0.02: F=0.9855  nc=119  t=56.11s
+  tSEEQST t=0.05: F=0.9771  nc=109  t=50.63s
+  tSEEQST t=0.10: F=0.8199  nc=27  t=12.64s
+  tSEEQST t=1/sqrt(m)=0.019: F=0.9821  nc=119  t=55.99s
 
 [105/197] shots=2700
-  Standard: F=0.9850  nc=342  t=68.01s
-  SEEQST:   F=0.9861  nc=127  t=59.89s
-  tSEEQST t=0.02: F=0.9851  nc=119  t=55.39s
-  tSEEQST t=0.05: F=0.9733  nc=109  t=49.54s
-  tSEEQST t=0.10: F=0.8464  nc=27  t=10.84s
-  tSEEQST t=1/√m=0.019: F=0.9841  nc=119  t=55.35s
+  Standard: F=0.9865  nc=342  t=68.44s
+  SEEQST:   F=0.9877  nc=127  t=60.36s
+  tSEEQST t=0.02: F=0.9866  nc=119  t=55.50s
+  tSEEQST t=0.05: F=0.9792  nc=109  t=49.58s
+  tSEEQST t=0.10: F=0.8176  nc=27  t=11.45s
+  tSEEQST t=1/sqrt(m)=0.019: F=0.9840  nc=119  t=55.28s
 
 [106/197] shots=2725
-  Standard: F=0.9868  nc=342  t=67.93s
-  SEEQST:   F=0.9856  nc=127  t=59.64s
-  tSEEQST t=0.02: F=0.9863  nc=119  t=55.24s
-  tSEEQST t=0.05: F=0.9806  nc=109  t=49.87s
-  tSEEQST t=0.10: F=0.8136  nc=27  t=11.54s
-  tSEEQST t=1/√m=0.019: F=0.9845  nc=119  t=55.38s
+  Standard: F=0.9862  nc=342  t=68.15s
+  SEEQST:   F=0.9874  nc=127  t=60.18s
+  tSEEQST t=0.02: F=0.9846  nc=119  t=55.69s
+  tSEEQST t=0.05: F=0.9825  nc=109  t=52.11s
+  tSEEQST t=0.10: F=0.8474  nc=27  t=13.28s
+  tSEEQST t=1/sqrt(m)=0.019: F=0.9841  nc=119  t=55.91s
 
 [107/197] shots=2750
-  Standard: F=0.9874  nc=342  t=67.42s
-  SEEQST:   F=0.9849  nc=127  t=59.97s
-  tSEEQST t=0.02: F=0.9863  nc=119  t=55.29s
-  tSEEQST t=0.05: F=0.9821  nc=109  t=49.87s
-  tSEEQST t=0.10: F=0.8125  nc=27  t=11.85s
-  tSEEQST t=1/√m=0.019: F=0.9858  nc=119  t=55.27s
+  Standard: F=0.9861  nc=342  t=68.84s
+  SEEQST:   F=0.9833  nc=127  t=60.67s
+  tSEEQST t=0.02: F=0.9851  nc=119  t=56.66s
+  tSEEQST t=0.05: F=0.9789  nc=109  t=52.14s
+  tSEEQST t=0.10: F=0.8567  nc=27  t=12.89s
+  tSEEQST t=1/sqrt(m)=0.019: F=0.9854  nc=119  t=55.57s
 
 [108/197] shots=2775
-  Standard: F=0.9867  nc=342  t=67.43s
-  SEEQST:   F=0.9850  nc=127  t=59.76s
-  tSEEQST t=0.02: F=0.9831  nc=119  t=55.52s
-  tSEEQST t=0.05: F=0.9747  nc=109  t=44.11s
-  tSEEQST t=0.10: F=0.7876  nc=27  t=12.70s
-  tSEEQST t=1/√m=0.019: F=0.9848  nc=119  t=55.42s
+  Standard: F=0.9869  nc=342  t=68.14s
+  SEEQST:   F=0.9847  nc=127  t=60.59s
+  tSEEQST t=0.02: F=0.9848  nc=119  t=55.98s
+  tSEEQST t=0.05: F=0.9834  nc=109  t=50.91s
+  tSEEQST t=0.10: F=0.7981  nc=27  t=11.54s
+  tSEEQST t=1/sqrt(m)=0.019: F=0.9874  nc=119  t=55.61s
 
 [109/197] shots=2800
-  Standard: F=0.9865  nc=342  t=67.49s
-  SEEQST:   F=0.9859  nc=127  t=60.12s
-  tSEEQST t=0.02: F=0.9852  nc=119  t=55.17s
-  tSEEQST t=0.05: F=0.9808  nc=109  t=51.57s
-  tSEEQST t=0.10: F=0.7930  nc=27  t=11.47s
-  tSEEQST t=1/√m=0.019: F=0.9864  nc=119  t=55.15s
+  Standard: F=0.9877  nc=342  t=68.26s
+  SEEQST:   F=0.9806  nc=127  t=60.35s
+  tSEEQST t=0.02: F=0.9829  nc=119  t=56.09s
+  tSEEQST t=0.05: F=0.9786  nc=109  t=50.10s
+  tSEEQST t=0.10: F=0.8099  nc=27  t=12.54s
+  tSEEQST t=1/sqrt(m)=0.019: F=0.9848  nc=119  t=55.37s
 
 [110/197] shots=2825
-  Standard: F=0.9869  nc=342  t=67.66s
-  SEEQST:   F=0.9841  nc=127  t=60.09s
-  tSEEQST t=0.02: F=0.9820  nc=119  t=55.72s
-  tSEEQST t=0.05: F=0.9847  nc=109  t=51.56s
-  tSEEQST t=0.10: F=0.8544  nc=27  t=13.62s
-  tSEEQST t=1/√m=0.019: F=0.9841  nc=119  t=55.68s
+  Standard: F=0.9854  nc=342  t=67.68s
+  SEEQST:   F=0.9833  nc=127  t=60.15s
+  tSEEQST t=0.02: F=0.9882  nc=119  t=55.81s
+  tSEEQST t=0.05: F=0.9712  nc=109  t=47.27s
+  tSEEQST t=0.10: F=0.8156  nc=27  t=12.47s
+  tSEEQST t=1/sqrt(m)=0.019: F=0.9861  nc=119  t=55.39s
 
 [111/197] shots=2850
-  Standard: F=0.9861  nc=342  t=68.07s
-  SEEQST:   F=0.9843  nc=127  t=59.98s
-  tSEEQST t=0.02: F=0.9869  nc=119  t=55.66s
-  tSEEQST t=0.05: F=0.9846  nc=109  t=51.93s
-  tSEEQST t=0.10: F=0.7657  nc=27  t=10.48s
-  tSEEQST t=1/√m=0.019: F=0.9840  nc=119  t=55.70s
+  Standard: F=0.9892  nc=342  t=68.14s
+  SEEQST:   F=0.9827  nc=127  t=60.56s
+  tSEEQST t=0.02: F=0.9872  nc=119  t=55.81s
+  tSEEQST t=0.05: F=0.9837  nc=109  t=52.93s
+  tSEEQST t=0.10: F=0.8302  nc=27  t=11.83s
+  tSEEQST t=1/sqrt(m)=0.019: F=0.9872  nc=119  t=56.01s
 
 [112/197] shots=2875
-  Standard: F=0.9875  nc=342  t=68.09s
-  SEEQST:   F=0.9846  nc=127  t=60.03s
-  tSEEQST t=0.02: F=0.9838  nc=119  t=55.36s
-  tSEEQST t=0.05: F=0.9798  nc=109  t=48.15s
-  tSEEQST t=0.10: F=0.8408  nc=27  t=12.24s
-  tSEEQST t=1/√m=0.019: F=0.9875  nc=119  t=55.24s
+  Standard: F=0.9892  nc=342  t=68.40s
+  SEEQST:   F=0.9896  nc=127  t=60.43s
+  tSEEQST t=0.02: F=0.9894  nc=119  t=55.98s
+  tSEEQST t=0.05: F=0.9853  nc=109  t=51.14s
+  tSEEQST t=0.10: F=0.7841  nc=27  t=10.50s
+  tSEEQST t=1/sqrt(m)=0.019: F=0.9832  nc=119  t=55.59s
 
 [113/197] shots=2900
-  Standard: F=0.9869  nc=342  t=68.11s
-  SEEQST:   F=0.9872  nc=127  t=59.81s
-  tSEEQST t=0.02: F=0.9851  nc=119  t=55.41s
-  tSEEQST t=0.05: F=0.9782  nc=109  t=49.21s
-  tSEEQST t=0.10: F=0.8269  nc=27  t=12.90s
-  tSEEQST t=1/√m=0.019: F=0.9864  nc=119  t=55.51s
+  Standard: F=0.9885  nc=342  t=68.22s
+  SEEQST:   F=0.9858  nc=127  t=59.86s
+  tSEEQST t=0.02: F=0.9820  nc=119  t=55.70s
+  tSEEQST t=0.05: F=0.9872  nc=109  t=53.07s
+  tSEEQST t=0.10: F=0.7952  nc=27  t=11.97s
+  tSEEQST t=1/sqrt(m)=0.019: F=0.9862  nc=119  t=55.97s
 
 [114/197] shots=2925
-  Standard: F=0.9855  nc=342  t=68.12s
-  SEEQST:   F=0.9865  nc=127  t=59.76s
-  tSEEQST t=0.02: F=0.9837  nc=119  t=55.40s
-  tSEEQST t=0.05: F=0.9736  nc=109  t=48.14s
-  tSEEQST t=0.10: F=0.8563  nc=27  t=14.33s
-  tSEEQST t=1/√m=0.018: F=0.9848  nc=119  t=55.19s
+  Standard: F=0.9875  nc=342  t=68.14s
+  SEEQST:   F=0.9860  nc=127  t=60.20s
+  tSEEQST t=0.02: F=0.9866  nc=119  t=55.44s
+  tSEEQST t=0.05: F=0.9827  nc=109  t=50.26s
+  tSEEQST t=0.10: F=0.8052  nc=27  t=12.70s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9833  nc=119  t=55.51s
 
 [115/197] shots=2950
-  Standard: F=0.9893  nc=342  t=67.73s
-  SEEQST:   F=0.9854  nc=127  t=60.22s
-  tSEEQST t=0.02: F=0.9890  nc=119  t=55.34s
-  tSEEQST t=0.05: F=0.9805  nc=109  t=48.06s
-  tSEEQST t=0.10: F=0.8090  nc=27  t=11.86s
-  tSEEQST t=1/√m=0.018: F=0.9880  nc=119  t=55.67s
+  Standard: F=0.9870  nc=342  t=68.65s
+  SEEQST:   F=0.9877  nc=127  t=60.83s
+  tSEEQST t=0.02: F=0.9837  nc=119  t=55.91s
+  tSEEQST t=0.05: F=0.9846  nc=109  t=50.13s
+  tSEEQST t=0.10: F=0.8252  nc=27  t=12.54s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9852  nc=119  t=55.78s
 
 [116/197] shots=2975
-  Standard: F=0.9878  nc=342  t=67.77s
-  SEEQST:   F=0.9891  nc=127  t=60.12s
-  tSEEQST t=0.02: F=0.9853  nc=119  t=55.63s
-  tSEEQST t=0.05: F=0.9778  nc=109  t=50.14s
-  tSEEQST t=0.10: F=0.8046  nc=27  t=11.91s
-  tSEEQST t=1/√m=0.018: F=0.9852  nc=119  t=55.41s
+  Standard: F=0.9884  nc=342  t=68.61s
+  SEEQST:   F=0.9858  nc=127  t=60.24s
+  tSEEQST t=0.02: F=0.9862  nc=119  t=55.94s
+  tSEEQST t=0.05: F=0.9776  nc=109  t=48.70s
+  tSEEQST t=0.10: F=0.7924  nc=27  t=12.66s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9874  nc=119  t=55.87s
 
 [117/197] shots=3000
-  Standard: F=0.9869  nc=342  t=68.07s
-  SEEQST:   F=0.9859  nc=127  t=59.83s
-  tSEEQST t=0.02: F=0.9867  nc=119  t=55.43s
-  tSEEQST t=0.05: F=0.9848  nc=109  t=51.43s
-  tSEEQST t=0.10: F=0.7891  nc=27  t=12.51s
-  tSEEQST t=1/√m=0.018: F=0.9863  nc=119  t=55.19s
+  Standard: F=0.9879  nc=342  t=68.67s
+  SEEQST:   F=0.9861  nc=127  t=60.74s
+  tSEEQST t=0.02: F=0.9866  nc=119  t=56.47s
+  tSEEQST t=0.05: F=0.9834  nc=109  t=54.12s
+  tSEEQST t=0.10: F=0.8353  nc=27  t=11.39s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9828  nc=119  t=55.76s
 
 [118/197] shots=3025
-  Standard: F=0.9863  nc=342  t=67.98s
-  SEEQST:   F=0.9859  nc=127  t=59.44s
-  tSEEQST t=0.02: F=0.9862  nc=119  t=55.31s
-  tSEEQST t=0.05: F=0.9801  nc=109  t=49.88s
-  tSEEQST t=0.10: F=0.8574  nc=27  t=13.98s
-  tSEEQST t=1/√m=0.018: F=0.9862  nc=119  t=55.03s
+  Standard: F=0.9858  nc=342  t=68.63s
+  SEEQST:   F=0.9904  nc=127  t=60.38s
+  tSEEQST t=0.02: F=0.9878  nc=119  t=55.84s
+  tSEEQST t=0.05: F=0.9803  nc=109  t=50.32s
+  tSEEQST t=0.10: F=0.8062  nc=27  t=11.62s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9880  nc=119  t=56.15s
 
 [119/197] shots=3050
-  Standard: F=0.9873  nc=342  t=67.44s
-  SEEQST:   F=0.9864  nc=127  t=60.11s
-  tSEEQST t=0.02: F=0.9869  nc=119  t=55.30s
-  tSEEQST t=0.05: F=0.9808  nc=109  t=49.84s
-  tSEEQST t=0.10: F=0.8420  nc=27  t=12.52s
-  tSEEQST t=1/√m=0.018: F=0.9870  nc=119  t=55.20s
+  Standard: F=0.9879  nc=342  t=69.03s
+  SEEQST:   F=0.9874  nc=127  t=60.82s
+  tSEEQST t=0.02: F=0.9892  nc=119  t=56.14s
+  tSEEQST t=0.05: F=0.9872  nc=109  t=52.10s
+  tSEEQST t=0.10: F=0.8100  nc=27  t=11.56s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9874  nc=119  t=55.93s
 
 [120/197] shots=3075
-  Standard: F=0.9875  nc=342  t=67.36s
-  SEEQST:   F=0.9863  nc=127  t=59.48s
-  tSEEQST t=0.02: F=0.9857  nc=119  t=55.32s
-  tSEEQST t=0.05: F=0.9826  nc=109  t=51.54s
-  tSEEQST t=0.10: F=0.7992  nc=27  t=11.86s
-  tSEEQST t=1/√m=0.018: F=0.9863  nc=119  t=55.11s
+  Standard: F=0.9866  nc=342  t=69.29s
+  SEEQST:   F=0.9880  nc=127  t=60.38s
+  tSEEQST t=0.02: F=0.9893  nc=119  t=56.31s
+  tSEEQST t=0.05: F=0.9848  nc=109  t=53.21s
+  tSEEQST t=0.10: F=0.8236  nc=27  t=11.55s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9889  nc=119  t=55.87s
 
 [121/197] shots=3100
-  Standard: F=0.9866  nc=342  t=67.77s
-  SEEQST:   F=0.9866  nc=127  t=59.96s
-  tSEEQST t=0.02: F=0.9865  nc=119  t=55.63s
-  tSEEQST t=0.05: F=0.9811  nc=109  t=51.18s
-  tSEEQST t=0.10: F=0.8264  nc=27  t=12.68s
-  tSEEQST t=1/√m=0.018: F=0.9895  nc=119  t=55.60s
+  Standard: F=0.9905  nc=342  t=68.27s
+  SEEQST:   F=0.9882  nc=127  t=60.84s
+  tSEEQST t=0.02: F=0.9877  nc=119  t=55.49s
+  tSEEQST t=0.05: F=0.9830  nc=109  t=50.87s
+  tSEEQST t=0.10: F=0.7973  nc=27  t=12.79s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9878  nc=119  t=55.54s
 
 [122/197] shots=3125
-  Standard: F=0.9896  nc=342  t=68.23s
-  SEEQST:   F=0.9866  nc=127  t=59.79s
-  tSEEQST t=0.02: F=0.9864  nc=119  t=55.54s
-  tSEEQST t=0.05: F=0.9776  nc=109  t=45.87s
-  tSEEQST t=0.10: F=0.8220  nc=27  t=11.60s
-  tSEEQST t=1/√m=0.018: F=0.9886  nc=119  t=55.60s
+  Standard: F=0.9841  nc=342  t=68.25s
+  SEEQST:   F=0.9874  nc=127  t=60.38s
+  tSEEQST t=0.02: F=0.9860  nc=119  t=56.13s
+  tSEEQST t=0.05: F=0.9781  nc=109  t=50.41s
+  tSEEQST t=0.10: F=0.8205  nc=27  t=12.59s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9879  nc=119  t=56.00s
 
 [123/197] shots=3150
-  Standard: F=0.9893  nc=342  t=68.11s
-  SEEQST:   F=0.9878  nc=127  t=60.10s
-  tSEEQST t=0.02: F=0.9864  nc=119  t=55.66s
-  tSEEQST t=0.05: F=0.9824  nc=109  t=50.17s
-  tSEEQST t=0.10: F=0.8257  nc=27  t=12.65s
-  tSEEQST t=1/√m=0.018: F=0.9839  nc=119  t=55.65s
+  Standard: F=0.9886  nc=342  t=68.42s
+  SEEQST:   F=0.9879  nc=127  t=60.50s
+  tSEEQST t=0.02: F=0.9875  nc=119  t=55.46s
+  tSEEQST t=0.05: F=0.9829  nc=109  t=51.01s
+  tSEEQST t=0.10: F=0.8538  nc=27  t=13.60s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9866  nc=119  t=55.40s
 
 [124/197] shots=3175
-  Standard: F=0.9884  nc=342  t=67.76s
-  SEEQST:   F=0.9871  nc=127  t=60.01s
-  tSEEQST t=0.02: F=0.9863  nc=119  t=55.39s
-  tSEEQST t=0.05: F=0.9800  nc=109  t=50.58s
-  tSEEQST t=0.10: F=0.7862  nc=27  t=11.45s
-  tSEEQST t=1/√m=0.018: F=0.9860  nc=119  t=55.36s
+  Standard: F=0.9887  nc=342  t=68.64s
+  SEEQST:   F=0.9859  nc=127  t=60.29s
+  tSEEQST t=0.02: F=0.9865  nc=119  t=55.75s
+  tSEEQST t=0.05: F=0.9848  nc=109  t=52.97s
+  tSEEQST t=0.10: F=0.7933  nc=27  t=12.25s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9874  nc=119  t=55.77s
 
 [125/197] shots=3200
-  Standard: F=0.9911  nc=342  t=67.84s
-  SEEQST:   F=0.9859  nc=127  t=59.92s
-  tSEEQST t=0.02: F=0.9862  nc=119  t=55.74s
-  tSEEQST t=0.05: F=0.9855  nc=109  t=51.97s
-  tSEEQST t=0.10: F=0.8108  nc=27  t=12.71s
-  tSEEQST t=1/√m=0.018: F=0.9861  nc=119  t=56.05s
+  Standard: F=0.9862  nc=342  t=68.08s
+  SEEQST:   F=0.9842  nc=127  t=59.90s
+  tSEEQST t=0.02: F=0.9852  nc=119  t=55.92s
+  tSEEQST t=0.05: F=0.9784  nc=109  t=48.74s
+  tSEEQST t=0.10: F=0.8017  nc=27  t=11.10s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9847  nc=119  t=55.62s
 
 [126/197] shots=3225
-  Standard: F=0.9907  nc=342  t=67.62s
-  SEEQST:   F=0.9860  nc=127  t=60.13s
-  tSEEQST t=0.02: F=0.9885  nc=119  t=55.67s
-  tSEEQST t=0.05: F=0.9775  nc=109  t=50.55s
-  tSEEQST t=0.10: F=0.8245  nc=27  t=11.83s
-  tSEEQST t=1/√m=0.018: F=0.9865  nc=119  t=55.15s
+  Standard: F=0.9906  nc=342  t=68.48s
+  SEEQST:   F=0.9876  nc=127  t=61.07s
+  tSEEQST t=0.02: F=0.9859  nc=119  t=56.31s
+  tSEEQST t=0.05: F=0.9802  nc=109  t=48.84s
+  tSEEQST t=0.10: F=0.8171  nc=27  t=12.60s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9853  nc=119  t=56.29s
 
 [127/197] shots=3250
-  Standard: F=0.9876  nc=342  t=67.35s
-  SEEQST:   F=0.9841  nc=127  t=59.73s
-  tSEEQST t=0.02: F=0.9898  nc=119  t=55.57s
-  tSEEQST t=0.05: F=0.9820  nc=109  t=52.79s
-  tSEEQST t=0.10: F=0.7872  nc=27  t=12.34s
-  tSEEQST t=1/√m=0.018: F=0.9866  nc=119  t=55.82s
+  Standard: F=0.9878  nc=342  t=68.37s
+  SEEQST:   F=0.9868  nc=127  t=60.46s
+  tSEEQST t=0.02: F=0.9859  nc=119  t=55.81s
+  tSEEQST t=0.05: F=0.9780  nc=109  t=48.39s
+  tSEEQST t=0.10: F=0.8120  nc=27  t=12.13s
+  tSEEQST t=1/sqrt(m)=0.018: F=0.9865  nc=119  t=55.63s
 
 [128/197] shots=3275
-  Standard: F=0.9852  nc=342  t=67.70s
-  SEEQST:   F=0.9886  nc=127  t=60.14s
-  tSEEQST t=0.02: F=0.9840  nc=119  t=55.96s
-  tSEEQST t=0.05: F=0.9817  nc=109  t=48.63s
-  tSEEQST t=0.10: F=0.8207  nc=27  t=11.87s
-  tSEEQST t=1/√m=0.017: F=0.9869  nc=119  t=55.17s
+  Standard: F=0.9854  nc=342  t=68.80s
+  SEEQST:   F=0.9875  nc=127  t=60.59s
+  tSEEQST t=0.02: F=0.9878  nc=119  t=55.90s
+  tSEEQST t=0.05: F=0.9806  nc=109  t=50.27s
+  tSEEQST t=0.10: F=0.7859  nc=27  t=12.58s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9892  nc=119  t=55.90s
 
 [129/197] shots=3300
-  Standard: F=0.9893  nc=342  t=67.43s
-  SEEQST:   F=0.9896  nc=127  t=60.09s
-  tSEEQST t=0.02: F=0.9894  nc=119  t=55.48s
-  tSEEQST t=0.05: F=0.9798  nc=109  t=49.98s
-  tSEEQST t=0.10: F=0.8187  nc=27  t=12.57s
-  tSEEQST t=1/√m=0.017: F=0.9870  nc=119  t=55.41s
+  Standard: F=0.9886  nc=342  t=67.38s
+  SEEQST:   F=0.9900  nc=127  t=59.59s
+  tSEEQST t=0.02: F=0.9895  nc=119  t=55.41s
+  tSEEQST t=0.05: F=0.9837  nc=109  t=50.13s
+  tSEEQST t=0.10: F=0.8147  nc=27  t=12.57s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9903  nc=119  t=55.82s
 
 [130/197] shots=3325
-  Standard: F=0.9881  nc=342  t=67.51s
-  SEEQST:   F=0.9857  nc=127  t=60.02s
-  tSEEQST t=0.02: F=0.9878  nc=119  t=55.69s
-  tSEEQST t=0.05: F=0.9868  nc=109  t=51.41s
-  tSEEQST t=0.10: F=0.8626  nc=27  t=13.91s
-  tSEEQST t=1/√m=0.017: F=0.9871  nc=119  t=55.08s
+  Standard: F=0.9882  nc=342  t=68.09s
+  SEEQST:   F=0.9881  nc=127  t=60.00s
+  tSEEQST t=0.02: F=0.9867  nc=119  t=55.76s
+  tSEEQST t=0.05: F=0.9697  nc=109  t=48.42s
+  tSEEQST t=0.10: F=0.8160  nc=27  t=12.65s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9876  nc=119  t=55.39s
 
 [131/197] shots=3350
-  Standard: F=0.9910  nc=342  t=67.19s
-  SEEQST:   F=0.9875  nc=127  t=59.70s
-  tSEEQST t=0.02: F=0.9898  nc=119  t=55.49s
-  tSEEQST t=0.05: F=0.9832  nc=109  t=52.47s
-  tSEEQST t=0.10: F=0.7846  nc=27  t=11.50s
-  tSEEQST t=1/√m=0.017: F=0.9898  nc=119  t=55.45s
+  Standard: F=0.9855  nc=342  t=67.80s
+  SEEQST:   F=0.9866  nc=127  t=59.46s
+  tSEEQST t=0.02: F=0.9892  nc=119  t=55.67s
+  tSEEQST t=0.05: F=0.9751  nc=109  t=50.17s
+  tSEEQST t=0.10: F=0.7892  nc=27  t=10.48s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9885  nc=119  t=55.74s
 
 [132/197] shots=3375
-  Standard: F=0.9900  nc=342  t=68.05s
-  SEEQST:   F=0.9882  nc=127  t=59.90s
-  tSEEQST t=0.02: F=0.9847  nc=119  t=55.52s
-  tSEEQST t=0.05: F=0.9854  nc=109  t=50.07s
-  tSEEQST t=0.10: F=0.8076  nc=27  t=12.57s
-  tSEEQST t=1/√m=0.017: F=0.9891  nc=119  t=55.45s
+  Standard: F=0.9869  nc=342  t=68.55s
+  SEEQST:   F=0.9866  nc=127  t=60.44s
+  tSEEQST t=0.02: F=0.9860  nc=119  t=56.06s
+  tSEEQST t=0.05: F=0.9821  nc=109  t=50.68s
+  tSEEQST t=0.10: F=0.8067  nc=27  t=10.93s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9837  nc=119  t=56.10s
 
 [133/197] shots=3400
-  Standard: F=0.9874  nc=342  t=67.72s
-  SEEQST:   F=0.9893  nc=127  t=59.59s
-  tSEEQST t=0.02: F=0.9849  nc=119  t=55.44s
-  tSEEQST t=0.05: F=0.9844  nc=109  t=48.68s
-  tSEEQST t=0.10: F=0.8233  nc=27  t=11.96s
-  tSEEQST t=1/√m=0.017: F=0.9886  nc=119  t=55.71s
+  Standard: F=0.9900  nc=342  t=69.16s
+  SEEQST:   F=0.9902  nc=127  t=60.84s
+  tSEEQST t=0.02: F=0.9880  nc=119  t=56.07s
+  tSEEQST t=0.05: F=0.9807  nc=109  t=50.64s
+  tSEEQST t=0.10: F=0.8057  nc=27  t=11.24s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9883  nc=119  t=56.20s
 
 [134/197] shots=3425
-  Standard: F=0.9903  nc=342  t=68.18s
-  SEEQST:   F=0.9876  nc=127  t=60.37s
-  tSEEQST t=0.02: F=0.9873  nc=119  t=55.78s
-  tSEEQST t=0.05: F=0.9891  nc=109  t=51.94s
-  tSEEQST t=0.10: F=0.8061  nc=27  t=12.62s
-  tSEEQST t=1/√m=0.017: F=0.9880  nc=119  t=55.53s
+  Standard: F=0.9876  nc=342  t=69.95s
+  SEEQST:   F=0.9890  nc=127  t=60.21s
+  tSEEQST t=0.02: F=0.9911  nc=119  t=55.98s
+  tSEEQST t=0.05: F=0.9865  nc=109  t=52.39s
+  tSEEQST t=0.10: F=0.7857  nc=27  t=11.16s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9892  nc=119  t=55.93s
 
 [135/197] shots=3450
-  Standard: F=0.9886  nc=342  t=67.51s
-  SEEQST:   F=0.9896  nc=127  t=59.83s
-  tSEEQST t=0.02: F=0.9871  nc=119  t=55.92s
-  tSEEQST t=0.05: F=0.9788  nc=109  t=50.52s
-  tSEEQST t=0.10: F=0.8060  nc=27  t=11.86s
-  tSEEQST t=1/√m=0.017: F=0.9874  nc=119  t=55.21s
+  Standard: F=0.9889  nc=342  t=67.86s
+  SEEQST:   F=0.9851  nc=127  t=60.38s
+  tSEEQST t=0.02: F=0.9864  nc=119  t=56.12s
+  tSEEQST t=0.05: F=0.9883  nc=109  t=52.44s
+  tSEEQST t=0.10: F=0.7879  nc=27  t=11.91s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9879  nc=119  t=55.99s
 
 [136/197] shots=3475
-  Standard: F=0.9853  nc=342  t=67.28s
-  SEEQST:   F=0.9880  nc=127  t=59.40s
-  tSEEQST t=0.02: F=0.9873  nc=119  t=55.33s
-  tSEEQST t=0.05: F=0.9766  nc=109  t=48.05s
-  tSEEQST t=0.10: F=0.7867  nc=27  t=11.51s
-  tSEEQST t=1/√m=0.017: F=0.9875  nc=119  t=55.18s
+  Standard: F=0.9870  nc=342  t=68.82s
+  SEEQST:   F=0.9889  nc=127  t=60.31s
+  tSEEQST t=0.02: F=0.9875  nc=119  t=56.22s
+  tSEEQST t=0.05: F=0.9852  nc=109  t=52.26s
+  tSEEQST t=0.10: F=0.8313  nc=27  t=12.12s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9883  nc=119  t=56.03s
 
 [137/197] shots=3500
-  Standard: F=0.9904  nc=342  t=67.42s
-  SEEQST:   F=0.9890  nc=127  t=59.88s
-  tSEEQST t=0.02: F=0.9877  nc=119  t=55.24s
-  tSEEQST t=0.05: F=0.9792  nc=109  t=48.17s
-  tSEEQST t=0.10: F=0.8499  nc=27  t=13.59s
-  tSEEQST t=1/√m=0.017: F=0.9893  nc=119  t=55.19s
+  Standard: F=0.9887  nc=342  t=68.86s
+  SEEQST:   F=0.9859  nc=127  t=60.60s
+  tSEEQST t=0.02: F=0.9846  nc=119  t=56.10s
+  tSEEQST t=0.05: F=0.9876  nc=109  t=50.80s
+  tSEEQST t=0.10: F=0.8134  nc=27  t=12.89s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9856  nc=119  t=55.44s
 
 [138/197] shots=3525
-  Standard: F=0.9884  nc=342  t=67.73s
-  SEEQST:   F=0.9870  nc=127  t=59.98s
-  tSEEQST t=0.02: F=0.9887  nc=119  t=55.85s
-  tSEEQST t=0.05: F=0.9876  nc=109  t=52.68s
-  tSEEQST t=0.10: F=0.7697  nc=27  t=10.90s
-  tSEEQST t=1/√m=0.017: F=0.9868  nc=119  t=55.81s
+  Standard: F=0.9863  nc=342  t=68.31s
+  SEEQST:   F=0.9871  nc=127  t=60.33s
+  tSEEQST t=0.02: F=0.9870  nc=119  t=56.05s
+  tSEEQST t=0.05: F=0.9853  nc=109  t=52.21s
+  tSEEQST t=0.10: F=0.7692  nc=27  t=11.31s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9843  nc=119  t=56.49s
 
 [139/197] shots=3550
-  Standard: F=0.9897  nc=342  t=67.82s
-  SEEQST:   F=0.9881  nc=127  t=60.18s
-  tSEEQST t=0.02: F=0.9884  nc=119  t=55.73s
-  tSEEQST t=0.05: F=0.9860  nc=109  t=51.93s
-  tSEEQST t=0.10: F=0.8224  nc=27  t=12.54s
-  tSEEQST t=1/√m=0.017: F=0.9867  nc=119  t=55.26s
+  Standard: F=0.9885  nc=342  t=68.33s
+  SEEQST:   F=0.9923  nc=127  t=60.56s
+  tSEEQST t=0.02: F=0.9881  nc=119  t=55.84s
+  tSEEQST t=0.05: F=0.9843  nc=109  t=48.52s
+  tSEEQST t=0.10: F=0.7756  nc=27  t=11.83s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9863  nc=119  t=55.43s
 
 [140/197] shots=3575
-  Standard: F=0.9898  nc=342  t=67.59s
-  SEEQST:   F=0.9885  nc=127  t=59.86s
-  tSEEQST t=0.02: F=0.9863  nc=119  t=55.52s
-  tSEEQST t=0.05: F=0.9870  nc=109  t=51.69s
-  tSEEQST t=0.10: F=0.7990  nc=27  t=10.51s
-  tSEEQST t=1/√m=0.017: F=0.9887  nc=119  t=55.58s
+  Standard: F=0.9867  nc=342  t=67.95s
+  SEEQST:   F=0.9910  nc=127  t=60.38s
+  tSEEQST t=0.02: F=0.9886  nc=119  t=56.36s
+  tSEEQST t=0.05: F=0.9850  nc=109  t=53.10s
+  tSEEQST t=0.10: F=0.8487  nc=27  t=13.00s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9887  nc=119  t=56.37s
 
 [141/197] shots=3600
-  Standard: F=0.9903  nc=342  t=68.36s
-  SEEQST:   F=0.9880  nc=127  t=59.80s
-  tSEEQST t=0.02: F=0.9886  nc=119  t=55.52s
-  tSEEQST t=0.05: F=0.9796  nc=109  t=50.02s
-  tSEEQST t=0.10: F=0.8659  nc=27  t=12.58s
-  tSEEQST t=1/√m=0.017: F=0.9887  nc=119  t=55.52s
+  Standard: F=0.9888  nc=342  t=67.69s
+  SEEQST:   F=0.9884  nc=127  t=59.55s
+  tSEEQST t=0.02: F=0.9867  nc=119  t=55.20s
+  tSEEQST t=0.05: F=0.9828  nc=109  t=49.96s
+  tSEEQST t=0.10: F=0.8547  nc=27  t=13.22s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9887  nc=119  t=55.15s
 
 [142/197] shots=3625
-  Standard: F=0.9899  nc=342  t=68.03s
-  SEEQST:   F=0.9895  nc=127  t=60.24s
-  tSEEQST t=0.02: F=0.9884  nc=119  t=55.88s
-  tSEEQST t=0.05: F=0.9825  nc=109  t=48.85s
-  tSEEQST t=0.10: F=0.8146  nc=27  t=12.73s
-  tSEEQST t=1/√m=0.017: F=0.9868  nc=119  t=55.98s
+  Standard: F=0.9882  nc=342  t=67.93s
+  SEEQST:   F=0.9864  nc=127  t=59.72s
+  tSEEQST t=0.02: F=0.9878  nc=119  t=55.36s
+  tSEEQST t=0.05: F=0.9813  nc=109  t=50.07s
+  tSEEQST t=0.10: F=0.7905  nc=27  t=11.47s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9876  nc=119  t=55.27s
 
 [143/197] shots=3650
-  Standard: F=0.9873  nc=342  t=67.98s
-  SEEQST:   F=0.9866  nc=127  t=60.10s
-  tSEEQST t=0.02: F=0.9882  nc=119  t=55.49s
-  tSEEQST t=0.05: F=0.9830  nc=109  t=51.81s
-  tSEEQST t=0.10: F=0.8253  nc=27  t=11.27s
-  tSEEQST t=1/√m=0.017: F=0.9876  nc=119  t=55.58s
+  Standard: F=0.9891  nc=342  t=67.53s
+  SEEQST:   F=0.9872  nc=127  t=59.74s
+  tSEEQST t=0.02: F=0.9887  nc=119  t=55.41s
+  tSEEQST t=0.05: F=0.9841  nc=109  t=50.29s
+  tSEEQST t=0.10: F=0.8311  nc=27  t=12.44s
+  tSEEQST t=1/sqrt(m)=0.017: F=0.9862  nc=119  t=54.96s
 
 [144/197] shots=3675
-  Standard: F=0.9849  nc=342  t=68.13s
-  SEEQST:   F=0.9917  nc=127  t=60.20s
-  tSEEQST t=0.02: F=0.9878  nc=119  t=56.02s
-  tSEEQST t=0.05: F=0.9834  nc=109  t=50.34s
-  tSEEQST t=0.10: F=0.8467  nc=27  t=14.07s
-  tSEEQST t=1/√m=0.016: F=0.9873  nc=119  t=55.79s
+  Standard: F=0.9894  nc=342  t=67.70s
+  SEEQST:   F=0.9896  nc=127  t=60.20s
+  tSEEQST t=0.02: F=0.9880  nc=119  t=55.82s
+  tSEEQST t=0.05: F=0.9864  nc=109  t=52.00s
+  tSEEQST t=0.10: F=0.8211  nc=27  t=13.57s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9871  nc=119  t=55.79s
 
 [145/197] shots=3700
-  Standard: F=0.9864  nc=342  t=68.30s
-  SEEQST:   F=0.9876  nc=127  t=60.03s
-  tSEEQST t=0.02: F=0.9870  nc=119  t=55.65s
-  tSEEQST t=0.05: F=0.9861  nc=109  t=51.83s
-  tSEEQST t=0.10: F=0.8516  nc=27  t=11.65s
-  tSEEQST t=1/√m=0.016: F=0.9889  nc=119  t=55.82s
+  Standard: F=0.9881  nc=342  t=68.22s
+  SEEQST:   F=0.9889  nc=127  t=60.54s
+  tSEEQST t=0.02: F=0.9874  nc=119  t=55.61s
+  tSEEQST t=0.05: F=0.9876  nc=109  t=51.73s
+  tSEEQST t=0.10: F=0.7955  nc=27  t=12.89s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9907  nc=119  t=55.75s
 
 [146/197] shots=3725
-  Standard: F=0.9885  nc=342  t=68.00s
-  SEEQST:   F=0.9890  nc=127  t=60.15s
-  tSEEQST t=0.02: F=0.9884  nc=119  t=55.69s
-  tSEEQST t=0.05: F=0.9833  nc=109  t=47.99s
-  tSEEQST t=0.10: F=0.8152  nc=27  t=12.53s
-  tSEEQST t=1/√m=0.016: F=0.9885  nc=119  t=55.07s
+  Standard: F=0.9901  nc=342  t=68.52s
+  SEEQST:   F=0.9893  nc=127  t=60.02s
+  tSEEQST t=0.02: F=0.9863  nc=119  t=56.02s
+  tSEEQST t=0.05: F=0.9823  nc=109  t=50.39s
+  tSEEQST t=0.10: F=0.8353  nc=27  t=13.61s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9896  nc=119  t=55.66s
 
 [147/197] shots=3750
-  Standard: F=0.9868  nc=342  t=67.54s
-  SEEQST:   F=0.9901  nc=127  t=59.97s
-  tSEEQST t=0.02: F=0.9901  nc=119  t=55.58s
-  tSEEQST t=0.05: F=0.9817  nc=109  t=50.26s
-  tSEEQST t=0.10: F=0.8371  nc=27  t=11.64s
-  tSEEQST t=1/√m=0.016: F=0.9875  nc=119  t=55.90s
+  Standard: F=0.9901  nc=342  t=68.51s
+  SEEQST:   F=0.9862  nc=127  t=60.30s
+  tSEEQST t=0.02: F=0.9896  nc=119  t=55.96s
+  tSEEQST t=0.05: F=0.9808  nc=109  t=50.43s
+  tSEEQST t=0.10: F=0.7583  nc=27  t=9.06s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9911  nc=119  t=55.40s
 
 [148/197] shots=3775
-  Standard: F=0.9891  nc=342  t=68.23s
-  SEEQST:   F=0.9912  nc=127  t=60.05s
-  tSEEQST t=0.02: F=0.9878  nc=119  t=55.76s
-  tSEEQST t=0.05: F=0.9832  nc=109  t=50.57s
-  tSEEQST t=0.10: F=0.8333  nc=27  t=13.07s
-  tSEEQST t=1/√m=0.016: F=0.9896  nc=119  t=55.83s
+  Standard: F=0.9889  nc=342  t=69.12s
+  SEEQST:   F=0.9888  nc=127  t=60.81s
+  tSEEQST t=0.02: F=0.9882  nc=119  t=56.46s
+  tSEEQST t=0.05: F=0.9865  nc=109  t=53.52s
+  tSEEQST t=0.10: F=0.8173  nc=27  t=12.66s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9861  nc=119  t=56.18s
 
 [149/197] shots=3800
-  Standard: F=0.9894  nc=342  t=67.45s
-  SEEQST:   F=0.9864  nc=127  t=59.91s
-  tSEEQST t=0.02: F=0.9880  nc=119  t=55.63s
-  tSEEQST t=0.05: F=0.9843  nc=109  t=50.37s
-  tSEEQST t=0.10: F=0.7494  nc=27  t=12.01s
-  tSEEQST t=1/√m=0.016: F=0.9881  nc=119  t=55.91s
+  Standard: F=0.9889  nc=342  t=68.84s
+  SEEQST:   F=0.9894  nc=127  t=60.09s
+  tSEEQST t=0.02: F=0.9872  nc=119  t=55.94s
+  tSEEQST t=0.05: F=0.9807  nc=109  t=50.23s
+  tSEEQST t=0.10: F=0.8149  nc=27  t=11.91s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9882  nc=119  t=55.97s
 
 [150/197] shots=3825
-  Standard: F=0.9902  nc=342  t=68.15s
-  SEEQST:   F=0.9902  nc=127  t=60.13s
-  tSEEQST t=0.02: F=0.9904  nc=119  t=55.74s
-  tSEEQST t=0.05: F=0.9816  nc=109  t=50.25s
-  tSEEQST t=0.10: F=0.8380  nc=27  t=13.03s
-  tSEEQST t=1/√m=0.016: F=0.9852  nc=119  t=55.57s
+  Standard: F=0.9918  nc=342  t=68.16s
+  SEEQST:   F=0.9878  nc=127  t=59.69s
+  tSEEQST t=0.02: F=0.9886  nc=119  t=55.59s
+  tSEEQST t=0.05: F=0.9829  nc=109  t=50.44s
+  tSEEQST t=0.10: F=0.8056  nc=27  t=10.82s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9882  nc=119  t=55.51s
 
 [151/197] shots=3850
-  Standard: F=0.9903  nc=342  t=68.07s
-  SEEQST:   F=0.9904  nc=127  t=59.86s
-  tSEEQST t=0.02: F=0.9886  nc=119  t=55.88s
-  tSEEQST t=0.05: F=0.9828  nc=109  t=50.34s
-  tSEEQST t=0.10: F=0.8149  nc=27  t=12.32s
-  tSEEQST t=1/√m=0.016: F=0.9872  nc=119  t=55.80s
+  Standard: F=0.9898  nc=342  t=68.12s
+  SEEQST:   F=0.9873  nc=127  t=60.13s
+  tSEEQST t=0.02: F=0.9884  nc=119  t=55.81s
+  tSEEQST t=0.05: F=0.9869  nc=109  t=52.39s
+  tSEEQST t=0.10: F=0.8477  nc=27  t=12.99s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9907  nc=119  t=55.66s
 
 [152/197] shots=3875
-  Standard: F=0.9898  nc=342  t=68.28s
-  SEEQST:   F=0.9873  nc=127  t=59.98s
-  tSEEQST t=0.02: F=0.9909  nc=119  t=55.71s
-  tSEEQST t=0.05: F=0.9880  nc=109  t=51.80s
-  tSEEQST t=0.10: F=0.8310  nc=27  t=12.65s
-  tSEEQST t=1/√m=0.016: F=0.9877  nc=119  t=55.60s
+  Standard: F=0.9898  nc=342  t=68.41s
+  SEEQST:   F=0.9865  nc=127  t=60.77s
+  tSEEQST t=0.02: F=0.9897  nc=119  t=56.46s
+  tSEEQST t=0.05: F=0.9900  nc=109  t=51.72s
+  tSEEQST t=0.10: F=0.8163  nc=27  t=12.50s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9842  nc=119  t=55.52s
 
 [153/197] shots=3900
-  Standard: F=0.9880  nc=342  t=68.10s
-  SEEQST:   F=0.9851  nc=127  t=59.58s
-  tSEEQST t=0.02: F=0.9905  nc=119  t=55.62s
-  tSEEQST t=0.05: F=0.9847  nc=109  t=50.12s
-  tSEEQST t=0.10: F=0.8214  nc=27  t=12.31s
-  tSEEQST t=1/√m=0.016: F=0.9884  nc=119  t=55.44s
+  Standard: F=0.9913  nc=342  t=68.13s
+  SEEQST:   F=0.9903  nc=127  t=60.59s
+  tSEEQST t=0.02: F=0.9888  nc=119  t=56.03s
+  tSEEQST t=0.05: F=0.9866  nc=109  t=50.44s
+  tSEEQST t=0.10: F=0.8231  nc=27  t=12.30s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9884  nc=119  t=55.82s
 
 [154/197] shots=3925
-  Standard: F=0.9890  nc=342  t=67.72s
-  SEEQST:   F=0.9906  nc=127  t=60.01s
-  tSEEQST t=0.02: F=0.9902  nc=119  t=55.46s
-  tSEEQST t=0.05: F=0.9846  nc=109  t=51.25s
-  tSEEQST t=0.10: F=0.7778  nc=27  t=11.19s
-  tSEEQST t=1/√m=0.016: F=0.9874  nc=119  t=55.24s
+  Standard: F=0.9893  nc=342  t=69.03s
+  SEEQST:   F=0.9904  nc=127  t=60.75s
+  tSEEQST t=0.02: F=0.9868  nc=119  t=57.00s
+  tSEEQST t=0.05: F=0.9825  nc=109  t=51.25s
+  tSEEQST t=0.10: F=0.8499  nc=27  t=13.71s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9896  nc=119  t=56.80s
 
 [155/197] shots=3950
-  Standard: F=0.9893  nc=342  t=68.16s
-  SEEQST:   F=0.9912  nc=127  t=59.77s
-  tSEEQST t=0.02: F=0.9899  nc=119  t=55.55s
-  tSEEQST t=0.05: F=0.9810  nc=109  t=50.54s
-  tSEEQST t=0.10: F=0.7845  nc=27  t=11.87s
-  tSEEQST t=1/√m=0.016: F=0.9910  nc=119  t=55.26s
+  Standard: F=0.9907  nc=342  t=67.90s
+  SEEQST:   F=0.9887  nc=127  t=60.44s
+  tSEEQST t=0.02: F=0.9910  nc=119  t=55.82s
+  tSEEQST t=0.05: F=0.9807  nc=109  t=50.28s
+  tSEEQST t=0.10: F=0.8396  nc=27  t=12.54s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9875  nc=119  t=55.35s
 
 [156/197] shots=3975
-  Standard: F=0.9889  nc=342  t=67.87s
-  SEEQST:   F=0.9902  nc=127  t=59.74s
-  tSEEQST t=0.02: F=0.9889  nc=119  t=55.64s
-  tSEEQST t=0.05: F=0.9871  nc=109  t=50.10s
-  tSEEQST t=0.10: F=0.8314  nc=27  t=12.91s
-  tSEEQST t=1/√m=0.016: F=0.9881  nc=119  t=55.51s
+  Standard: F=0.9892  nc=342  t=67.66s
+  SEEQST:   F=0.9901  nc=127  t=60.18s
+  tSEEQST t=0.02: F=0.9895  nc=119  t=56.27s
+  tSEEQST t=0.05: F=0.9823  nc=109  t=51.17s
+  tSEEQST t=0.10: F=0.8209  nc=27  t=12.67s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9904  nc=119  t=55.78s
 
 [157/197] shots=4000
-  Standard: F=0.9909  nc=342  t=67.64s
-  SEEQST:   F=0.9885  nc=127  t=60.25s
-  tSEEQST t=0.02: F=0.9894  nc=119  t=55.39s
-  tSEEQST t=0.05: F=0.9896  nc=109  t=51.49s
-  tSEEQST t=0.10: F=0.8100  nc=27  t=11.91s
-  tSEEQST t=1/√m=0.016: F=0.9895  nc=119  t=55.47s
+  Standard: F=0.9851  nc=342  t=67.99s
+  SEEQST:   F=0.9854  nc=127  t=59.77s
+  tSEEQST t=0.02: F=0.9892  nc=119  t=55.71s
+  tSEEQST t=0.05: F=0.9880  nc=109  t=52.83s
+  tSEEQST t=0.10: F=0.8314  nc=27  t=12.63s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9902  nc=119  t=55.81s
 
 [158/197] shots=4025
-  Standard: F=0.9899  nc=342  t=67.93s
-  SEEQST:   F=0.9905  nc=127  t=59.78s
-  tSEEQST t=0.02: F=0.9895  nc=119  t=55.51s
-  tSEEQST t=0.05: F=0.9879  nc=109  t=49.99s
-  tSEEQST t=0.10: F=0.8089  nc=27  t=11.83s
-  tSEEQST t=1/√m=0.016: F=0.9884  nc=119  t=55.39s
+  Standard: F=0.9893  nc=342  t=69.01s
+  SEEQST:   F=0.9911  nc=127  t=59.93s
+  tSEEQST t=0.02: F=0.9882  nc=119  t=55.82s
+  tSEEQST t=0.05: F=0.9846  nc=109  t=50.09s
+  tSEEQST t=0.10: F=0.8081  nc=27  t=12.95s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9864  nc=119  t=55.83s
 
 [159/197] shots=4050
-  Standard: F=0.9895  nc=342  t=67.42s
-  SEEQST:   F=0.9905  nc=127  t=59.76s
-  tSEEQST t=0.02: F=0.9862  nc=119  t=55.63s
-  tSEEQST t=0.05: F=0.9889  nc=109  t=50.16s
-  tSEEQST t=0.10: F=0.8458  nc=27  t=13.30s
-  tSEEQST t=1/√m=0.016: F=0.9908  nc=119  t=55.75s
+  Standard: F=0.9888  nc=342  t=68.78s
+  SEEQST:   F=0.9924  nc=127  t=60.27s
+  tSEEQST t=0.02: F=0.9880  nc=119  t=56.05s
+  tSEEQST t=0.05: F=0.9850  nc=109  t=50.64s
+  tSEEQST t=0.10: F=0.8000  nc=27  t=10.82s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9904  nc=119  t=56.08s
 
 [160/197] shots=4075
-  Standard: F=0.9902  nc=342  t=67.96s
-  SEEQST:   F=0.9890  nc=127  t=59.94s
-  tSEEQST t=0.02: F=0.9909  nc=119  t=55.71s
-  tSEEQST t=0.05: F=0.9845  nc=109  t=50.38s
-  tSEEQST t=0.10: F=0.8380  nc=27  t=12.25s
-  tSEEQST t=1/√m=0.016: F=0.9876  nc=119  t=55.90s
+  Standard: F=0.9902  nc=342  t=69.18s
+  SEEQST:   F=0.9863  nc=127  t=60.38s
+  tSEEQST t=0.02: F=0.9898  nc=119  t=55.71s
+  tSEEQST t=0.05: F=0.9829  nc=109  t=50.29s
+  tSEEQST t=0.10: F=0.8096  nc=27  t=11.84s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9893  nc=119  t=55.53s
 
 [161/197] shots=4100
-  Standard: F=0.9914  nc=342  t=68.15s
-  SEEQST:   F=0.9911  nc=127  t=59.77s
-  tSEEQST t=0.02: F=0.9895  nc=119  t=55.29s
-  tSEEQST t=0.05: F=0.9812  nc=109  t=48.19s
-  tSEEQST t=0.10: F=0.8110  nc=27  t=10.81s
-  tSEEQST t=1/√m=0.016: F=0.9892  nc=119  t=55.55s
+  Standard: F=0.9897  nc=342  t=68.31s
+  SEEQST:   F=0.9895  nc=127  t=60.53s
+  tSEEQST t=0.02: F=0.9888  nc=119  t=56.36s
+  tSEEQST t=0.05: F=0.9888  nc=109  t=52.42s
+  tSEEQST t=0.10: F=0.7795  nc=27  t=12.01s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9880  nc=119  t=56.89s
 
 [162/197] shots=4125
-  Standard: F=0.9906  nc=342  t=68.29s
-  SEEQST:   F=0.9891  nc=127  t=59.91s
-  tSEEQST t=0.02: F=0.9879  nc=119  t=55.42s
-  tSEEQST t=0.05: F=0.9851  nc=109  t=49.30s
-  tSEEQST t=0.10: F=0.8433  nc=27  t=13.01s
-  tSEEQST t=1/√m=0.016: F=0.9895  nc=119  t=55.45s
+  Standard: F=0.9907  nc=342  t=69.33s
+  SEEQST:   F=0.9881  nc=127  t=61.53s
+  tSEEQST t=0.02: F=0.9875  nc=119  t=55.52s
+  tSEEQST t=0.05: F=0.9878  nc=109  t=51.57s
+  tSEEQST t=0.10: F=0.8470  nc=27  t=14.04s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9920  nc=119  t=55.72s
 
 [163/197] shots=4150
-  Standard: F=0.9896  nc=342  t=68.15s
-  SEEQST:   F=0.9899  nc=127  t=60.51s
-  tSEEQST t=0.02: F=0.9884  nc=119  t=56.19s
-  tSEEQST t=0.05: F=0.9816  nc=109  t=49.71s
-  tSEEQST t=0.10: F=0.8216  nc=27  t=12.00s
-  tSEEQST t=1/√m=0.016: F=0.9869  nc=119  t=55.95s
+  Standard: F=0.9919  nc=342  t=68.08s
+  SEEQST:   F=0.9888  nc=127  t=60.64s
+  tSEEQST t=0.02: F=0.9889  nc=119  t=55.53s
+  tSEEQST t=0.05: F=0.9887  nc=109  t=52.66s
+  tSEEQST t=0.10: F=0.7979  nc=27  t=12.87s
+  tSEEQST t=1/sqrt(m)=0.016: F=0.9890  nc=119  t=55.38s
 
 [164/197] shots=4175
-  Standard: F=0.9901  nc=342  t=68.69s
-  SEEQST:   F=0.9903  nc=127  t=60.00s
-  tSEEQST t=0.02: F=0.9894  nc=119  t=55.88s
-  tSEEQST t=0.05: F=0.9853  nc=109  t=50.78s
-  tSEEQST t=0.10: F=0.8508  nc=27  t=13.82s
-  tSEEQST t=1/√m=0.015: F=0.9863  nc=119  t=55.89s
+  Standard: F=0.9908  nc=342  t=68.36s
+  SEEQST:   F=0.9889  nc=127  t=60.20s
+  tSEEQST t=0.02: F=0.9884  nc=119  t=55.96s
+  tSEEQST t=0.05: F=0.9816  nc=109  t=48.53s
+  tSEEQST t=0.10: F=0.8129  nc=27  t=11.93s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9893  nc=119  t=55.87s
 
 [165/197] shots=4200
-  Standard: F=0.9889  nc=342  t=68.38s
-  SEEQST:   F=0.9914  nc=127  t=60.09s
-  tSEEQST t=0.02: F=0.9896  nc=119  t=55.73s
-  tSEEQST t=0.05: F=0.9822  nc=109  t=46.81s
-  tSEEQST t=0.10: F=0.8039  nc=27  t=12.64s
-  tSEEQST t=1/√m=0.015: F=0.9881  nc=119  t=55.64s
+  Standard: F=0.9882  nc=342  t=68.47s
+  SEEQST:   F=0.9894  nc=127  t=60.45s
+  tSEEQST t=0.02: F=0.9900  nc=119  t=56.09s
+  tSEEQST t=0.05: F=0.9811  nc=109  t=48.59s
+  tSEEQST t=0.10: F=0.8135  nc=27  t=13.05s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9893  nc=119  t=55.83s
 
 [166/197] shots=4225
-  Standard: F=0.9932  nc=342  t=68.18s
-  SEEQST:   F=0.9898  nc=127  t=59.97s
-  tSEEQST t=0.02: F=0.9910  nc=119  t=55.47s
-  tSEEQST t=0.05: F=0.9902  nc=109  t=51.64s
-  tSEEQST t=0.10: F=0.8228  nc=27  t=11.92s
-  tSEEQST t=1/√m=0.015: F=0.9905  nc=119  t=55.62s
+  Standard: F=0.9910  nc=342  t=68.13s
+  SEEQST:   F=0.9890  nc=127  t=60.43s
+  tSEEQST t=0.02: F=0.9882  nc=119  t=55.67s
+  tSEEQST t=0.05: F=0.9842  nc=109  t=51.92s
+  tSEEQST t=0.10: F=0.8090  nc=27  t=11.82s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9890  nc=119  t=55.41s
 
 [167/197] shots=4250
-  Standard: F=0.9888  nc=342  t=68.29s
-  SEEQST:   F=0.9918  nc=127  t=59.97s
-  tSEEQST t=0.02: F=0.9882  nc=119  t=55.46s
-  tSEEQST t=0.05: F=0.9898  nc=109  t=52.04s
-  tSEEQST t=0.10: F=0.8297  nc=27  t=12.57s
-  tSEEQST t=1/√m=0.015: F=0.9903  nc=119  t=55.25s
+  Standard: F=0.9914  nc=342  t=68.85s
+  SEEQST:   F=0.9882  nc=127  t=60.53s
+  tSEEQST t=0.02: F=0.9901  nc=119  t=56.44s
+  tSEEQST t=0.05: F=0.9832  nc=109  t=50.70s
+  tSEEQST t=0.10: F=0.8144  nc=27  t=12.54s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9889  nc=119  t=56.27s
 
 [168/197] shots=4275
-  Standard: F=0.9904  nc=342  t=67.37s
-  SEEQST:   F=0.9892  nc=127  t=59.51s
-  tSEEQST t=0.02: F=0.9891  nc=119  t=55.58s
-  tSEEQST t=0.05: F=0.9729  nc=109  t=48.25s
-  tSEEQST t=0.10: F=0.8198  nc=27  t=13.61s
-  tSEEQST t=1/√m=0.015: F=0.9914  nc=119  t=55.45s
+  Standard: F=0.9918  nc=342  t=67.84s
+  SEEQST:   F=0.9924  nc=127  t=59.78s
+  tSEEQST t=0.02: F=0.9891  nc=119  t=55.19s
+  tSEEQST t=0.05: F=0.9870  nc=109  t=50.54s
+  tSEEQST t=0.10: F=0.8220  nc=27  t=12.49s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9926  nc=119  t=55.04s
 
 [169/197] shots=4300
-  Standard: F=0.9902  nc=342  t=68.40s
-  SEEQST:   F=0.9918  nc=127  t=60.43s
-  tSEEQST t=0.02: F=0.9909  nc=119  t=56.15s
-  tSEEQST t=0.05: F=0.9892  nc=109  t=52.16s
-  tSEEQST t=0.10: F=0.8235  nc=27  t=11.40s
-  tSEEQST t=1/√m=0.015: F=0.9871  nc=119  t=55.83s
+  Standard: F=0.9912  nc=342  t=67.59s
+  SEEQST:   F=0.9912  nc=127  t=59.73s
+  tSEEQST t=0.02: F=0.9914  nc=119  t=55.60s
+  tSEEQST t=0.05: F=0.9826  nc=109  t=48.38s
+  tSEEQST t=0.10: F=0.8447  nc=27  t=12.94s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9901  nc=119  t=55.40s
 
 [170/197] shots=4325
-  Standard: F=0.9923  nc=342  t=68.09s
-  SEEQST:   F=0.9900  nc=127  t=59.77s
-  tSEEQST t=0.02: F=0.9895  nc=119  t=55.51s
-  tSEEQST t=0.05: F=0.9885  nc=109  t=50.95s
-  tSEEQST t=0.10: F=0.8148  nc=27  t=10.88s
-  tSEEQST t=1/√m=0.015: F=0.9883  nc=119  t=55.41s
+  Standard: F=0.9914  nc=342  t=68.24s
+  SEEQST:   F=0.9881  nc=127  t=59.84s
+  tSEEQST t=0.02: F=0.9893  nc=119  t=55.77s
+  tSEEQST t=0.05: F=0.9779  nc=109  t=48.62s
+  tSEEQST t=0.10: F=0.8249  nc=27  t=12.06s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9897  nc=119  t=55.99s
 
 [171/197] shots=4350
-  Standard: F=0.9910  nc=342  t=67.67s
-  SEEQST:   F=0.9906  nc=127  t=60.14s
-  tSEEQST t=0.02: F=0.9925  nc=119  t=55.76s
-  tSEEQST t=0.05: F=0.9842  nc=109  t=50.57s
-  tSEEQST t=0.10: F=0.8218  nc=27  t=12.95s
-  tSEEQST t=1/√m=0.015: F=0.9912  nc=119  t=55.33s
+  Standard: F=0.9901  nc=342  t=68.66s
+  SEEQST:   F=0.9920  nc=127  t=60.43s
+  tSEEQST t=0.02: F=0.9894  nc=119  t=56.04s
+  tSEEQST t=0.05: F=0.9879  nc=109  t=50.24s
+  tSEEQST t=0.10: F=0.8484  nc=27  t=11.66s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9921  nc=119  t=56.09s
 
 [172/197] shots=4375
-  Standard: F=0.9900  nc=342  t=67.62s
-  SEEQST:   F=0.9873  nc=127  t=60.11s
-  tSEEQST t=0.02: F=0.9895  nc=119  t=55.75s
-  tSEEQST t=0.05: F=0.9852  nc=109  t=50.14s
-  tSEEQST t=0.10: F=0.7947  nc=27  t=13.01s
-  tSEEQST t=1/√m=0.015: F=0.9916  nc=119  t=55.76s
+  Standard: F=0.9896  nc=342  t=68.09s
+  SEEQST:   F=0.9893  nc=127  t=60.03s
+  tSEEQST t=0.02: F=0.9890  nc=119  t=55.57s
+  tSEEQST t=0.05: F=0.9882  nc=109  t=52.10s
+  tSEEQST t=0.10: F=0.8026  nc=27  t=10.85s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9899  nc=119  t=55.71s
 
 [173/197] shots=4400
-  Standard: F=0.9901  nc=342  t=68.30s
-  SEEQST:   F=0.9892  nc=127  t=60.18s
-  tSEEQST t=0.02: F=0.9889  nc=119  t=55.99s
-  tSEEQST t=0.05: F=0.9856  nc=109  t=50.49s
-  tSEEQST t=0.10: F=0.7948  nc=27  t=11.99s
-  tSEEQST t=1/√m=0.015: F=0.9922  nc=119  t=55.86s
+  Standard: F=0.9936  nc=342  t=68.88s
+  SEEQST:   F=0.9890  nc=127  t=60.04s
+  tSEEQST t=0.02: F=0.9868  nc=119  t=56.26s
+  tSEEQST t=0.05: F=0.9843  nc=109  t=50.70s
+  tSEEQST t=0.10: F=0.7728  nc=27  t=11.96s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9909  nc=119  t=56.25s
 
 [174/197] shots=4425
-  Standard: F=0.9918  nc=342  t=68.17s
-  SEEQST:   F=0.9915  nc=127  t=60.31s
-  tSEEQST t=0.02: F=0.9898  nc=119  t=55.51s
-  tSEEQST t=0.05: F=0.9923  nc=109  t=51.81s
-  tSEEQST t=0.10: F=0.7861  nc=27  t=11.95s
-  tSEEQST t=1/√m=0.015: F=0.9896  nc=119  t=55.47s
+  Standard: F=0.9900  nc=342  t=68.61s
+  SEEQST:   F=0.9896  nc=127  t=61.04s
+  tSEEQST t=0.02: F=0.9904  nc=119  t=56.36s
+  tSEEQST t=0.05: F=0.9816  nc=109  t=49.44s
+  tSEEQST t=0.10: F=0.8123  nc=27  t=12.31s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9899  nc=119  t=56.12s
 
 [175/197] shots=4450
-  Standard: F=0.9896  nc=342  t=68.10s
-  SEEQST:   F=0.9925  nc=127  t=59.56s
-  tSEEQST t=0.02: F=0.9919  nc=119  t=55.29s
-  tSEEQST t=0.05: F=0.9911  nc=109  t=51.58s
-  tSEEQST t=0.10: F=0.8520  nc=27  t=12.91s
-  tSEEQST t=1/√m=0.015: F=0.9900  nc=119  t=55.23s
+  Standard: F=0.9904  nc=342  t=68.70s
+  SEEQST:   F=0.9889  nc=127  t=60.91s
+  tSEEQST t=0.02: F=0.9922  nc=119  t=56.48s
+  tSEEQST t=0.05: F=0.9867  nc=109  t=50.81s
+  tSEEQST t=0.10: F=0.8467  nc=27  t=13.01s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9908  nc=119  t=56.26s
 
 [176/197] shots=4475
-  Standard: F=0.9912  nc=342  t=67.85s
-  SEEQST:   F=0.9908  nc=127  t=60.01s
-  tSEEQST t=0.02: F=0.9917  nc=119  t=55.70s
-  tSEEQST t=0.05: F=0.9828  nc=109  t=50.45s
-  tSEEQST t=0.10: F=0.7778  nc=27  t=11.52s
-  tSEEQST t=1/√m=0.015: F=0.9901  nc=119  t=55.39s
+  Standard: F=0.9910  nc=342  t=68.58s
+  SEEQST:   F=0.9906  nc=127  t=60.47s
+  tSEEQST t=0.02: F=0.9913  nc=119  t=56.08s
+  tSEEQST t=0.05: F=0.9848  nc=109  t=50.59s
+  tSEEQST t=0.10: F=0.8356  nc=27  t=12.98s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9901  nc=119  t=56.55s
 
 [177/197] shots=4500
-  Standard: F=0.9918  nc=342  t=67.73s
-  SEEQST:   F=0.9926  nc=127  t=60.40s
-  tSEEQST t=0.02: F=0.9892  nc=119  t=56.15s
-  tSEEQST t=0.05: F=0.9890  nc=109  t=53.13s
-  tSEEQST t=0.10: F=0.7834  nc=27  t=11.69s
-  tSEEQST t=1/√m=0.015: F=0.9906  nc=119  t=56.29s
+  Standard: F=0.9906  nc=342  t=69.18s
+  SEEQST:   F=0.9900  nc=127  t=60.90s
+  tSEEQST t=0.02: F=0.9903  nc=119  t=56.35s
+  tSEEQST t=0.05: F=0.9891  nc=109  t=52.46s
+  tSEEQST t=0.10: F=0.7978  nc=27  t=12.50s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9906  nc=119  t=55.76s
 
 [178/197] shots=4525
-  Standard: F=0.9921  nc=342  t=68.31s
-  SEEQST:   F=0.9919  nc=127  t=60.43s
-  tSEEQST t=0.02: F=0.9913  nc=119  t=55.95s
-  tSEEQST t=0.05: F=0.9844  nc=109  t=50.61s
-  tSEEQST t=0.10: F=0.7793  nc=27  t=12.40s
-  tSEEQST t=1/√m=0.015: F=0.9921  nc=119  t=55.94s
+  Standard: F=0.9898  nc=342  t=68.70s
+  SEEQST:   F=0.9876  nc=127  t=60.73s
+  tSEEQST t=0.02: F=0.9900  nc=119  t=56.68s
+  tSEEQST t=0.05: F=0.9849  nc=109  t=51.06s
+  tSEEQST t=0.10: F=0.8016  nc=27  t=11.32s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9904  nc=119  t=56.79s
 
 [179/197] shots=4550
-  Standard: F=0.9917  nc=342  t=68.49s
-  SEEQST:   F=0.9896  nc=127  t=60.01s
-  tSEEQST t=0.02: F=0.9885  nc=119  t=55.75s
-  tSEEQST t=0.05: F=0.9811  nc=109  t=50.33s
-  tSEEQST t=0.10: F=0.8224  nc=27  t=12.94s
-  tSEEQST t=1/√m=0.015: F=0.9914  nc=119  t=56.13s
+  Standard: F=0.9916  nc=342  t=68.10s
+  SEEQST:   F=0.9895  nc=127  t=60.34s
+  tSEEQST t=0.02: F=0.9884  nc=119  t=55.93s
+  tSEEQST t=0.05: F=0.9874  nc=109  t=50.30s
+  tSEEQST t=0.10: F=0.8485  nc=27  t=13.92s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9903  nc=119  t=55.12s
 
 [180/197] shots=4575
-  Standard: F=0.9907  nc=342  t=67.77s
-  SEEQST:   F=0.9924  nc=127  t=59.96s
-  tSEEQST t=0.02: F=0.9901  nc=119  t=55.67s
-  tSEEQST t=0.05: F=0.9825  nc=109  t=50.07s
-  tSEEQST t=0.10: F=0.7989  nc=27  t=11.88s
-  tSEEQST t=1/√m=0.015: F=0.9935  nc=119  t=55.61s
+  Standard: F=0.9906  nc=342  t=68.16s
+  SEEQST:   F=0.9897  nc=127  t=60.21s
+  tSEEQST t=0.02: F=0.9886  nc=119  t=55.90s
+  tSEEQST t=0.05: F=0.9842  nc=109  t=50.48s
+  tSEEQST t=0.10: F=0.7858  nc=27  t=12.74s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9903  nc=119  t=56.41s
 
 [181/197] shots=4600
-  Standard: F=0.9916  nc=342  t=68.29s
-  SEEQST:   F=0.9916  nc=127  t=59.92s
-  tSEEQST t=0.02: F=0.9911  nc=119  t=55.69s
-  tSEEQST t=0.05: F=0.9842  nc=109  t=48.46s
-  tSEEQST t=0.10: F=0.7836  nc=27  t=11.27s
-  tSEEQST t=1/√m=0.015: F=0.9900  nc=119  t=55.78s
+  Standard: F=0.9932  nc=342  t=68.21s
+  SEEQST:   F=0.9907  nc=127  t=60.42s
+  tSEEQST t=0.02: F=0.9868  nc=119  t=56.12s
+  tSEEQST t=0.05: F=0.9892  nc=109  t=50.70s
+  tSEEQST t=0.10: F=0.8387  nc=27  t=12.96s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9898  nc=119  t=56.37s
 
 [182/197] shots=4625
-  Standard: F=0.9913  nc=342  t=68.27s
-  SEEQST:   F=0.9901  nc=127  t=60.10s
-  tSEEQST t=0.02: F=0.9906  nc=119  t=56.01s
-  tSEEQST t=0.05: F=0.9866  nc=109  t=50.46s
-  tSEEQST t=0.10: F=0.8228  nc=27  t=12.69s
-  tSEEQST t=1/√m=0.015: F=0.9899  nc=119  t=55.67s
+  Standard: F=0.9919  nc=342  t=68.88s
+  SEEQST:   F=0.9900  nc=127  t=60.55s
+  tSEEQST t=0.02: F=0.9923  nc=119  t=56.13s
+  tSEEQST t=0.05: F=0.9877  nc=109  t=53.24s
+  tSEEQST t=0.10: F=0.8030  nc=27  t=12.75s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9919  nc=119  t=56.35s
 
 [183/197] shots=4650
-  Standard: F=0.9899  nc=342  t=68.25s
-  SEEQST:   F=0.9914  nc=127  t=59.65s
-  tSEEQST t=0.02: F=0.9899  nc=119  t=55.44s
-  tSEEQST t=0.05: F=0.9873  nc=109  t=50.22s
-  tSEEQST t=0.10: F=0.8088  nc=27  t=12.57s
-  tSEEQST t=1/√m=0.015: F=0.9865  nc=119  t=55.32s
+  Standard: F=0.9889  nc=342  t=68.70s
+  SEEQST:   F=0.9910  nc=127  t=60.25s
+  tSEEQST t=0.02: F=0.9928  nc=119  t=56.07s
+  tSEEQST t=0.05: F=0.9831  nc=109  t=48.96s
+  tSEEQST t=0.10: F=0.8142  nc=27  t=12.26s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9917  nc=119  t=56.42s
 
 [184/197] shots=4675
-  Standard: F=0.9913  nc=342  t=67.67s
-  SEEQST:   F=0.9912  nc=127  t=60.09s
-  tSEEQST t=0.02: F=0.9897  nc=119  t=56.02s
-  tSEEQST t=0.05: F=0.9905  nc=109  t=52.23s
-  tSEEQST t=0.10: F=0.7940  nc=27  t=11.91s
-  tSEEQST t=1/√m=0.015: F=0.9915  nc=119  t=55.36s
+  Standard: F=0.9929  nc=342  t=69.22s
+  SEEQST:   F=0.9905  nc=127  t=60.34s
+  tSEEQST t=0.02: F=0.9897  nc=119  t=56.13s
+  tSEEQST t=0.05: F=0.9889  nc=109  t=52.09s
+  tSEEQST t=0.10: F=0.7992  nc=27  t=11.92s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9903  nc=119  t=56.10s
 
 [185/197] shots=4700
-  Standard: F=0.9914  nc=342  t=67.78s
-  SEEQST:   F=0.9903  nc=127  t=60.18s
-  tSEEQST t=0.02: F=0.9880  nc=119  t=55.72s
-  tSEEQST t=0.05: F=0.9871  nc=109  t=50.34s
-  tSEEQST t=0.10: F=0.8226  nc=27  t=11.01s
-  tSEEQST t=1/√m=0.015: F=0.9894  nc=119  t=55.74s
+  Standard: F=0.9909  nc=342  t=67.99s
+  SEEQST:   F=0.9901  nc=127  t=60.14s
+  tSEEQST t=0.02: F=0.9894  nc=119  t=55.70s
+  tSEEQST t=0.05: F=0.9893  nc=109  t=51.72s
+  tSEEQST t=0.10: F=0.8051  nc=27  t=12.57s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9887  nc=119  t=55.61s
 
 [186/197] shots=4725
-  Standard: F=0.9908  nc=342  t=68.14s
-  SEEQST:   F=0.9905  nc=127  t=59.84s
-  tSEEQST t=0.02: F=0.9925  nc=119  t=55.57s
-  tSEEQST t=0.05: F=0.9877  nc=109  t=50.02s
-  tSEEQST t=0.10: F=0.8231  nc=27  t=12.21s
-  tSEEQST t=1/√m=0.015: F=0.9908  nc=119  t=55.56s
+  Standard: F=0.9912  nc=342  t=68.38s
+  SEEQST:   F=0.9909  nc=127  t=59.56s
+  tSEEQST t=0.02: F=0.9896  nc=119  t=55.38s
+  tSEEQST t=0.05: F=0.9893  nc=109  t=51.55s
+  tSEEQST t=0.10: F=0.8508  nc=27  t=12.83s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9924  nc=119  t=55.17s
 
 [187/197] shots=4750
-  Standard: F=0.9911  nc=342  t=67.89s
-  SEEQST:   F=0.9912  nc=127  t=59.89s
-  tSEEQST t=0.02: F=0.9916  nc=119  t=55.46s
-  tSEEQST t=0.05: F=0.9907  nc=109  t=51.67s
-  tSEEQST t=0.10: F=0.8110  nc=27  t=11.62s
-  tSEEQST t=1/√m=0.015: F=0.9921  nc=119  t=55.62s
+  Standard: F=0.9911  nc=342  t=67.50s
+  SEEQST:   F=0.9893  nc=127  t=59.53s
+  tSEEQST t=0.02: F=0.9909  nc=119  t=56.18s
+  tSEEQST t=0.05: F=0.9874  nc=109  t=50.45s
+  tSEEQST t=0.10: F=0.8306  nc=27  t=12.86s
+  tSEEQST t=1/sqrt(m)=0.015: F=0.9884  nc=119  t=55.18s
 
 [188/197] shots=4775
-  Standard: F=0.9904  nc=342  t=68.13s
-  SEEQST:   F=0.9917  nc=127  t=60.19s
-  tSEEQST t=0.02: F=0.9905  nc=119  t=55.96s
-  tSEEQST t=0.05: F=0.9896  nc=109  t=51.87s
-  tSEEQST t=0.10: F=0.8228  nc=27  t=12.00s
-  tSEEQST t=1/√m=0.014: F=0.9902  nc=119  t=55.94s
+  Standard: F=0.9914  nc=342  t=68.65s
+  SEEQST:   F=0.9934  nc=127  t=61.18s
+  tSEEQST t=0.02: F=0.9884  nc=119  t=56.51s
+  tSEEQST t=0.05: F=0.9851  nc=109  t=51.00s
+  tSEEQST t=0.10: F=0.8224  nc=27  t=12.78s
+  tSEEQST t=1/sqrt(m)=0.014: F=0.9899  nc=119  t=56.79s
 
 [189/197] shots=4800
-  Standard: F=0.9899  nc=342  t=68.44s
-  SEEQST:   F=0.9903  nc=127  t=60.23s
-  tSEEQST t=0.02: F=0.9887  nc=119  t=55.94s
-  tSEEQST t=0.05: F=0.9897  nc=109  t=53.10s
-  tSEEQST t=0.10: F=0.7938  nc=27  t=11.68s
-  tSEEQST t=1/√m=0.014: F=0.9912  nc=119  t=55.86s
+  Standard: F=0.9912  nc=342  t=69.35s
+  SEEQST:   F=0.9934  nc=127  t=60.74s
+  tSEEQST t=0.02: F=0.9888  nc=119  t=56.13s
+  tSEEQST t=0.05: F=0.9859  nc=109  t=50.55s
+  tSEEQST t=0.10: F=0.7904  nc=27  t=11.84s
+  tSEEQST t=1/sqrt(m)=0.014: F=0.9908  nc=119  t=56.14s
 
 [190/197] shots=4825
-  Standard: F=0.9906  nc=342  t=68.40s
-  SEEQST:   F=0.9915  nc=127  t=59.85s
-  tSEEQST t=0.02: F=0.9903  nc=119  t=55.51s
-  tSEEQST t=0.05: F=0.9865  nc=109  t=50.02s
-  tSEEQST t=0.10: F=0.8313  nc=27  t=12.59s
-  tSEEQST t=1/√m=0.014: F=0.9905  nc=119  t=55.41s
+  Standard: F=0.9921  nc=342  t=68.59s
+  SEEQST:   F=0.9912  nc=127  t=60.74s
+  tSEEQST t=0.02: F=0.9901  nc=119  t=56.08s
+  tSEEQST t=0.05: F=0.9856  nc=109  t=50.56s
+  tSEEQST t=0.10: F=0.7876  nc=27  t=11.94s
+  tSEEQST t=1/sqrt(m)=0.014: F=0.9912  nc=119  t=56.35s
 
 [191/197] shots=4850
-  Standard: F=0.9931  nc=342  t=67.75s
-  SEEQST:   F=0.9894  nc=127  t=59.92s
-  tSEEQST t=0.02: F=0.9938  nc=119  t=55.60s
-  tSEEQST t=0.05: F=0.9843  nc=109  t=48.54s
-  tSEEQST t=0.10: F=0.8026  nc=27  t=12.93s
-  tSEEQST t=1/√m=0.014: F=0.9895  nc=119  t=55.63s
+  Standard: F=0.9914  nc=342  t=68.48s
+  SEEQST:   F=0.9923  nc=127  t=60.13s
+  tSEEQST t=0.02: F=0.9888  nc=119  t=56.07s
+  tSEEQST t=0.05: F=0.9886  nc=109  t=51.85s
+  tSEEQST t=0.10: F=0.7807  nc=27  t=11.58s
+  tSEEQST t=1/sqrt(m)=0.014: F=0.9894  nc=119  t=55.74s
 
 [192/197] shots=4875
-  Standard: F=0.9926  nc=342  t=68.26s
-  SEEQST:   F=0.9913  nc=127  t=60.11s
-  tSEEQST t=0.02: F=0.9909  nc=119  t=55.99s
-  tSEEQST t=0.05: F=0.9835  nc=109  t=50.50s
-  tSEEQST t=0.10: F=0.8204  nc=27  t=12.98s
-  tSEEQST t=1/√m=0.014: F=0.9915  nc=119  t=56.04s
+  Standard: F=0.9905  nc=342  t=68.95s
+  SEEQST:   F=0.9900  nc=127  t=60.37s
+  tSEEQST t=0.02: F=0.9924  nc=119  t=56.04s
+  tSEEQST t=0.05: F=0.9883  nc=109  t=52.08s
+  tSEEQST t=0.10: F=0.8026  nc=27  t=10.86s
+  tSEEQST t=1/sqrt(m)=0.014: F=0.9924  nc=119  t=55.78s
 
 [193/197] shots=4900
-  Standard: F=0.9922  nc=342  t=67.98s
-  SEEQST:   F=0.9907  nc=127  t=60.23s
-  tSEEQST t=0.02: F=0.9912  nc=119  t=56.04s
-  tSEEQST t=0.05: F=0.9833  nc=109  t=50.87s
-  tSEEQST t=0.10: F=0.8022  nc=27  t=13.04s
-  tSEEQST t=1/√m=0.014: F=0.9925  nc=119  t=55.39s
+  Standard: F=0.9913  nc=342  t=68.81s
+  SEEQST:   F=0.9897  nc=127  t=60.14s
+  tSEEQST t=0.02: F=0.9918  nc=119  t=55.88s
+  tSEEQST t=0.05: F=0.9816  nc=109  t=48.44s
+  tSEEQST t=0.10: F=0.7977  nc=27  t=10.95s
+  tSEEQST t=1/sqrt(m)=0.014: F=0.9915  nc=119  t=55.93s
 
 [194/197] shots=4925
-  Standard: F=0.9916  nc=342  t=67.90s
-  SEEQST:   F=0.9924  nc=127  t=60.30s
-  tSEEQST t=0.02: F=0.9912  nc=119  t=56.03s
-  tSEEQST t=0.05: F=0.9903  nc=109  t=52.97s
-  tSEEQST t=0.10: F=0.7752  nc=27  t=11.68s
-  tSEEQST t=1/√m=0.014: F=0.9875  nc=119  t=55.94s
+  Standard: F=0.9916  nc=342  t=68.61s
+  SEEQST:   F=0.9907  nc=127  t=60.38s
+  tSEEQST t=0.02: F=0.9910  nc=119  t=55.67s
+  tSEEQST t=0.05: F=0.9852  nc=109  t=50.29s
+  tSEEQST t=0.10: F=0.7960  nc=27  t=11.23s
+  tSEEQST t=1/sqrt(m)=0.014: F=0.9934  nc=119  t=55.53s
 
 [195/197] shots=4950
-  Standard: F=0.9916  nc=342  t=68.49s
-  SEEQST:   F=0.9880  nc=127  t=60.39s
-  tSEEQST t=0.02: F=0.9876  nc=119  t=55.96s
-  tSEEQST t=0.05: F=0.9858  nc=109  t=50.42s
-  tSEEQST t=0.10: F=0.8423  nc=27  t=13.10s
-  tSEEQST t=1/√m=0.014: F=0.9899  nc=119  t=56.08s
+  Standard: F=0.9916  nc=342  t=68.66s
+  SEEQST:   F=0.9909  nc=127  t=60.71s
+  tSEEQST t=0.02: F=0.9904  nc=119  t=56.08s
+  tSEEQST t=0.05: F=0.9881  nc=109  t=53.02s
+  tSEEQST t=0.10: F=0.7755  nc=27  t=11.61s
+  tSEEQST t=1/sqrt(m)=0.014: F=0.9913  nc=119  t=56.05s
 
 [196/197] shots=4975
-  Standard: F=0.9910  nc=342  t=68.25s
-  SEEQST:   F=0.9931  nc=127  t=60.26s
-  tSEEQST t=0.02: F=0.9914  nc=119  t=55.92s
-  tSEEQST t=0.05: F=0.9927  nc=109  t=52.01s
-  tSEEQST t=0.10: F=0.7878  nc=27  t=12.08s
-  tSEEQST t=1/√m=0.014: F=0.9896  nc=119  t=56.30s
+  Standard: F=0.9921  nc=342  t=68.40s
+  SEEQST:   F=0.9889  nc=127  t=59.43s
+  tSEEQST t=0.02: F=0.9910  nc=119  t=55.29s
+  tSEEQST t=0.05: F=0.9871  nc=109  t=49.96s
+  tSEEQST t=0.10: F=0.8424  nc=27  t=11.16s
+  tSEEQST t=1/sqrt(m)=0.014: F=0.9923  nc=119  t=55.18s
 
 [197/197] shots=5000
-  Standard: F=0.9944  nc=342  t=68.28s
-  SEEQST:   F=0.9907  nc=127  t=59.74s
-  tSEEQST t=0.02: F=0.9889  nc=119  t=55.73s
-  tSEEQST t=0.05: F=0.9880  nc=109  t=50.23s
-  tSEEQST t=0.10: F=0.8218  nc=27  t=12.55s
-  tSEEQST t=1/√m=0.014: F=0.9919  nc=119  t=55.53s
+  Standard: F=0.9927  nc=342  t=68.23s
+  SEEQST:   F=0.9932  nc=127  t=59.80s
+  tSEEQST t=0.02: F=0.9913  nc=119  t=55.48s
+  tSEEQST t=0.05: F=0.9856  nc=109  t=50.85s
+  tSEEQST t=0.10: F=0.8171  nc=27  t=12.57s
+  tSEEQST t=1/sqrt(m)=0.014: F=0.9917  nc=119  t=55.49s
 
 
 ── Plots Standard ──
@@ -1598,10 +1598,10 @@ Messungen starten...
 ── Plots SEEQST ──
 ✓ Plot: fidelity_seeqst_full.png
 ✓ Plot: fidelity_seeqst_zoom.png
-── Plots tSEEQST (feste t) ──
+── Plots tSEEQST (fixed t) ──
 ✓ Plot: fidelity_tseeqst_full.png
 ✓ Plot: fidelity_tseeqst_zoom.png
-── Plots tSEEQST t=1/√m ──
+── Plots tSEEQST t=1/sqrt(m) ──
 ✓ Plot: fidelity_tseeqst_adaptive_full.png
 ✓ Plot: fidelity_tseeqst_adaptive_zoom.png
 ── Plot Runtime Comparison ──
@@ -1611,22 +1611,22 @@ Messungen starten...
 ✓ Plot: threshold_vs_shots.png
 
 ══════════════════════════════════════════════════════════════════════
-Zusammenfassung bei shots=5000
+Summary at shots=5000
 ══════════════════════════════════════════════════════════════════════
-  Methode                 Fidelity    Circuits    Zeit(s)     Reduktion   
+  Method                  Fidelity    Circuits    Time(s)     Reduction   
   ────────────────────────────────────────────────────────────────────
-  Standard                0.9944      342         68.28       0%
-  SEEQST                  0.9907      127         59.74       62.9%
-  tSEEQST t=0.02          0.9889      119         55.73       65.2%
-  tSEEQST t=0.05          0.9880      109         50.23       68.1%
-  tSEEQST t=0.10          0.8218      27          12.55       92.1%
-  tSEEQST t=1/√m          0.9919      119         55.53       65.2%
+  Standard                0.9927      342         68.23       0%
+  SEEQST                  0.9932      127         59.80       62.9%
+  tSEEQST t=0.02          0.9913      119         55.48       65.2%
+  tSEEQST t=0.05          0.9856      109         50.85       68.1%
+  tSEEQST t=0.10          0.8171      27          12.57       92.1%
+  tSEEQST t=1/√m          0.9917      119         55.49       65.2%
 ══════════════════════════════════════════════════════════════════════
 
-  Gesamtzeit Standard:        13401.4s
-  Gesamtzeit SEEQST:          11814.6s
-  Gesamtzeit tSEEQST t=0.02:  10956.1s
-  Gesamtzeit tSEEQST t=0.05:  9844.6s
-  Gesamtzeit tSEEQST t=0.10:  2351.9s
-  Gesamtzeit tSEEQST t=1/√m:  10531.8s
+  Total time Standard:        13502.6s
+  Total time SEEQST:          11892.8s
+  Total time tSEEQST t=0.02:  11017.9s
+  Total time tSEEQST t=0.05:  9923.7s
+  Total time tSEEQST t=0.10:  2335.0s
+  Total time tSEEQST t=1/√m:  10611.1s
 ══════════════════════════════════════════════════════════════════════
