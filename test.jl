@@ -1,125 +1,82 @@
 cd(@__DIR__)
 
-include("moduleSeeqstQutrit.jl")
-using .SeeqstHybridQutrit
+using Printf
 using LinearAlgebra
 using QuantumInformation
-using Printf
+using Random
 
-println("═"^65)
-println("Vergleich: Standard vs SEEQST vs tSEEQST (Qutrits)")
-println("═"^65)
-println()
+include("moduleSeeqstQutrit.jl")
+include("moduleSeeqstQutrit2.jl")
+include("moduleTSeeqstQutrit2.jl")
 
-shots = 5000
-N     = 3
+using .SeeqstHybridQutrit
+using .SeeqstMixedQutrit
+using .TSeeqstMixedQutrit
 
-function embed_qubit_in_qutrit(rho_qubit::Matrix{ComplexF64}, N::Int)
-    d_qubit  = 2^N   # = 8
-    d_qutrit = 3^N   # = 27
+# ══════════════════════════════════════════════════════════════
+# Zufällige Dichtematrix
+# ══════════════════════════════════════════════════════════════
+function GenerateRandomDensityMatrixQutrits(N::Int)
+    d        = 3^N
+    n_active = rand(1:d)
+    active   = randperm(d)[1:n_active]
+    rho      = zeros(ComplexF64, d, d)
+    for _ in 1:n_active
+        psi         = zeros(ComplexF64, d)
+        psi[active] = randn(ComplexF64, n_active) .+
+                      1im .* randn(ComplexF64, n_active)
+        psi        /= norm(psi)
+        rho        += psi * psi'
+    end
+    return rho / tr(rho)
+end
 
-    rho_qutrit = zeros(ComplexF64, d_qutrit, d_qutrit)
+# ══════════════════════════════════════════════════════════════
+# Einstellungen
+# ══════════════════════════════════════════════════════════════
+N_values = [2, 3, 4, 5]
+shots    = 5000
+t_fixed  = 0.05
 
-    # Kopiere die 8×8 Qubit-Matrix in die ersten 8×8 Einträge
-    for i in 1:d_qubit, j in 1:d_qubit
-        rho_qutrit[i, j] = rho_qubit[i, j]
+Random.seed!(42)
+
+# ══════════════════════════════════════════════════════════════
+# Messungen
+# ══════════════════════════════════════════════════════════════
+println("═"^55)
+println("Fidelity Comparison  (shots=$shots, t=$t_fixed)")
+println("═"^55)
+@printf("%-4s │ %-10s │ %-10s │ %-10s\n",
+    "N", "Standard", "SEEQST", "tSEEQST")
+println("─"^45)
+
+for N in N_values
+
+    rho_true = GenerateRandomDensityMatrixQutrits(N)
+
+    # ── Standard ────────────────────────────────────────────
+    F_std = NaN
+    if N <= 4
+        rho_std = RecreatingDensityMatrixWithNonentanglingQutrit(
+            rho_true, shots; verbose=false)
+        F_std = fidelity(Matrix{ComplexF64}(rho_std), rho_true)
     end
 
-    return rho_qutrit
+    # ── SEEQST ──────────────────────────────────────────────
+    rho_seeqst = RecreatingDensityMatrixWithMixedSeeqstQutrit(
+        rho_true, shots; verbose=false)
+    F_seeqst = fidelity(Matrix{ComplexF64}(rho_seeqst), rho_true)
+
+    # ── tSEEQST ─────────────────────────────────────────────
+    rho_t = RecreatingDensityMatrixWithTMixedSeeqstQutrit(
+        rho_true, shots, t_fixed; verbose=false)
+    F_t = fidelity(Matrix{ComplexF64}(rho_t), rho_true)
+
+    # ── Ausgabe ─────────────────────────────────────────────
+    std_str = isnan(F_std) ? "OOM" : @sprintf("%.6f", F_std)
+    @printf("%-4d │ %-10s │ %-10.6f │ %-10.6f\n",
+        N, std_str, F_seeqst, F_t)
 end
 
-# ── Deine 3-Qubit Matrix ───────────────────────────────────────
-rho_true = zeros(ComplexF64, 8, 8)
-rho_true[1,1] =  0.5        # ρ[000,000]
-rho_true[2,2] =  0.5        # ρ[001,001]
-rho_true[1,2] = -0.5im      # ρ[000,001]
-rho_true[2,1] =  0.5im      # ρ[001,000]
-
-# ── Einbettung ─────────────────────────────────────────────────
-rho_true = embed_qubit_in_qutrit(rho_true, 3)
-
-#rho_true = GenerateRandomDensityMatrixNoZerosQutrits(N)
-
-println(@sprintf("N = %d Qutrits, shots = %d", N, shots))
-println()
-
-# ── Circuit Anzahl ─────────────────────────────────────────────
-blocks_all = collect(0:(4^N - 1))
-non_circs  = BuildNonEntanglingCircuitsQutrit(blocks_all, N)
-hyb_circs  = BuildHybridCircuitsQutrit(blocks_all, N)
-
-n_standard = length(unique(String[
-    c for g in non_circs for c in g if c != ""]))
-n_seeqst   = length(unique(String[
-    startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
-    for g in hyb_circs for c in g if c != ""]))
-
-println("── Circuit Anzahl ──")
-println(@sprintf("  Standard SEEQST: %d Circuits", n_standard))
-println(@sprintf("  SEEQST (Hybrid): %d Circuits", n_seeqst))
-println()
-
-# ── Standard SEEQST ────────────────────────────────────────────
-println("── Standard SEEQST ──")
-t0      = time()
-rho_std = RecreatingDensityMatrixWithNonentanglingQutrit(
-    rho_true, shots; verbose=false)
-t_std   = time() - t0
-F_std   = fidelity(rho_std, rho_true)
-println(@sprintf("  Fidelity: %.4f  Runtime: %.2fs  Circuits: %d",
-    F_std, t_std, n_standard))
-println()
-
-# ── SEEQST Hybrid ──────────────────────────────────────────────
-println("── SEEQST (Hybrid) ──")
-t0         = time()
-rho_seeqst = RecreatingDensityMatrixWithSeeqstQutrit(
-    rho_true, shots; verbose=false)
-t_seeqst   = time() - t0
-F_seeqst   = fidelity(rho_seeqst, rho_true)
-println(@sprintf("  Fidelity: %.4f  Runtime: %.2fs  Circuits: %d",
-    F_seeqst, t_seeqst, n_seeqst))
-println()
-
-# ── tSEEQST ────────────────────────────────────────────────────
-println("── tSEEQST ──")
-println()
-println(@sprintf("  %-8s  %-10s  %-12s  %-12s  %-10s  %-10s",
-    "t", "Circuits", "Fidelity", "F_bound", "Runtime", "Reduktion"))
-println("  " * "─"^65)
-
-rho_diag = real.(diag(rho_true))
-
-for t in [0.0, 0.02, 0.05, 0.1, 0.15, 0.2]
-    blocks_rel    = BlocksAboveThresholdQutrit(N, rho_diag, t)
-    hybrid_circs_rel = BuildHybridCircuitsQutrit(blocks_rel, N)
-    n_circ_t         = length(unique(String[
-        startswith(c,"E:")||startswith(c,"O:") ? c[3:end] : c
-        for g in hybrid_circs_rel for c in g if c != ""]))
-    fb            = FidelityBoundQutrit(rho_true, rho_diag, t)
-    reduktion     = (1 - n_circ_t / n_standard) * 100
-
-    t0      = time()
-    rho_rec = RecreatingDensityMatrixWithTSeeqstQutrit(
-        rho_true, shots, t; verbose=false)
-    t_t     = time() - t0
-    F       = fidelity(rho_rec, rho_true)
-
-    println(@sprintf("  t=%.2f   %-10d  %-12.4f  %-12.4f  %-10.2fs  %.1f%%",
-        t, n_circ_t, F, fb, t_t, reduktion))
-end
-println()
-
-# ── Zusammenfassung ────────────────────────────────────────────
-println("═"^65)
-println("Zusammenfassung")
-println("═"^65)
-println(@sprintf("  %-20s  %-10s  %-10s  %-10s",
-    "Methode", "Fidelity", "Circuits", "Runtime"))
-println("  " * "─"^55)
-println(@sprintf("  %-20s  %-10.4f  %-10d  %.2fs",
-    "Standard SEEQST", F_std, n_standard, t_std))
-println(@sprintf("  %-20s  %-10.4f  %-10d  %.2fs",
-    "SEEQST Hybrid",   F_seeqst, n_seeqst, t_seeqst))
-println("  tSEEQST: siehe Tabelle oben")
-println("═"^65)
+println("═"^55)
+println("N=5 Standard: übersprungen (Speicherlimit)")
